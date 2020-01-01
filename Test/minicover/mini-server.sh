@@ -1,4 +1,17 @@
 #!/bin/bash
+
+cd ..
+cd ..
+
+sln="solution.sln"
+if [ -f "$sln" ]
+then
+	echo "Performing minicover execution"
+else
+	echo "$sln not found."
+	exit 1
+fi
+
 dotnet restore
 dotnet build
 minicover instrument --workdir . --assemblies "Test/Test.SimpleAuth.Server/bin/**/SimpleAuth.Server.dll" --sources "SimpleAuth.Server/**/*.cs"
