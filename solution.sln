@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Server", "SimpleAuth.Server\SimpleAuth.Server.csproj", "{CB80837A-61BF-4AF1-B7E3-A2E5396206B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevTest", "DevTest\DevTest.csproj", "{45557A1A-D64A-46E7-A9F0-48EBF043562F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Core", "SimpleAuth.Core\SimpleAuth.Core.csproj", "{75A02AD6-918A-42C8-9746-EA1CF55D6A2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Shared", "SimpleAuth.Shared\SimpleAuth.Shared.csproj", "{D353D14C-F3E9-48EC-8FA0-C1C9543987CC}"
@@ -52,18 +50,6 @@ Global
 		{CB80837A-61BF-4AF1-B7E3-A2E5396206B8}.Release|x64.Build.0 = Release|Any CPU
 		{CB80837A-61BF-4AF1-B7E3-A2E5396206B8}.Release|x86.ActiveCfg = Release|Any CPU
 		{CB80837A-61BF-4AF1-B7E3-A2E5396206B8}.Release|x86.Build.0 = Release|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Debug|x64.Build.0 = Debug|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Debug|x86.Build.0 = Debug|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Release|x64.ActiveCfg = Release|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Release|x64.Build.0 = Release|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Release|x86.ActiveCfg = Release|Any CPU
-		{45557A1A-D64A-46E7-A9F0-48EBF043562F}.Release|x86.Build.0 = Release|Any CPU
 		{75A02AD6-918A-42C8-9746-EA1CF55D6A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{75A02AD6-918A-42C8-9746-EA1CF55D6A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75A02AD6-918A-42C8-9746-EA1CF55D6A2D}.Debug|x64.ActiveCfg = Debug|Any CPU
