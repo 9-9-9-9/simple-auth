@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19249.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.1" />
+      <PackageReference Include="Toolbelt.EntityFrameworkCore.IndexAttribute" Version="3.0.0" />
+      <PackageReference Include="Toolbelt.EntityFrameworkCore.IndexAttribute.Attribute" Version="1.1.0.4" />
+    </ItemGroup>
+
+</Project>

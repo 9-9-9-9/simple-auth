@@ -1,0 +1,11 @@
+*.user
+obj/
+bin/
+.vs/
+.idea/
+*/Migrations/*
+*/*/Migrations/*
+*.db
+*.db-*
+Test/CodeCoverageResult*
+coverage*
