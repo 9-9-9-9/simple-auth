@@ -3,7 +3,7 @@ Code coverage: 71%
 # SimpleAuth
 ## A lightweighted Authorization server, integrated with external Authentication providers
 
-// TODO
+// TODO: Motivation & The reason behind
 
 ## Getting Started
 
