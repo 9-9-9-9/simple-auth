@@ -53,7 +53,8 @@ namespace SimpleAuthServer
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //TODO HTTPS
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
             
