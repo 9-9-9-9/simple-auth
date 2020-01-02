@@ -7,7 +7,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
-      <ProjectReference Include="..\Test\Test.SimpleAuth.Shared\Test.SimpleAuth.Shared.csproj" />
+      <ProjectReference Include="..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
     </ItemGroup>
 
 </Project>
