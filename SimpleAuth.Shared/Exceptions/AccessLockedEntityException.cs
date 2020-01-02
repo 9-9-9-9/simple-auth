@@ -9,7 +9,7 @@ namespace SimpleAuth.Shared.Exceptions
         {
         }
         
-        public AccessLockedEntityException(IEnumerable<object> entities) : base(string.Join(',', entities.DropNull()))
+        public AccessLockedEntityException(IEnumerable<object> entities) : base(string.Join(",", entities.DropNull()))
         {
         }
     }

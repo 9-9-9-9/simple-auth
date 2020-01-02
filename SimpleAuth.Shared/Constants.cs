@@ -3,6 +3,7 @@ namespace SimpleAuth.Shared
     public static class Constants
     {
         public const string SplitterSubModules = "|";
+        public const char chSplitterSubModules = '|';
         public const string WildCard = "*";
         public const string SplitterRoleParts = ".";
 
