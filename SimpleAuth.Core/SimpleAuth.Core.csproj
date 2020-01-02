@@ -8,8 +8,4 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Root" />
-    </ItemGroup>
-
 </Project>

@@ -1,7 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.Claims;
 
 namespace SimpleAuth.Shared.Models
 {
@@ -20,6 +22,7 @@ namespace SimpleAuth.Shared.Models
         public string Corp { get; set; }
         public string Email { get; set; }
         public RoleModel[] ActiveRoles { get; set; }
+        public Claim[] Claims => ActiveRoles.Select(x => x.ToClaim()).ToArray();
         
         public GoogleTokenResponseResult GoogleToken { get; set; }
         public long? TokenExpireAfterSeconds { get; set; }

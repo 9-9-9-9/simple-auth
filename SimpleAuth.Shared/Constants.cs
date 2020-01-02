@@ -28,5 +28,10 @@ namespace SimpleAuth.Shared
             public const string PrivateKeyName = "Rsa2048PrivateKey";
             public const int KeySize = 2048;
         }
+
+        public static class Identity
+        {
+            public const string Issuer = "SA";
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost("{userId}/password")]
-        public IActionResult CheckPass(string userId, [FromQuery] string password)
+        public IActionResult CheckPass(string userId, [FromBody] string password)
         {
             return ProcedureDefaultResponseIfError(() =>
             {
@@ -81,7 +81,7 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPut, HttpPatch("{userId}/password")]
-        public async Task<IActionResult> ChangePass(string userId, [FromQuery] string newPassword)
+        public async Task<IActionResult> ChangePass(string userId, [FromBody] string newPassword)
         {
             var vr = _userValidationService.IsValidPassword(newPassword);
             if (!vr.IsValid)

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using SimpleAuth.Shared.Enums;
 
 namespace SimpleAuth.Shared.Models
@@ -38,6 +39,11 @@ namespace SimpleAuth.Shared.Models
                 Role = role.RoleId,
                 Permission = role.Permission.Serialize()
             };
+        }
+
+        public Claim ToClaim()
+        {
+            return new Claim(Role, Permission, "Byte", Constants.Identity.Issuer);
         }
     }
 
