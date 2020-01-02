@@ -1,6 +1,6 @@
 using System;
-using System.Net.Http;
 using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared;
 
 namespace SimpleAuth.Client.Utils
 {
@@ -9,7 +9,7 @@ namespace SimpleAuth.Client.Utils
         public string Url { get; private set; }
         public bool UseCorpToken { get; set; }
         public bool UseAppToken { get; set; }
-        public HttpMethod HttpMethod { get; set; } = HttpMethod.Post;
+        public string HttpMethod { get; set; } = Constants.HttpMethods.POST;
 
         public RequestBuilder(string url)
         {
@@ -18,7 +18,7 @@ namespace SimpleAuth.Client.Utils
             Url = url.TrimEnd('/');
         }
 
-        public RequestBuilder Method(HttpMethod httpMethod)
+        public RequestBuilder Method(string httpMethod)
         {
             HttpMethod = httpMethod;
             return this;

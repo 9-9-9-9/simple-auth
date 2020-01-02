@@ -42,9 +42,9 @@ namespace SimpleAuth.Client.Services
             if (!payload.IsBlank())
             {
                 if (
-                    HttpMethod.Get == requestBuilder.HttpMethod
+                    Constants.HttpMethods.GET == requestBuilder.HttpMethod
                     ||
-                    HttpMethod.Delete == requestBuilder.HttpMethod
+                    Constants.HttpMethods.DELETE == requestBuilder.HttpMethod
                 )
                 {
                     throw new NotSupportedException(
@@ -59,19 +59,17 @@ namespace SimpleAuth.Client.Services
             var requestUrl = requestBuilder.Url;
             HttpResponseMessage response;
 
-            if (HttpMethod.Get == requestBuilder.HttpMethod)
+            if (Constants.HttpMethods.GET == requestBuilder.HttpMethod)
                 response = await httpClient.GetAsync(requestUrl);
-            else if (HttpMethod.Post == requestBuilder.HttpMethod)
+            else if (Constants.HttpMethods.POST == requestBuilder.HttpMethod)
                 response = await httpClient.PostAsync(requestUrl, httpContent);
-            else if (HttpMethod.Put == requestBuilder.HttpMethod)
+            else if (Constants.HttpMethods.PUT == requestBuilder.HttpMethod)
                 response = await httpClient.PutAsync(requestUrl, httpContent);
-            else if (HttpMethod.Patch == requestBuilder.HttpMethod)
-                response = await httpClient.PatchAsync(requestUrl, httpContent);
-            else if (HttpMethod.Delete == requestBuilder.HttpMethod)
+            else if (Constants.HttpMethods.DELETE == requestBuilder.HttpMethod)
                 response = await httpClient.DeleteAsync(requestUrl);
             else
                 throw new NotSupportedException(
-                    $"{requestBuilder.HttpMethod.Method} is not being supported by this function <{nameof(DoHttpRequestAsync)}>");
+                    $"{requestBuilder.HttpMethod} is not being supported by this function <{nameof(DoHttpRequestAsync)}>");
 
             TResult responseContent = default;
             if (response.IsSuccessStatusCode)

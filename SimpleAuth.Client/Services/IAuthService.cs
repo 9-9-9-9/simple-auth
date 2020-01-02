@@ -1,7 +1,7 @@
-using System.Net.Http;
 using System.Threading.Tasks;
 using SimpleAuth.Client.InternalExtensions;
 using SimpleAuth.Client.Utils;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.Services
@@ -33,7 +33,7 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
                 .Append(EndpointConstants.User.GetActiveRoles(userId))
-                .Method(HttpMethod.Get)
+                .Method(Constants.HttpMethods.GET)
                 .WithAppToken()
             );
         }
@@ -43,7 +43,7 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
                 .Append(EndpointConstants.User.CheckPass(userId))
-                .Method(HttpMethod.Post)
+                .Method(Constants.HttpMethods.POST)
                 .WithAppToken(),
                 password
             );
@@ -54,7 +54,7 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
                     .Append(EndpointConstants.User.CheckGoogleToken(loginByGoogleRequest.Email))
-                    .Method(HttpMethod.Post)
+                    .Method(Constants.HttpMethods.POST)
                     .WithAppToken(),
                 loginByGoogleRequest.JsonSerialize()
             );

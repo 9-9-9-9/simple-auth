@@ -73,7 +73,7 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpPost, HttpPut, HttpPatch, Route("{name}/lock")]
+        [HttpPost, HttpPut, Route("{name}/lock")]
         public async Task<IActionResult> UpdateLock(string name)
         {
             var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);

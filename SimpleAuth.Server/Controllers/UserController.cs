@@ -35,7 +35,7 @@ namespace SimpleAuth.Server.Controllers
             _userValidationService = userValidationService;
         }
 
-        [HttpPost, HttpPut, HttpPatch, Route("{userId}/lock")]
+        [HttpPost, HttpPut, Route("{userId}/lock")]
         public async Task<IActionResult> LockUser(string userId)
         {
             var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
@@ -80,7 +80,7 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        [HttpPut, HttpPatch("{userId}/password")]
+        [HttpPut("{userId}/password")]
         public async Task<IActionResult> ChangePass(string userId, [FromBody] string newPassword)
         {
             var vr = _userValidationService.IsValidPassword(newPassword);
