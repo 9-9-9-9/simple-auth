@@ -12,6 +12,7 @@ namespace SimpleAuth.Repositories
         public DbSet<User> Users { get; set; }
         public DbSet<LocalUserInfo> LocalUserInfos { get; set; }
         public DbSet<RoleGroupUser> RoleGroupUsers { get; set; }
+        public DbSet<TokenInfo> TokenInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
