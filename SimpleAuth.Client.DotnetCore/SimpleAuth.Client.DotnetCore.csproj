@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
         <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
       <ProjectReference Include="..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
-      <ProjectReference Include="..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
+      <ProjectReference Include="..\Test\Test.SimpleAuth.Shared\Test.SimpleAuth.Shared.csproj" />
     </ItemGroup>
 
 </Project>

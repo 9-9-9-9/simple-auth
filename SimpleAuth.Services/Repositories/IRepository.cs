@@ -53,7 +53,7 @@ namespace SimpleAuth.Repositories
 
         public virtual async Task<int> CreateManyAsync(IEnumerable<TEntity> entities)
         {
-            await using var ctx = OpenConnect();
+            using var ctx = OpenConnect();
             var dbSet = ctx.Set<TEntity>();
             foreach (var entity in entities)
                 await dbSet.AddAsync(entity);
@@ -109,7 +109,7 @@ namespace SimpleAuth.Repositories
 
         public virtual async Task<int> UpdateManyAsync(IEnumerable<TEntity> entities)
         {
-            await using var ctx = OpenConnect();
+            using var ctx = OpenConnect();
             var dbSet = ctx.Set<TEntity>();
 
             foreach (var entity in entities)
@@ -120,7 +120,7 @@ namespace SimpleAuth.Repositories
 
         public virtual async Task<int> DeleteManyAsync(IEnumerable<TEntity> entities)
         {
-            await using var ctx = OpenConnect();
+            using var ctx = OpenConnect();
             var dbSet = ctx.Set<TEntity>();
             foreach (var entity in entities)
                 dbSet.Remove(entity);
@@ -129,7 +129,7 @@ namespace SimpleAuth.Repositories
 
         public async Task TruncateTable()
         {
-            await using var ctx = OpenConnect();
+            using var ctx = OpenConnect();
             var dbSet = ctx.Set<TEntity>();
             dbSet.RemoveRange(dbSet);
             await ctx.SaveChangesAsync();

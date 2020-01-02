@@ -56,7 +56,7 @@ namespace SimpleAuth.Repositories
 
         public async Task<int> UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles)
         {
-            await using var ctx = OpenConnect();
+            using var ctx = OpenConnect();
             var dbGroups = ctx.Set<RoleGroup>();
             var dbRecords = ctx.Set<RoleRecord>();
 
@@ -81,7 +81,7 @@ namespace SimpleAuth.Repositories
         public override async Task<int> DeleteManyAsync(IEnumerable<RoleGroup> entities)
         {
             var ids = entities.Select(e => e.Id).Distinct().ToList();
-            await using var ctx = OpenConnect();
+            using var ctx = OpenConnect();
 
             var gSet = ctx.Set<RoleGroup>();
             var queryable = Include(gSet);
