@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleAuth.Client.AspNetCore.Middlewares;
+using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.DependencyInjection;
@@ -33,7 +34,9 @@ namespace WebApiPlayground
             });
 
             //TODO to extension
-            services.RegisterModules<BasicServiceModules>();
+            services
+                .RegisterModules<BasicServiceModules>()
+                .UseTenantProvider<RuntimeTenantProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
+using SimpleAuth.Client.AspNetCore.Services;
+using SimpleAuth.Client.Models;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
@@ -47,6 +50,8 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         return;
                     }
 #endif
+
+                    var tenant = httpContext.RequestServices.GetService<ITenantProvider>().GetTenant(httpContext);
 
                     var saP = endpoint.Metadata.OfType<SaPermissionAttribute>().OrEmpty().ToList();
                     if (saP.IsAny())

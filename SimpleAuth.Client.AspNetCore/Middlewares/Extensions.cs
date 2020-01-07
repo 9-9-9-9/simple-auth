@@ -2,7 +2,9 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Middlewares;
+using SimpleAuth.Client.AspNetCore.Services;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -36,6 +38,13 @@ namespace Microsoft.AspNetCore.Builder
             httpResponse.ContentType = contentType;
             await httpResponse.Body.WriteAsync(buffer);
             return httpResponse;
+        }
+
+        public static IServiceCollection UseTenantProvider<TTenantProvider>(this IServiceCollection serviceCollection)
+            where TTenantProvider : class, ITenantProvider
+        {
+            serviceCollection.AddTransient<ITenantProvider, TTenantProvider>();
+            return serviceCollection;
         }
     }
 }

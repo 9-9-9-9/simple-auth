@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleAuth.Client.AspNetCore.Middlewares;
@@ -26,7 +25,9 @@ namespace WebApiPlayground.Controllers
             _logger = logger;
         }
 
-        [HttpGet, SaPermission(Permission.View, "b"), SaPermission(Permission.View, "a")]
+        [HttpGet]
+        [SaPermission(Permission.View, "a")]
+        [SaPermission(Permission.View, "b")]
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
