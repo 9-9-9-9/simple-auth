@@ -127,7 +127,7 @@ namespace SimpleAuth.Services
 
         public async Task UpdateLockStatusAsync(RoleGroup roleGroup)
         {
-            var entity = GetEntity(roleGroup);
+            var entity = await GetEntity(roleGroup);
             entity.Locked = roleGroup.Locked;
 
             _cachedUserRolesRepository.Clear(entity.Corp, entity.App);
@@ -208,19 +208,18 @@ namespace SimpleAuth.Services
 
             _cachedUserRolesRepository.Clear(roleGroup.Corp, roleGroup.App);
 
-            await Repository.UpdateRoleRecordsAsync(GetEntity(roleGroup), newRoles);
+            await Repository.UpdateRoleRecordsAsync(await GetEntity(roleGroup), newRoles);
 
             roleGroup.Roles = newRoles.Select(r => r.ToDomainObject()).ToArray();
         }
 
-        private Entities.RoleGroup GetEntity(RoleGroup roleGroup)
+        private async Task<Entities.RoleGroup> GetEntity(RoleGroup roleGroup)
         {
-            var entity = Repository.Find(x => x.Name == roleGroup.Name
-                                              && x.Corp == roleGroup.Corp
-                                              && x.App == roleGroup.App, new FindOptions
-            {
-                Take = 1,
-            }).FirstOrDefault();
+            var entity = await Repository.FindSingleAsync(x =>
+                x.Name == roleGroup.Name
+                && x.Corp == roleGroup.Corp
+                && x.App == roleGroup.App
+            );
             if (entity == null)
                 throw new EntityNotExistsException(roleGroup.Name);
             return entity;

@@ -13,10 +13,12 @@ namespace SimpleAuth.Repositories
     {
         Task<int> CreateManyAsync(IEnumerable<TEntity> entities);
 
-        IEnumerable<TEntity> FindMany(IEnumerable<Expression<Func<TEntity, bool>>> expressions, 
+        Task<TEntity> FindSingleAsync(IEnumerable<Expression<Func<TEntity, bool>>> expressions);
+
+        IEnumerable<TEntity> FindMany(IEnumerable<Expression<Func<TEntity, bool>>> expressions,
             FindOptions findOptions = null);
 
-        IEnumerable<TEntity> FindManyOrdered<TKey>(IEnumerable<Expression<Func<TEntity, bool>>> expressions, 
+        IEnumerable<TEntity> FindManyOrdered<TKey>(IEnumerable<Expression<Func<TEntity, bool>>> expressions,
             FindOptions findOptions = null,
             OrderByOptions<TEntity, TKey> orderByOption = null);
 
@@ -28,7 +30,9 @@ namespace SimpleAuth.Repositories
 
     public enum OrderDirection
     {
-        Default = 0, Asc = 0, Desc = 1
+        Default = 0,
+        Asc = 0,
+        Desc = 1
     }
 
     public interface IRepository<TEntity, in TEntityKey> : IRepository<TEntity> where TEntity : BaseEntity<TEntityKey>
@@ -60,7 +64,20 @@ namespace SimpleAuth.Repositories
             return await ctx.SaveChangesAsync();
         }
 
-        public virtual IEnumerable<TEntity> FindMany(IEnumerable<Expression<Func<TEntity, bool>>> expressions, 
+        public async Task<TEntity> FindSingleAsync(IEnumerable<Expression<Func<TEntity, bool>>> expressions)
+        {
+            await using var ctx = OpenConnect();
+            var dbSet = Include(ctx.Set<TEntity>());
+
+            return await expressions
+                .Aggregate(
+                    dbSet,
+                    (current, expression) => current.Where(expression)
+                )
+                .SingleOrDefaultAsync();
+        }
+
+        public virtual IEnumerable<TEntity> FindMany(IEnumerable<Expression<Func<TEntity, bool>>> expressions,
             FindOptions findOptions = null)
         {
             using var ctx = OpenConnect();
@@ -68,39 +85,41 @@ namespace SimpleAuth.Repositories
             return FindManyQueryBuilder(dbSet, expressions, findOptions).ToImmutableArray();
         }
 
-        public virtual IEnumerable<TEntity> FindManyOrdered<TKey>(IEnumerable<Expression<Func<TEntity, bool>>> expressions, 
+        public virtual IEnumerable<TEntity> FindManyOrdered<TKey>(
+            IEnumerable<Expression<Func<TEntity, bool>>> expressions,
             FindOptions findOptions = null,
             OrderByOptions<TEntity, TKey> orderByOption = null)
         {
             using var ctx = OpenConnect();
             var dbSet = Include(ctx.Set<TEntity>());
             var queryable = FindManyQueryBuilder(dbSet, expressions, findOptions);
-            
+
             if (orderByOption?.Expression != null)
             {
-                if (orderByOption.Direction == OrderDirection.Desc) 
+                if (orderByOption.Direction == OrderDirection.Desc)
                     queryable = queryable.OrderByDescending(orderByOption.Expression);
                 else
                     queryable = queryable.OrderBy(orderByOption.Expression);
             }
-            
+
             return queryable.ToImmutableArray();
         }
 
         private IQueryable<TEntity> FindManyQueryBuilder(IQueryable<TEntity> queryable,
-            IEnumerable<Expression<Func<TEntity, bool>>> expressions, 
+            IEnumerable<Expression<Func<TEntity, bool>>> expressions,
             FindOptions findOptions = null)
         {
             findOptions ??= new FindOptions();
 
             queryable = expressions
-                .Aggregate(queryable,
-                    (current, expression)
-                        => current.Where(expression));
-            
+                .Aggregate(
+                    queryable,
+                    (current, expression) => current.Where(expression)
+                );
+
             if (findOptions.Skip > 0)
                 queryable = queryable.Skip(findOptions.Skip);
-            
+
             if (findOptions.Take > 0)
                 queryable = queryable.Take(findOptions.Take);
 
@@ -179,15 +198,21 @@ namespace SimpleAuth.Repositories
         }
 
         public static IEnumerable<TEntity> FindOrdered<TEntity, TKey>(this IRepository<TEntity> repository,
-            Expression<Func<TEntity, bool>> expression, 
+            Expression<Func<TEntity, bool>> expression,
             FindOptions findOptions = null,
             OrderByOptions<TEntity, TKey> orderByOption = null) where TEntity : BaseEntity
         {
             return repository.FindManyOrdered(new[] {expression}, findOptions, orderByOption);
         }
 
+        public static async Task<TEntity> FindSingleAsync<TEntity>(this IRepository<TEntity> repository,
+            Expression<Func<TEntity, bool>> expression) where TEntity : BaseEntity
+        {
+            return await repository.FindSingleAsync(new[] {expression});
+        }
+
         public static IEnumerable<TEntity> Find<TEntity>(this IRepository<TEntity> repository,
-            Expression<Func<TEntity, bool>> expression, 
+            Expression<Func<TEntity, bool>> expression,
             FindOptions findOptions = null) where TEntity : BaseEntity
         {
             return repository.FindMany(new[] {expression}, findOptions);
