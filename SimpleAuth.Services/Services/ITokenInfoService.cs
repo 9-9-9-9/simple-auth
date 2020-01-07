@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
@@ -26,17 +25,13 @@ namespace SimpleAuth.Services
 
         public async Task<int> IncreaseVersionAsync(TokenInfo tokenInfo)
         {
-            var entity = Repository
-                .Find(x =>
-                        x.Corp == tokenInfo.Corp
-                        &&
-                        x.App == tokenInfo.App,
-                    new FindOptions
-                    {
-                        Take = 1
-                    }
-                ).FirstOrDefault();
-            if (entity == null)
+            var entity = await Repository
+                .FindSingleAsync(x =>
+                    x.Corp == tokenInfo.Corp
+                    &&
+                    x.App == tokenInfo.App
+                );
+            if (entity == default)
             {
                 entity = new Entities.TokenInfo
                 {

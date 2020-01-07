@@ -84,9 +84,12 @@ namespace SimpleAuth.Services
 
         public async Task AddRoleGroupAsync(CreateRoleGroupModel newRoleGroup)
         {
-            if (Repository.Find(x => x.Name == newRoleGroup.Name
-                                     && x.Corp == newRoleGroup.Corp
-                                     && x.App == newRoleGroup.App, new FindOptions {Take = 1}).Any())
+            var findSingleAsync = await Repository.FindSingleAsync(x =>
+                x.Name == newRoleGroup.Name
+                && x.Corp == newRoleGroup.Corp
+                && x.App == newRoleGroup.App
+            );
+            if (findSingleAsync != default)
             {
                 throw new EntityAlreadyExistsException(newRoleGroup.Name);
             }
