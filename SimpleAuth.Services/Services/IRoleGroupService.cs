@@ -120,7 +120,7 @@ namespace SimpleAuth.Services
                 App = newRoleGroup.App,
                 Locked = false,
                 RoleRecords = initRoles
-                    .Select(r => BaseEntityExtensions.WithRandomId(r.ToEntityObject()))
+                    .Select(r => r.ToEntityObject().WithRandomId())
                     .ToList()
             });
         }
