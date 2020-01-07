@@ -56,18 +56,21 @@ namespace SimpleAuth.Repositories
 
         public async Task<int> UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles)
         {
-            using var ctx = OpenConnect();
+            await using var ctx = OpenConnect();
             var dbGroups = ctx.Set<RoleGroup>();
             var dbRecords = ctx.Set<RoleRecord>();
 
+            roleGroup = await Include(dbGroups).SingleAsync(x => x.Id == roleGroup.Id);
+            
             if (roleGroup.RoleRecords.IsAny())
-            {
                 dbRecords.RemoveRange(roleGroup.RoleRecords);
-            }
 
             if (newRoles.IsAny())
             {
-                newRoles.ForEach(r => { ctx.Entry(r).State = EntityState.Added; });
+                newRoles.ForEach(r =>
+                {
+                    ctx.Entry(r).State = EntityState.Added;
+                });
                 await dbRecords.AddRangeAsync(newRoles);
             }
 
@@ -81,7 +84,7 @@ namespace SimpleAuth.Repositories
         public override async Task<int> DeleteManyAsync(IEnumerable<RoleGroup> entities)
         {
             var ids = entities.Select(e => e.Id).Distinct().ToList();
-            using var ctx = OpenConnect();
+            await using var ctx = OpenConnect();
 
             var gSet = ctx.Set<RoleGroup>();
             var queryable = Include(gSet);
