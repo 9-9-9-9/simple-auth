@@ -38,6 +38,7 @@ namespace SimpleAuth.Repositories
     public interface IRepository<TEntity, in TEntityKey> : IRepository<TEntity> where TEntity : BaseEntity<TEntityKey>
     {
         TEntity Find(TEntityKey id);
+        Task<TEntity> FindAsync(TEntityKey id);
     }
 
     public abstract class Repository<TEntity> : IRepository<TEntity>
@@ -128,7 +129,7 @@ namespace SimpleAuth.Repositories
 
         public virtual async Task<int> UpdateManyAsync(IEnumerable<TEntity> entities)
         {
-            using var ctx = OpenConnect();
+            await using var ctx = OpenConnect();
             var dbSet = ctx.Set<TEntity>();
 
             foreach (var entity in entities)
@@ -173,7 +174,14 @@ namespace SimpleAuth.Repositories
         {
             using var ctx = OpenConnect();
             var dbSet = Include(ctx.Set<TEntity>());
-            return dbSet.FirstOrDefault(e => e.Id.Equals(id));
+            return dbSet.SingleOrDefault(e => e.Id.Equals(id));
+        }
+
+        public async Task<TEntity> FindAsync(TEntityKey id)
+        {
+            await using var ctx = OpenConnect();
+            var dbSet = Include(ctx.Set<TEntity>());
+            return await dbSet.SingleOrDefaultAsync(e => e.Id.Equals(id));   
         }
     }
 

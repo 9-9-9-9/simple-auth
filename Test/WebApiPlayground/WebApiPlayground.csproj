@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\SimpleAuth.Client.AspNetCore\SimpleAuth.Client.AspNetCore.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

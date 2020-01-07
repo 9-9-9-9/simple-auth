@@ -8,6 +8,7 @@ using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
+using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
 using Role = SimpleAuth.Shared.Domains.Role;
@@ -24,6 +25,7 @@ namespace SimpleAuth.Services
         Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromAllGroups(User user, string corp);
         ICollection<Role> GetActiveRoles(string user, string corp, string app, string env = null, string tenant = null);
+        Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app, string env = null, string tenant = null);
         Task UpdateLockStatusAsync(User user);
         Task UpdatePasswordAsync(User user);
     }
@@ -262,6 +264,89 @@ namespace SimpleAuth.Services
                 .ToList();
 
             return roles;
+        }
+
+        public async Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app,
+            string env = null, string tenant = null)
+        {
+            if (permission == Permission.None)
+                throw new ArgumentException(nameof(permission));
+            
+            var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
+
+            var permissionsOfSameRoleRecord = roleRecords
+                .Where(x => x.RoleId == roleId)
+                .ToList();
+
+            if (permissionsOfSameRoleRecord.IsEmpty())
+                return false;
+
+            var isThisRoleLocked = await _roleRepository.FindSingleAsync(new Expression<Func<Entities.Role, bool>>[]
+            {
+                x =>
+                    x.Corp == corp
+                    &&
+                    x.App == app
+                    &&
+                    x.Locked
+                    &&
+                    x.Id == roleId
+            }) != default;
+
+            if (isThisRoleLocked)
+                return false;
+
+            var roles = permissionsOfSameRoleRecord
+                .Select(x => x.ToDomainObject())
+                .DistinctRoles()
+                .ToList();
+            
+            return roles.First().Permission.HasFlag(permission);
+        }
+
+        private async Task<IEnumerable<RoleRecord>> FindRoleRecordsBasedOnFilterAsync(string userId, string corp, string app, string env, string tenant)
+        {
+            if (userId.IsBlank())
+                throw new ArgumentNullException(nameof(userId));
+
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+
+            if (app.IsBlank())
+                throw new ArgumentNullException(nameof(app));
+
+            if (Constants.WildCard.Equals(env))
+                throw new ArgumentException($"{nameof(env)}: filter does not accept wildcard");
+
+            if (Constants.WildCard.Equals(tenant))
+                throw new ArgumentException($"{nameof(tenant)}: filter does not accept wildcard");
+
+            var user = await Repository.FindAsync(userId);
+            var localUserInfo = user?.UserInfos?.FirstOrDefault(x => x.Corp == corp);
+            if (localUserInfo == null)
+                throw new EntityNotExistsException($"{userId} at {corp}");
+
+            var roleGroups = user.RoleGroupUsers
+                .Where(x =>
+                    x.RoleGroup.Corp == corp
+                    &&
+                    x.RoleGroup.App == app
+                    &&
+                    !x.RoleGroup.Locked
+                )
+                .Select(x => x.RoleGroup)
+                .ToList();
+
+            var roleRecords = roleGroups
+                .SelectMany(x => x.RoleRecords);
+
+            if (!env.IsBlank())
+                roleRecords = roleRecords.Where(rr => rr.Env == Constants.WildCard || rr.Env == env);
+
+            if (!tenant.IsBlank())
+                roleRecords = roleRecords.Where(rr => rr.Tenant == Constants.WildCard || rr.Tenant == tenant);
+            
+            return roleRecords;
         }
 
         public async Task UpdateLockStatusAsync(User user)
