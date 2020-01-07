@@ -3,10 +3,10 @@ namespace SimpleAuth.Shared
     public static class Constants
     {
         public const string SplitterSubModules = "|";
-        public const char chSplitterSubModules = '|';
+        public const char ChSplitterSubModules = '|';
         public const string WildCard = "*";
         public const string SplitterRoleParts = ".";
-        public const char chSplitterRoleParts = '.';
+        public const char ChSplitterRoleParts = '.';
 
         public static class Length
         {
@@ -28,8 +28,8 @@ namespace SimpleAuth.Shared
             public const string Section = "SA:Secret";
             public const string MasterTokenKey = "MasterTokenValue";
 
-            public const string PublicKeyName = "Rsa2048PublicKey";
-            public const string PrivateKeyName = "Rsa2048PrivateKey";
+            public static readonly string PublicKeyName = $"Rsa{KeySize}PublicKey";
+            public static readonly string PrivateKeyName = $"Rsa{KeySize}PrivateKey";
             public const int KeySize = 2048;
         }
 
@@ -49,11 +49,13 @@ namespace SimpleAuth.Shared
 
         public static class HttpMethods
         {
+            // ReSharper disable InconsistentNaming
             public const string GET = nameof(GET);
             public const string POST = nameof(POST);
             public const string PUT = nameof(PUT);
             //public const string PATCH = nameof(PATCH);
             public const string DELETE = nameof(DELETE);
+            // ReSharper restore InconsistentNaming
         }
     }
 }

@@ -28,7 +28,7 @@ namespace SimpleAuth.Shared.Utils
             if (takeFromRolePart > RolePart.Module)
                 throw new ArgumentException(nameof(takeFromRolePart));
 
-            var spl = text.Split(new[] {Constants.chSplitterRoleParts}, StringSplitOptions.None);
+            var spl = text.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
             if (spl.Length < 5) // invalid number of parts
                 throw new ArgumentException($"{nameof(text)} ({text})");
 

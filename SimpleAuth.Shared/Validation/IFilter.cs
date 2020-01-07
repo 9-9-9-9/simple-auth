@@ -205,7 +205,7 @@ namespace SimpleAuth.Shared.Validation
             if (!vr.IsValid)
                 return vr;
 
-            foreach (var part in src.Split(Constants.chSplitterSubModules))
+            foreach (var part in src.Split(Constants.ChSplitterSubModules))
             {
                 vr = new FilterSubModulePartInput().IsValid(part);
                 if (!vr.IsValid)
