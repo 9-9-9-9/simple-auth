@@ -41,9 +41,9 @@ namespace SimpleAuth.Shared.Models
             };
         }
 
-        public Claim ToClaim()
+        public ModuleClaim ToClaim()
         {
-            return new Claim(Role, Permission, "Byte", Constants.Identity.Issuer);
+            return new ModuleClaim(this, Constants.Identity.Issuer);
         }
     }
 

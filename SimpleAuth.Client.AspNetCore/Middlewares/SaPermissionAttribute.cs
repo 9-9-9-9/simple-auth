@@ -1,5 +1,4 @@
 using System;
-using Microsoft.AspNetCore.Mvc.Filters;
 using SimpleAuth.Shared.Enums;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
