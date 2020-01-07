@@ -6,9 +6,11 @@ using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAuth.Services.Entities
 {
-    public partial class RoleRecord : BaseEntity<Guid>, IPermissionRelated
+    public partial class RoleRecord : BaseEntity<Guid>, IEnvRelated, ITenantRelated, IPermissionRelated
     {
         [Index, Required] public string RoleId { get; set; }
+        [Index, Required] public string Env { get; set; }
+        [Index, Required] public string Tenant { get; set; }
         public Permission Permission { get; set; }
     }
 

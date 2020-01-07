@@ -16,6 +16,8 @@ namespace SimpleAuth.Shared
 
         public static class Headers
         {
+            public const string FilterByEnv = "x-accept-env";
+            public const string FilterByTenant = "x-accept-tenant";
             public const string AppPermission = "x-app-token";
             public const string CorpPermission = "x-corp-token";
             public const string MasterToken = "x-master-token";

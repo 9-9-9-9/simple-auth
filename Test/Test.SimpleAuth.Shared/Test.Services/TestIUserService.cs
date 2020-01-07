@@ -52,7 +52,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             await AddRoleAsync(rSvc, randomCorp1, "a", "e", "t", "m12");
             await AddRoleAsync(rSvc, randomCorp1, "a", "e", "t", "m20");
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("g1", randomCorp1, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("g1", randomCorp1, "a"), new[]
             {
                 new RoleModel
                 {
@@ -67,7 +67,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 }
             });
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("g2", randomCorp1, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("g2", randomCorp1, "a"), new[]
             {
                 new RoleModel
                 {
@@ -118,7 +118,8 @@ namespace Test.SimpleAuth.Shared.Test.Services
         public async Task CreateUserAsync(bool expectCreated, Type expectedException, string userId, string corp,
             string password, int expectedNumberOfCorps)
         {
-            await Truncate<global::SimpleAuth.Services.Entities.LocalUserInfo, global::SimpleAuth.Services.Entities.User>(nameof(CreateUserAsync));
+            await Truncate<global::SimpleAuth.Services.Entities.LocalUserInfo, global::SimpleAuth.Services.Entities.User
+            >(nameof(CreateUserAsync));
 
             var svc = Svc<IUserService>();
             try
@@ -183,7 +184,8 @@ namespace Test.SimpleAuth.Shared.Test.Services
         {
             #region Setup
 
-            await Truncate<RoleGroupUser, global::SimpleAuth.Services.Entities.LocalUserInfo, global::SimpleAuth.Services.Entities.User, RoleRecord, RoleGroup>(nameof(AssignUserToGroups));
+            await Truncate<RoleGroupUser, global::SimpleAuth.Services.Entities.LocalUserInfo,
+                global::SimpleAuth.Services.Entities.User, RoleRecord, RoleGroup>(nameof(AssignUserToGroups));
             var uSvc = Svc<IUserService>();
             ExecuteOne(nameof(AssignUserToGroups), async () =>
             {
@@ -245,7 +247,8 @@ namespace Test.SimpleAuth.Shared.Test.Services
         {
             #region Setup
 
-            await Truncate<RoleGroupUser, global::SimpleAuth.Services.Entities.LocalUserInfo, global::SimpleAuth.Services.Entities.User, RoleRecord, RoleGroup>(nameof(UnAssignUserFromGroups));
+            await Truncate<RoleGroupUser, global::SimpleAuth.Services.Entities.LocalUserInfo,
+                global::SimpleAuth.Services.Entities.User, RoleRecord, RoleGroup>(nameof(UnAssignUserFromGroups));
             var uSvc = Svc<IUserService>();
             ExecuteOne(nameof(UnAssignUserFromGroups), async () =>
             {
@@ -340,8 +343,9 @@ namespace Test.SimpleAuth.Shared.Test.Services
             await AssignUserToGroups(uSvc, user.Id, $"g1.{randomCorp1}.a", $"g2.{randomCorp1}.a");
             await AssignUserToGroups(uSvc, user.Id, $"g3.{randomCorp2}.a");
 
-            
-            Assert.That(async () => await uSvc.UnAssignUserFromAllGroups(user, null), Throws.TypeOf<ArgumentNullException>());
+
+            Assert.That(async () => await uSvc.UnAssignUserFromAllGroups(user, null),
+                Throws.TypeOf<ArgumentNullException>());
 
             await uSvc.UnAssignUserFromAllGroups(user, randomCorp1);
 
@@ -385,7 +389,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             await AddRoleAsync(rSvc, corp, "a", "nl3", "*", "*");
 
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("gg", corp, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("gg", corp, "a"), new[]
             {
                 new RoleModel
                 {
@@ -399,7 +403,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 },
             });
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("gr", corp, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("gr", corp, "a"), new[]
             {
                 new RoleModel
                 {
@@ -413,7 +417,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 },
             });
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("gl", corp, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("gl", corp, "a"), new[]
             {
                 new RoleModel
                 {
@@ -426,7 +430,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             l1.Locked = true;
             await rSvc.UpdateLockStatus(l1);
 
-            var gl = gSvc.GetRoleGroupByName("gl", corp, "a");
+            var gl = await gSvc.GetRoleGroupByName("gl", corp, "a");
             gl.Locked = true;
             await gSvc.UpdateLockStatusAsync(gl);
 
@@ -438,14 +442,95 @@ namespace Test.SimpleAuth.Shared.Test.Services
             Assert.IsNull(roles.FirstOrDefault(x => x.RoleId.Contains(".l1.")));
             Assert.IsNull(roles.FirstOrDefault(x => x.RoleId.Contains(".nl3.")));
             Assert.AreEqual(Permission.Crud, roles.First(x => x.RoleId.Contains(".nl1.")).Permission);
-            
+
             roles = uSvc.GetActiveRoles(user.Id, corp, "a");
             Assert.AreEqual(2, roles.Count);
 
-            Assert.That(() => uSvc.GetActiveRoles(user.Id, Guid.NewGuid().ToString(), "a"), Throws.TypeOf<EntityNotExistsException>());
+            Assert.That(() => uSvc.GetActiveRoles(user.Id, Guid.NewGuid().ToString(), "a"),
+                Throws.TypeOf<EntityNotExistsException>());
             Assert.That(() => uSvc.GetActiveRoles(null, corp, "a"), Throws.TypeOf<ArgumentNullException>());
             Assert.That(() => uSvc.GetActiveRoles(user.Id, null, "a"), Throws.TypeOf<ArgumentNullException>());
             Assert.That(() => uSvc.GetActiveRoles(user.Id, corp, null), Throws.TypeOf<ArgumentNullException>());
+        }
+
+        [Test]
+        public async Task GetActiveRoles_WithFilter()
+        {
+            var uSvc = Svc<IUserService>();
+            var rSvc = Svc<IRoleService>();
+            var gSvc = Svc<IRoleGroupService>();
+
+            #region Setup
+
+            var corp = Guid.NewGuid().ToString().Substring(5);
+            var user = new User
+            {
+                Id = "1",
+            };
+
+            await uSvc.CreateUserAsync(user,
+                new LocalUserInfo
+                {
+                    Corp = corp,
+                });
+
+            await AddRoleGroupAsync(gSvc, "g", corp, "a"); // all roles are not locked
+
+            await AssignUserToGroups(uSvc, user.Id, $"g.{corp}.a");
+
+            await AddRoleAsync(rSvc, corp, "a", "*", "*", "*");
+            await AddRoleAsync(rSvc, corp, "a", "e", "*", "*");
+            await AddRoleAsync(rSvc, corp, "a", "*", "t1", "*");
+            await AddRoleAsync(rSvc, corp, "a", "e", "t1", "*");
+            await AddRoleAsync(rSvc, corp, "a", "e", "t2", "*");
+
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("g", corp, "a"), new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp}.a.*.*.*",
+                    Permission = Permission.Crud.Serialize()
+                },
+                new RoleModel
+                {
+                    Role = $"{corp}.a.e.*.*",
+                    Permission = Permission.Crud.Serialize()
+                },
+                new RoleModel
+                {
+                    Role = $"{corp}.a.*.t1.*",
+                    Permission = Permission.Crud.Serialize()
+                },
+                new RoleModel
+                {
+                    Role = $"{corp}.a.e.t1.*",
+                    Permission = Permission.Crud.Serialize()
+                },
+                new RoleModel
+                {
+                    Role = $"{corp}.a.e.t2.*",
+                    Permission = Permission.Crud.Serialize()
+                }
+            });
+
+            #endregion
+
+            var roles = uSvc.GetActiveRoles(user.Id, corp, "a");
+            Assert.AreEqual(5, roles.Count);
+
+            Assert.That(() => uSvc.GetActiveRoles(user.Id, corp, "a", "*"), Throws.TypeOf<ArgumentException>());
+            
+            roles = uSvc.GetActiveRoles(user.Id, corp, "a", null, "t1");
+            Assert.AreEqual(4, roles.Count);
+            
+            roles = uSvc.GetActiveRoles(user.Id, corp, "a", null, "t2");
+            Assert.AreEqual(3, roles.Count);
+            
+            roles = uSvc.GetActiveRoles(user.Id, corp, "a", "e", "t2");
+            Assert.AreEqual(3, roles.Count);
+            
+            roles = uSvc.GetActiveRoles(user.Id, corp, "a", "e2", "t2");
+            Assert.AreEqual(1, roles.Count);
         }
 
         [Test]

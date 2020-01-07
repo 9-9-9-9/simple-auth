@@ -39,5 +39,12 @@ namespace SimpleAuth.Core.Extensions
         {
             return left.Equals(right, StringComparison.InvariantCultureIgnoreCase);
         }
+
+        public static string TrimToNull(this string text)
+        {
+            if (text == null) return null;
+            var trimmed = text.Trim();
+            return trimmed.Length == 0 ? null : trimmed;
+        }
     }
 }
