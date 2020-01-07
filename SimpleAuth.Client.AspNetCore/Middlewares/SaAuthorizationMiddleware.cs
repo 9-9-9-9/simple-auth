@@ -51,7 +51,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                     }
 #endif
 
-                    var tenant = httpContext.RequestServices.GetService<ITenantProvider>().GetTenant(httpContext);
+                    var requireTenant = httpContext.RequestServices.GetService<ITenantProvider>().GetTenant(httpContext);
 
                     var saP = endpoint.Metadata.OfType<SaPermissionAttribute>().OrEmpty().ToList();
                     if (saP.IsAny())
@@ -69,6 +69,8 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                                     .WithBody(roleFromModule);
                                 return;
                             }
+                            
+                            //TODO impl check tenant using claim
 
                             if (existingRole.Permission.HasFlag(permissionAttribute.Permission))
                             {

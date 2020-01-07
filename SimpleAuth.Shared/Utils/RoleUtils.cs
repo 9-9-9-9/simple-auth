@@ -34,5 +34,17 @@ namespace SimpleAuth.Shared.Utils
 
             return string.Join(Constants.SplitterRoleParts, spl.Skip((int) takeFromRolePart - 1));
         }
+
+        public static string TakeSinglePart(RolePart takeSinglePart, string text)
+        {
+            if ((int)takeSinglePart < 1 || (int)takeSinglePart > 6)
+                throw new ArgumentException(nameof(takeSinglePart));
+
+            var spl = text.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
+            if (spl.Length < 5) // invalid number of parts
+                throw new ArgumentException($"{nameof(text)} ({text})");
+
+            return spl[(int) takeSinglePart - 1];
+        }
     }
 }
