@@ -76,7 +76,12 @@ namespace SimpleAuth.Client.Services
             {
                 var responseContentString = await response.Content.ReadAsStringAsync();
                 if (responseContentString != null)
-                    responseContent = responseContentString.JsonDeserialize<TResult>();
+                {
+                    if (typeof(TResult) == typeof(string))
+                        responseContent = (TResult)(object)responseContentString;
+                    else
+                        responseContent = responseContentString.JsonDeserialize<TResult>();
+                }
             }
 
             return (response.IsSuccessStatusCode, response.StatusCode, responseContent);

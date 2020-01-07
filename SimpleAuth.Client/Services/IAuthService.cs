@@ -1,7 +1,10 @@
+using System.Net;
 using System.Threading.Tasks;
+using SimpleAuth.Client.Exceptions;
 using SimpleAuth.Client.InternalExtensions;
 using SimpleAuth.Client.Utils;
 using SimpleAuth.Shared;
+using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.Services
@@ -11,6 +14,7 @@ namespace SimpleAuth.Client.Services
         Task<ResponseUserModel> GetRolesAsync(string userId);
         Task<ResponseUserModel> LoginUsingPasswordAsync(string userId, string password);
         Task<ResponseUserModel> LoginUsingGoogleTokenAsync(LoginByGoogleRequest loginByGoogleRequest);
+        Task<bool> IsUserHavePermissionAsync(string userId, string roleId, Permission permission);
     }
 
     public class DefaultAuthService : ClientService, IAuthService
@@ -58,6 +62,21 @@ namespace SimpleAuth.Client.Services
                     .Method(Constants.HttpMethods.POST),
                 loginByGoogleRequest.JsonSerialize()
             );
+        }
+
+        public async Task<bool> IsUserHavePermissionAsync(string userId, string roleId, Permission permission)
+        {
+            var res = await _httpService.DoHttpRequestAsync<string>(
+                NewRequest()
+                    .Append(EndpointBuilder.User.CheckUserPermission(userId, roleId, permission.Serialize()))
+                    .Method(Constants.HttpMethods.GET), 
+                null
+            );
+            if (res.Item2 == HttpStatusCode.OK)
+                return true;
+            if (res.Item2 == HttpStatusCode.NotAcceptable)
+                return false;
+            throw new SimpleAuthHttpRequestException(res.Item2);
         }
     }
 }

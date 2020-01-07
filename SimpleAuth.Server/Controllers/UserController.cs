@@ -181,6 +181,24 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
+        [HttpGet, HttpPost, Route("{userId}/roles/{roleId}/{permission}")]
+        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
+        {
+            var filterRoleEnv = GetHeader(Constants.Headers.FilterByEnv);
+            var filterRoleTenant = GetHeader(Constants.Headers.FilterByTenant);
+            return await ProcedureDefaultResponseIfError(() =>
+                Service.IsHaveActivePermissionAsync(
+                    userId,
+                    roleId,
+                    permission.Deserialize(),
+                    RequestAppHeaders.Corp, RequestAppHeaders.App, filterRoleEnv, filterRoleTenant
+                ).ContinueWith(
+                    x => (x.Result ? StatusCodes.Status200OK : StatusCodes.Status406NotAcceptable)
+                        .WithEmpty()
+                )
+            );
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
         {
