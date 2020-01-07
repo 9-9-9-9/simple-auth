@@ -95,16 +95,12 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("{groupName}/roles")]
         public async Task<IActionResult> GetRoles(string groupName)
         {
-            /*
-            return await ProcedureResponseForArrayLookUp(() => Task.FromResult(
-                    FindRoleGroup(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
-                        .Roles
-                        .OrEmpty()
-                        .Select(RoleModel.Cast)
-                )
+            return await ProcedureResponseForArrayLookUp(() =>
+                FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
+                    .ContinueWith(x =>
+                        x.Result.Roles.OrEmpty().Select(RoleModel.Cast)
+                    )
             );
-            */
-            return null;
         }
 
         [HttpPost, HttpPut, Route("{groupName}/roles")]
