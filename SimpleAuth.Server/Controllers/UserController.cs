@@ -10,6 +10,7 @@ using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Server.Services;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
@@ -214,11 +215,14 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        private ResponseUserModel GetBaseResponseUserModel(string userId, string filterRoleEnv = null, string filterRoleTenant = null)
+        private ResponseUserModel GetBaseResponseUserModel(string userId)
         {
             var user = Service.GetUser(userId, RequestAppHeaders.Corp);
             if (user == null)
                 throw new EntityNotExistsException(userId);
+
+            var filterRoleEnv = GetHeader(Constants.Headers.FilterByEnv);
+            var filterRoleTenant = GetHeader(Constants.Headers.FilterByTenant);
 
             var activeRoles = Service.GetActiveRoles(userId, RequestAppHeaders.Corp, RequestAppHeaders.App, filterRoleEnv, filterRoleTenant);
             return new ResponseUserModel
