@@ -33,20 +33,18 @@ namespace SimpleAuth.Services
         private readonly IEncryptionService _encryptionService;
         private readonly IRoleGroupRepository _roleGroupRepository;
         private readonly IRoleGroupUserRepository _roleGroupUserRepository;
-        private readonly ICachedUserRolesRepository _cachedUserRolesRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly ILocalUserInfoRepository _localUserInfoRepository;
 
         public DefaultUserService(IServiceProvider serviceProvider, IEncryptionService encryptionService,
-            IRoleGroupRepository roleGroupRepository, IRoleGroupUserRepository roleGroupUserRepository,
-            ICachedUserRolesRepository cachedUserRolesRepository, IRoleRepository roleRepository,
-            ILocalUserInfoRepository localUserInfoRepository) : base(
-            serviceProvider)
+            IRoleGroupRepository roleGroupRepository, IRoleGroupUserRepository roleGroupUserRepository, 
+            IRoleRepository roleRepository,
+            ILocalUserInfoRepository localUserInfoRepository) : 
+            base(serviceProvider)
         {
             _encryptionService = encryptionService;
             _roleGroupRepository = roleGroupRepository;
             _roleGroupUserRepository = roleGroupUserRepository;
-            _cachedUserRolesRepository = cachedUserRolesRepository;
             _roleRepository = roleRepository;
             _localUserInfoRepository = localUserInfoRepository;
         }
@@ -134,8 +132,6 @@ namespace SimpleAuth.Services
             if (missingRoleGroups.Any())
                 throw new EntityNotExistsException(missingRoleGroups.Select(g => g.Name));
 
-            _cachedUserRolesRepository.Clear(corp, app);
-
             await Repository.AssignUserToGroups(new Entities.User
             {
                 Id = user.Id
@@ -169,8 +165,6 @@ namespace SimpleAuth.Services
                 throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
                     .Except(tobeRemoved.Select(g => g.RoleGroup.Name)));
 
-            _cachedUserRolesRepository.Clear(corp, app);
-
             await Repository.UnAssignUserFromGroups(new Entities.User
             {
                 Id = user.Id
@@ -190,11 +184,6 @@ namespace SimpleAuth.Services
                 return;
 
             var tobeRemoved = lookupUser.RoleGroupUsers.Where(rg => rg.RoleGroup.Corp == corp).ToList();
-
-            tobeRemoved.Select(x => (x.RoleGroup.Corp, x.RoleGroup.App)).Distinct().ToList().ForEach(x =>
-            {
-                _cachedUserRolesRepository.Clear(x.Corp, x.App);
-            });
 
             await Repository.UnAssignUserFromGroups(new Entities.User
                 {
@@ -223,10 +212,6 @@ namespace SimpleAuth.Services
 
             if (Constants.WildCard.Equals(tenant))
                 throw new ArgumentException($"{nameof(tenant)}: filter does not accept wildcard");
-
-            var cachedRoles = _cachedUserRolesRepository.Get(userId, corp, app) as List<Role>;
-            if (cachedRoles.IsAny())
-                return cachedRoles;
 
             var user = Repository.Find(userId);
             var localUserInfo = user?.UserInfos?.FirstOrDefault(x => x.Corp == corp);
@@ -275,8 +260,6 @@ namespace SimpleAuth.Services
                 .Where(x => !lockedRoles.Contains(x.RoleId))
                 .DistinctRoles()
                 .ToList();
-
-            _cachedUserRolesRepository.Push(roles, userId, corp, app);
 
             return roles;
         }

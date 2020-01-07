@@ -19,12 +19,8 @@ namespace SimpleAuth.Services
 
     public class DefaultRoleService : DomainService<IRoleRepository, Entities.Role>, IRoleService
     {
-        private readonly ICachedUserRolesRepository _cachedUserRolesRepository;
-
-        public DefaultRoleService(IServiceProvider serviceProvider,
-            ICachedUserRolesRepository cachedUserRolesRepository) : base(serviceProvider)
+        public DefaultRoleService(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _cachedUserRolesRepository = cachedUserRolesRepository;
         }
 
         public async Task AddRoleAsync(CreateRoleModel model)
@@ -34,8 +30,6 @@ namespace SimpleAuth.Services
             if (Repository.Find(entity.Id) != null)
                 throw new EntityAlreadyExistsException(entity.Id);
             
-            _cachedUserRolesRepository.Clear(entity.Corp, entity.App);
-
             await Repository.CreateAsync(entity);
         }
 
@@ -46,8 +40,6 @@ namespace SimpleAuth.Services
                 throw new EntityNotExistsException(role.RoleId);
 
             entity.Locked = role.Locked;
-            
-            _cachedUserRolesRepository.Clear(entity.Corp, entity.App);
             
             await Repository.UpdateAsync(entity);
         }

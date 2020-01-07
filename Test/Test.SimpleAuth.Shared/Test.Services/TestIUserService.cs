@@ -525,13 +525,12 @@ namespace Test.SimpleAuth.Shared.Test.Services
             
             roles = uSvc.GetActiveRoles(user.Id, corp, "a", null, "t2");
             Assert.AreEqual(3, roles.Count);
-            Assert.AreEqual(4, roles.Count);
             
             roles = uSvc.GetActiveRoles(user.Id, corp, "a", "e", "t2");
             Assert.AreEqual(3, roles.Count);
             
             roles = uSvc.GetActiveRoles(user.Id, corp, "a", "e2", "t2");
-            Assert.AreEqual(0, roles.Count);
+            Assert.AreEqual(1, roles.Count);
         }
 
         [Test]
