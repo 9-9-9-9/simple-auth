@@ -234,15 +234,6 @@ namespace SimpleAuth.Services
             if (permission == Permission.None)
                 throw new ArgumentException(nameof(permission));
             
-            var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
-
-            var permissionsOfSameRoleRecord = roleRecords
-                .Where(x => x.RoleId == roleId)
-                .ToList();
-
-            if (permissionsOfSameRoleRecord.IsEmpty())
-                return false;
-
             var isThisRoleLocked = await _roleRepository.FindSingleAsync(new Expression<Func<Entities.Role, bool>>[]
             {
                 x =>
@@ -256,6 +247,15 @@ namespace SimpleAuth.Services
             }) != default;
 
             if (isThisRoleLocked)
+                return false;
+            
+            var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
+
+            var permissionsOfSameRoleRecord = roleRecords
+                .Where(x => x.RoleId == roleId)
+                .ToList();
+
+            if (permissionsOfSameRoleRecord.IsEmpty())
                 return false;
 
             var roles = permissionsOfSameRoleRecord
