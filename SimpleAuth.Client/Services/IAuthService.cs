@@ -35,7 +35,7 @@ namespace SimpleAuth.Client.Services
         {
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
-                .Append(EndpointConstants.User.GetActiveRoles(userId))
+                .Append(EndpointBuilder.User.GetActiveRoles(userId))
                 .Method(Constants.HttpMethods.GET)
             );
         }
@@ -44,7 +44,7 @@ namespace SimpleAuth.Client.Services
         {
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
-                .Append(EndpointConstants.User.CheckPass(userId))
+                .Append(EndpointBuilder.User.CheckPass(userId))
                 .Method(Constants.HttpMethods.POST),
                 password
             );
@@ -54,7 +54,7 @@ namespace SimpleAuth.Client.Services
         {
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
-                    .Append(EndpointConstants.User.CheckGoogleToken(loginByGoogleRequest.Email))
+                    .Append(EndpointBuilder.User.CheckGoogleToken(loginByGoogleRequest.Email))
                     .Method(Constants.HttpMethods.POST),
                 loginByGoogleRequest.JsonSerialize()
             );

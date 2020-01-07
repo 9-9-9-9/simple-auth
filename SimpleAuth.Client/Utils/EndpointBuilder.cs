@@ -1,6 +1,6 @@
-namespace SimpleAuth.Client
+namespace SimpleAuth.Client.Utils
 {
-    public static class EndpointConstants
+    public static class EndpointBuilder
     {
         public static class User
         {
