@@ -154,7 +154,7 @@ namespace SimpleAuth.Services
                     })
                 )
                 .DistinctRoles()
-                .Select(r => BaseEntityExtensions.WithRandomId(r.ToEntityObject()))
+                .Select(r => r.ToEntityObject().WithRandomId())
                 .ToList();
 
             await UpdateRolesAsync(roleGroup, newRoles);
