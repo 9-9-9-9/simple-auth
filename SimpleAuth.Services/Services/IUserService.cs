@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Exceptions;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
@@ -22,7 +23,7 @@ namespace SimpleAuth.Services
         Task AssignUserToGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromAllGroups(User user, string corp);
-        ICollection<Role> GetActiveRoles(string user, string corp, string app);
+        ICollection<Role> GetActiveRoles(string user, string corp, string app, string env = null, string tenant = null);
         Task UpdateLockStatusAsync(User user);
         Task UpdatePasswordAsync(User user);
     }
@@ -205,7 +206,8 @@ namespace SimpleAuth.Services
             );
         }
 
-        public ICollection<Role> GetActiveRoles(string userId, string corp, string app)
+        public ICollection<Role> GetActiveRoles(string userId, string corp, string app, string env = null,
+            string tenant = null)
         {
             if (userId.IsBlank())
                 throw new ArgumentNullException(nameof(userId));
@@ -215,6 +217,12 @@ namespace SimpleAuth.Services
 
             if (app.IsBlank())
                 throw new ArgumentNullException(nameof(app));
+
+            if (Constants.WildCard.Equals(env))
+                throw new ArgumentException($"{nameof(env)}: filter does not accept wildcard");
+
+            if (Constants.WildCard.Equals(tenant))
+                throw new ArgumentException($"{nameof(tenant)}: filter does not accept wildcard");
 
             var cachedRoles = _cachedUserRolesRepository.Get(userId, corp, app) as List<Role>;
             if (cachedRoles.IsAny())
@@ -236,8 +244,16 @@ namespace SimpleAuth.Services
                 .Select(x => x.RoleGroup)
                 .ToList();
 
-            var roles = roleGroups
-                .SelectMany(x => x.RoleRecords)
+            var roleRecords = roleGroups
+                .SelectMany(x => x.RoleRecords);
+
+            if (!env.IsBlank())
+                roleRecords = roleRecords.Where(rr => rr.Env == Constants.WildCard || rr.Env == env);
+
+            if (!tenant.IsBlank())
+                roleRecords = roleRecords.Where(rr => rr.Tenant == Constants.WildCard || rr.Tenant == tenant);
+
+            var roles = roleRecords
                 .Select(x => x.ToDomainObject())
                 .ToList();
 

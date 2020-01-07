@@ -214,13 +214,13 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        private ResponseUserModel GetBaseResponseUserModel(string userId)
+        private ResponseUserModel GetBaseResponseUserModel(string userId, string filterRoleEnv = null, string filterRoleTenant = null)
         {
             var user = Service.GetUser(userId, RequestAppHeaders.Corp);
             if (user == null)
                 throw new EntityNotExistsException(userId);
 
-            var activeRoles = Service.GetActiveRoles(userId, RequestAppHeaders.Corp, RequestAppHeaders.App);
+            var activeRoles = Service.GetActiveRoles(userId, RequestAppHeaders.Corp, RequestAppHeaders.App, filterRoleEnv, filterRoleTenant);
             return new ResponseUserModel
             {
                 Id = userId,

@@ -33,11 +33,14 @@ namespace SimpleAuth.Services
         IRoleGroupService
     {
         private readonly ICachedUserRolesRepository _cachedUserRolesRepository;
+        private readonly IRoleRepository _roleRepository;
 
         public DefaultRoleGroupService(IServiceProvider serviceProvider,
-            ICachedUserRolesRepository cachedUserRolesRepository) : base(serviceProvider)
+            ICachedUserRolesRepository cachedUserRolesRepository, 
+            IRoleRepository roleRepository) : base(serviceProvider)
         {
             _cachedUserRolesRepository = cachedUserRolesRepository;
+            _roleRepository = roleRepository;
         }
 
         public IEnumerable<RoleGroup> SearchRoleGroups(string term, string corp, string app,
@@ -203,6 +206,15 @@ namespace SimpleAuth.Services
             newRoles = newRoles.OrEmpty().Where(r => r.Permission != Permission.None).ToList();
 
             _cachedUserRolesRepository.Clear(roleGroup.Corp, roleGroup.App);
+            
+            newRoles.ForEach(async (x) =>
+            {
+                var role = await _roleRepository.FindSingleAsync(r => r.Id == x.RoleId);
+                if (role == default)
+                    throw new EntityNotExistsException(x.RoleId);
+                x.Env = role.Env;
+                x.Tenant = role.Tenant;
+            });
 
             await Repository.UpdateRoleRecordsAsync(await GetEntity(roleGroup), newRoles);
 
