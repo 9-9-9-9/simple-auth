@@ -52,9 +52,9 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("{name}")]
         public async Task<IActionResult> GetRoleGroup(string name)
         {
-            return await ProcedureResponseForLookUp(() => Task.FromResult(
-                FindRoleGroup(name, RequestAppHeaders.Corp, RequestAppHeaders.App)
-            ));
+            return await ProcedureResponseForLookUp(() =>
+                FindRoleGroupAsync(name, RequestAppHeaders.Corp, RequestAppHeaders.App)
+            );
         }
 
         [HttpGet]
@@ -95,6 +95,7 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("{groupName}/roles")]
         public async Task<IActionResult> GetRoles(string groupName)
         {
+            /*
             return await ProcedureResponseForArrayLookUp(() => Task.FromResult(
                     FindRoleGroup(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
                         .Roles
@@ -102,6 +103,8 @@ namespace SimpleAuth.Server.Controllers
                         .Select(RoleModel.Cast)
                 )
             );
+            */
+            return null;
         }
 
         [HttpPost, HttpPut, Route("{groupName}/roles")]
@@ -114,7 +117,7 @@ namespace SimpleAuth.Server.Controllers
 
             return await ProcedureDefaultResponse(async () =>
             {
-                var group = FindRoleGroup(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
+                var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
                 await Service.AddRolesToGroupAsync(group, model.Roles);
             });
         }
@@ -129,7 +132,7 @@ namespace SimpleAuth.Server.Controllers
 
             return await ProcedureDefaultResponse(async () =>
             {
-                var group = FindRoleGroup(name, RequestAppHeaders.Corp, RequestAppHeaders.App);
+                var group = await FindRoleGroupAsync(name, RequestAppHeaders.Corp, RequestAppHeaders.App);
                 if (model.Roles.IsAny())
                     await Service.DeleteRolesFromGroupAsync(group, model.Roles);
                 else
@@ -137,9 +140,9 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        private Shared.Domains.RoleGroup FindRoleGroup(string name, string corp, string app)
+        private async Task<Shared.Domains.RoleGroup> FindRoleGroupAsync(string name, string corp, string app)
         {
-            var group = Service.GetRoleGroupByName(name, corp, app);
+            var group = await Service.GetRoleGroupByName(name, corp, app);
             if (group == null)
                 throw new EntityNotExistsException(name);
             return group;

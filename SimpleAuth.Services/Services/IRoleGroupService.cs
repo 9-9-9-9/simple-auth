@@ -19,7 +19,7 @@ namespace SimpleAuth.Services
     public interface IRoleGroupService : IDomainService
     {
         IEnumerable<RoleGroup> SearchRoleGroups(string term, string corp, string app, FindOptions findOptions = null);
-        RoleGroup GetRoleGroupByName(string name, string corp, string app);
+        Task<RoleGroup> GetRoleGroupByName(string name, string corp, string app);
         IEnumerable<RoleGroup> FindByName(string[] nameList, string corp, string app);
         Task AddRoleGroupAsync(CreateRoleGroupModel newRoleGroup);
         Task UpdateLockStatusAsync(RoleGroup roleGroup);
@@ -47,26 +47,19 @@ namespace SimpleAuth.Services
                 .Select(x => x.ToDomainObject());
         }
 
-        public RoleGroup GetRoleGroupByName(string name, string corp, string app)
+        public async Task<RoleGroup> GetRoleGroupByName(string name, string corp, string app)
         {
-            return GetRoleGroupByExpression(x => x.Name == name, corp, app, new FindOptions {Take = 1})
-                .FirstOrDefault();
-        }
-
-        private IEnumerable<RoleGroup> GetRoleGroupByExpression(
-            Expression<Func<Entities.RoleGroup, bool>> expression,
-            string corp, string app, FindOptions findOptions = null)
-        {
-            return Repository
-                .FindMany(new[]
-                {
-                    expression,
-                    x =>
-                        x.Corp == corp
-                        &&
-                        x.App == app
-                }, findOptions)
-                .Select(x => x.ToDomainObject());
+            return (
+                await Repository
+                    .FindSingleAsync(
+                        x =>
+                            x.Name == name
+                            &&
+                            x.Corp == corp
+                            &&
+                            x.App == app
+                    )
+            )?.ToDomainObject();
         }
 
         public IEnumerable<RoleGroup> FindByName(string[] nameList, string corp, string app)

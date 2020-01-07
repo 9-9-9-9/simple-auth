@@ -52,7 +52,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             await AddRoleAsync(rSvc, randomCorp1, "a", "e", "t", "m12");
             await AddRoleAsync(rSvc, randomCorp1, "a", "e", "t", "m20");
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("g1", randomCorp1, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("g1", randomCorp1, "a"), new[]
             {
                 new RoleModel
                 {
@@ -67,7 +67,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 }
             });
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("g2", randomCorp1, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("g2", randomCorp1, "a"), new[]
             {
                 new RoleModel
                 {
@@ -385,7 +385,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             await AddRoleAsync(rSvc, corp, "a", "nl3", "*", "*");
 
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("gg", corp, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("gg", corp, "a"), new[]
             {
                 new RoleModel
                 {
@@ -399,7 +399,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 },
             });
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("gr", corp, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("gr", corp, "a"), new[]
             {
                 new RoleModel
                 {
@@ -413,7 +413,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 },
             });
 
-            await gSvc.AddRolesToGroupAsync(gSvc.GetRoleGroupByName("gl", corp, "a"), new[]
+            await gSvc.AddRolesToGroupAsync(await gSvc.GetRoleGroupByName("gl", corp, "a"), new[]
             {
                 new RoleModel
                 {
@@ -426,7 +426,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             l1.Locked = true;
             await rSvc.UpdateLockStatus(l1);
 
-            var gl = gSvc.GetRoleGroupByName("gl", corp, "a");
+            var gl = await gSvc.GetRoleGroupByName("gl", corp, "a");
             gl.Locked = true;
             await gSvc.UpdateLockStatusAsync(gl);
 
