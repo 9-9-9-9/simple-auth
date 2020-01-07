@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleAuth.Client.AspNetCore.Middlewares;
-using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.DependencyInjection;
@@ -25,18 +24,12 @@ namespace WebApiPlayground
         {
             services.AddControllers();
 
-            //TODO to extension or somewhat
-            services.AddSingleton(new SimpleAuthSettings
+            services.UseSimpleAuthDefaultServices(new SimpleAuthSettings
             {
                 SimpleAuthServerUrl = "http://standingtrust.com",
                 CorpToken = "",
                 AppToken = "",
             });
-
-            //TODO to extension
-            services
-                .RegisterModules<BasicServiceModules>()
-                .UseTenantProvider<RuntimeTenantProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,8 +42,7 @@ namespace WebApiPlayground
 
             app.UseRouting();
 
-            //TODO to extension
-            app.UseMiddleware<SaAuthorizationMiddleware>();
+            app.UseSimpleAuth();
 
             app.UseAuthorization();
             

@@ -18,11 +18,11 @@ namespace SimpleAuth.Shared.Models
         }
 
         public ModuleClaim(RoleModel roleModel, string issuer)
-            : this(CropCorpAndApp(roleModel.Role), roleModel.Permission, issuer)
+            : this(CutPartsBeforeModule(roleModel.Role), roleModel.Permission, issuer)
         {
         }
 
-        internal static string CropCorpAndApp(string roleId)
+        internal static string CutPartsBeforeModule(string roleId)
         {
             return RoleUtils.CutPartsBefore(RoleUtils.RolePart.Module, roleId);
         }
