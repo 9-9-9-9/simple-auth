@@ -9,6 +9,8 @@ namespace SimpleAuth.Client.Utils
         public string Url { get; private set; }
         public bool UseCorpToken { get; set; }
         public bool UseAppToken { get; set; }
+        public bool UserFilterEnv { get; set; }
+        public bool UseFilterTenant { get; set; }
         public string HttpMethod { get; set; } = Constants.HttpMethods.POST;
 
         public RequestBuilder(string url)
@@ -40,6 +42,18 @@ namespace SimpleAuth.Client.Utils
         public RequestBuilder WithAppToken()
         {
             UseAppToken = true;
+            return this;
+        }
+
+        public RequestBuilder WithFilterEnv()
+        {
+            UserFilterEnv = true;
+            return this;
+        }
+
+        public RequestBuilder WithFilterTenant()
+        {
+            UseFilterTenant = true;
             return this;
         }
     }

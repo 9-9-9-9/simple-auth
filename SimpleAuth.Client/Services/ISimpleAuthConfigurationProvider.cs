@@ -1,5 +1,4 @@
 using SimpleAuth.Client.Models;
-using SimpleAuth.Core.Extensions;
 
 namespace SimpleAuth.Client.Services
 {
@@ -7,6 +6,8 @@ namespace SimpleAuth.Client.Services
     {
         string CorpToken { get; }
         string AppToken { get; }
+        string Env { get; }
+        string Tenant { get; }
         string EndPointUrl { get; }
     }
 
@@ -22,6 +23,8 @@ namespace SimpleAuth.Client.Services
 
         public string CorpToken => _simpleAuthSettings.CorpToken;
         public string AppToken => _simpleAuthSettings.AppToken;
+        public string Env => _simpleAuthSettings.Env;
+        public string Tenant => _simpleAuthSettings.Tenant;
         public string EndPointUrl { get; }
     }
 }

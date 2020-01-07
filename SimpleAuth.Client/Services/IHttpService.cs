@@ -108,6 +108,14 @@ namespace SimpleAuth.Client.Services
             if (requestBuilder.UseAppToken)
                 httpClient.DefaultRequestHeaders.Add(Constants.Headers.AppPermission,
                     _simpleAuthConfigurationProvider.AppToken);
+            
+            if (requestBuilder.UserFilterEnv)
+                httpClient.DefaultRequestHeaders.Add(Constants.Headers.FilterByEnv,
+                    _simpleAuthConfigurationProvider.Env);
+            
+            if (requestBuilder.UseFilterTenant)
+                httpClient.DefaultRequestHeaders.Add(Constants.Headers.FilterByTenant,
+                    _simpleAuthConfigurationProvider.Tenant);
 
             httpClient.Timeout = TimeSpan.FromMinutes(5);
             return httpClient;

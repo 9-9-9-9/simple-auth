@@ -25,7 +25,10 @@ namespace SimpleAuth.Client.Services
 
         protected override RequestBuilder NewRequest()
         {
-            return base.NewRequest().WithAppToken();
+            return base.NewRequest()
+                .WithAppToken()
+                .WithFilterEnv()
+                .WithFilterTenant();
         }
 
         public async Task<ResponseUserModel> GetRolesAsync(string userId)
@@ -34,7 +37,6 @@ namespace SimpleAuth.Client.Services
                 NewRequest()
                 .Append(EndpointConstants.User.GetActiveRoles(userId))
                 .Method(Constants.HttpMethods.GET)
-                .WithAppToken()
             );
         }
 
@@ -43,8 +45,7 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
                 .Append(EndpointConstants.User.CheckPass(userId))
-                .Method(Constants.HttpMethods.POST)
-                .WithAppToken(),
+                .Method(Constants.HttpMethods.POST),
                 password
             );
         }
@@ -54,8 +55,7 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
                     .Append(EndpointConstants.User.CheckGoogleToken(loginByGoogleRequest.Email))
-                    .Method(Constants.HttpMethods.POST)
-                    .WithAppToken(),
+                    .Method(Constants.HttpMethods.POST),
                 loginByGoogleRequest.JsonSerialize()
             );
         }
