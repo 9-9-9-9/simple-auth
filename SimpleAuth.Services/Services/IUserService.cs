@@ -24,7 +24,7 @@ namespace SimpleAuth.Services
         Task AssignUserToGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromAllGroups(User user, string corp);
-        ICollection<Role> GetActiveRoles(string user, string corp, string app, string env = null, string tenant = null);
+        Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null, string tenant = null);
         Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app, string env = null, string tenant = null);
         Task UpdateLockStatusAsync(User user);
         Task UpdatePasswordAsync(User user);
@@ -197,48 +197,10 @@ namespace SimpleAuth.Services
             );
         }
 
-        public ICollection<Role> GetActiveRoles(string userId, string corp, string app, string env = null,
+        public async Task<ICollection<Role>> GetActiveRolesAsync(string userId, string corp, string app, string env = null,
             string tenant = null)
         {
-            if (userId.IsBlank())
-                throw new ArgumentNullException(nameof(userId));
-
-            if (corp.IsBlank())
-                throw new ArgumentNullException(nameof(corp));
-
-            if (app.IsBlank())
-                throw new ArgumentNullException(nameof(app));
-
-            if (Constants.WildCard.Equals(env))
-                throw new ArgumentException($"{nameof(env)}: filter does not accept wildcard");
-
-            if (Constants.WildCard.Equals(tenant))
-                throw new ArgumentException($"{nameof(tenant)}: filter does not accept wildcard");
-
-            var user = Repository.Find(userId);
-            var localUserInfo = user?.UserInfos?.FirstOrDefault(x => x.Corp == corp);
-            if (localUserInfo == null)
-                throw new EntityNotExistsException($"{userId} at {corp}");
-
-            var roleGroups = user.RoleGroupUsers
-                .Where(x =>
-                    x.RoleGroup.Corp == corp
-                    &&
-                    x.RoleGroup.App == app
-                    &&
-                    !x.RoleGroup.Locked
-                )
-                .Select(x => x.RoleGroup)
-                .ToList();
-
-            var roleRecords = roleGroups
-                .SelectMany(x => x.RoleRecords);
-
-            if (!env.IsBlank())
-                roleRecords = roleRecords.Where(rr => rr.Env == Constants.WildCard || rr.Env == env);
-
-            if (!tenant.IsBlank())
-                roleRecords = roleRecords.Where(rr => rr.Tenant == Constants.WildCard || rr.Tenant == tenant);
+            var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
 
             var roles = roleRecords
                 .Select(x => x.ToDomainObject())

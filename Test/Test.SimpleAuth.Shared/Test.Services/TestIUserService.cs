@@ -436,21 +436,21 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             #endregion
 
-            var roles = uSvc.GetActiveRoles(user.Id, corp, "a");
+            var roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a");
 
             Assert.AreEqual(2, roles.Count);
             Assert.IsNull(roles.FirstOrDefault(x => x.RoleId.Contains(".l1.")));
             Assert.IsNull(roles.FirstOrDefault(x => x.RoleId.Contains(".nl3.")));
             Assert.AreEqual(Permission.Crud, roles.First(x => x.RoleId.Contains(".nl1.")).Permission);
 
-            roles = uSvc.GetActiveRoles(user.Id, corp, "a");
+            roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a");
             Assert.AreEqual(2, roles.Count);
 
-            Assert.That(() => uSvc.GetActiveRoles(user.Id, Guid.NewGuid().ToString(), "a"),
+            Assert.That(() => uSvc.GetActiveRolesAsync(user.Id, Guid.NewGuid().ToString(), "a"),
                 Throws.TypeOf<EntityNotExistsException>());
-            Assert.That(() => uSvc.GetActiveRoles(null, corp, "a"), Throws.TypeOf<ArgumentNullException>());
-            Assert.That(() => uSvc.GetActiveRoles(user.Id, null, "a"), Throws.TypeOf<ArgumentNullException>());
-            Assert.That(() => uSvc.GetActiveRoles(user.Id, corp, null), Throws.TypeOf<ArgumentNullException>());
+            Assert.That(() => uSvc.GetActiveRolesAsync(null, corp, "a"), Throws.TypeOf<ArgumentNullException>());
+            Assert.That(() => uSvc.GetActiveRolesAsync(user.Id, null, "a"), Throws.TypeOf<ArgumentNullException>());
+            Assert.That(() => uSvc.GetActiveRolesAsync(user.Id, corp, null), Throws.TypeOf<ArgumentNullException>());
         }
 
         [Test]
@@ -515,21 +515,21 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             #endregion
 
-            var roles = uSvc.GetActiveRoles(user.Id, corp, "a");
+            var roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a");
             Assert.AreEqual(5, roles.Count);
 
-            Assert.That(() => uSvc.GetActiveRoles(user.Id, corp, "a", "*"), Throws.TypeOf<ArgumentException>());
+            Assert.That(async () => await uSvc.GetActiveRolesAsync(user.Id, corp, "a", "*"), Throws.TypeOf<ArgumentException>());
             
-            roles = uSvc.GetActiveRoles(user.Id, corp, "a", null, "t1");
+            roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", null, "t1");
             Assert.AreEqual(4, roles.Count);
             
-            roles = uSvc.GetActiveRoles(user.Id, corp, "a", null, "t2");
+            roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", null, "t2");
             Assert.AreEqual(3, roles.Count);
             
-            roles = uSvc.GetActiveRoles(user.Id, corp, "a", "e", "t2");
+            roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", "e", "t2");
             Assert.AreEqual(3, roles.Count);
             
-            roles = uSvc.GetActiveRoles(user.Id, corp, "a", "e2", "t2");
+            roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", "e2", "t2");
             Assert.AreEqual(1, roles.Count);
         }
 
