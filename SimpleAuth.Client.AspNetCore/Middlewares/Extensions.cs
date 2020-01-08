@@ -67,8 +67,8 @@ namespace Microsoft.AspNetCore.Builder
             services.AddSingleton(simpleAuthSettings);
             services
                 .RegisterModules<BasicServiceModules>()
+                .RegisterModules<ServiceModules>()
                 .UseConfiguredTenantProvider();
-            services.AddSingleton<IJsonService, JsonNetService>();
             return services;
         }
     }

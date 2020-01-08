@@ -24,16 +24,16 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
+            var authenticationInfoProvider = httpContext.RequestServices.GetService<IAuthenticationInfoProvider>();
             var endpoint = GetEndpoint(httpContext);
 
             var saP = endpoint?.Metadata.OfType<SaPermissionAttribute>().OrEmpty().ToList();
             var saM = endpoint?.Metadata.GetMetadata<SaModuleAttribute>();
 
-            var isUserAuthenticated = httpContext.User.Identity.IsAuthenticated;
             if (
                 (saP.IsAny() || saM != null)
                 &&
-                !isUserAuthenticated
+                !await authenticationInfoProvider.IsAuthenticated(httpContext)
             )
             {
                 httpContext.Response
@@ -45,7 +45,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             {
                 if (saM != null)
                 {
-                    var claim = httpContext.User.Claims.OfSimpleAuth();
+                    var claim = (await authenticationInfoProvider.GetClaims(httpContext)).OfSimpleAuth();
                     if (claim == default)
                     {
                         await httpContext.Response
