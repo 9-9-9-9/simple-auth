@@ -35,25 +35,13 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                 {
                     if (saM != null)
                     {
-                        // ReSharper disable once JoinDeclarationAndInitializer
-                        // ReSharper disable once CollectionNeverUpdated.Local
-                        List<ModuleClaim> moduleClaims;
-#if DEBUG
-                        moduleClaims = new List<ModuleClaim>();
-#else
-                        if (!httpContext.User.Identity.IsAuthenticated)
-                        {
-                            httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-                            return;
-                        }
-
-                        moduleClaims = httpContext.User.Claims.OfType<ModuleClaim>().ToList();
+                        var moduleClaims = httpContext.User.Claims.OfType<ModuleClaim>().ToList();
                         if (!moduleClaims.IsAny())
                         {
-                            httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            httpContext.Response
+                                .WithStatus(StatusCodes.Status403Forbidden);
                             return;
                         }
-#endif
 
                         var requireTenant = httpContext.RequestServices
                             .GetService<ITenantProvider>()

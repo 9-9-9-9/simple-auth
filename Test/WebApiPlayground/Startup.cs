@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -30,6 +31,10 @@ namespace WebApiPlayground
                 CorpToken = "",
                 AppToken = "",
             });
+            
+            services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,11 +45,13 @@ namespace WebApiPlayground
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
-
-            app.UseSimpleAuth();
+            app.UseAuthentication();
 
             app.UseAuthorization();
+            
+            app.UseRouting();
+            
+            app.UseSimpleAuth();
             
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
