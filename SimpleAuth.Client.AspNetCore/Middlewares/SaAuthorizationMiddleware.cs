@@ -53,11 +53,18 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         saM.Module,
                         x.SubModules,
                         x.Permission
-                    ));
+                    )).ToArray();
 
                     var missingClaims = (await claims.GetMissingClaimsAsync(requireClaims, httpContext.RequestServices)).OrEmpty().ToArray();
                     if (missingClaims.Any())
                     {
+                        if (missingClaims.Length == requireClaims.Length)
+                        {
+                            await httpContext.Response
+                                .WithStatus(StatusCodes.Status403Forbidden)
+                                .WithBody($"Missing {nameof(SimpleAuthorizationClaim)}");
+                            return;
+                        }
                         await httpContext.Response
                             .WithStatus(StatusCodes.Status403Forbidden)
                             .WithBody(
