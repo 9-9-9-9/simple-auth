@@ -32,24 +32,23 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             {
                 if (saM != null)
                 {
-                    var claim =
-                        httpContext.User.Claims.FirstOrDefault(x => x.Type == nameof(SimpleAuthorizationClaims));
-                    if (claim == null)
+                    var claim = httpContext.User.Claims.OfSimpleAuth();
+                    if (claim == default)
                     {
                         await httpContext.Response
                             .WithStatus(StatusCodes.Status403Forbidden)
-                            .WithBody($"Missing {nameof(SimpleAuthorizationClaims)}");
+                            .WithBody($"Missing {SimpleAuthDefaults.ClaimType}");
                         return;
                     }
 
                     var jsonService = httpContext.RequestServices.GetService<IJsonService>();
-                    var simpleAuthorizationClaims = jsonService.Deserialize<SimpleAuthorizationClaims>(claim.Value);
+                    var simpleAuthorizationClaims = jsonService.Deserialize<SimpleAuthorizationClaim[]>(claim.Value);
 
-                    if (simpleAuthorizationClaims.Claims.IsEmpty())
+                    if (simpleAuthorizationClaims.IsEmpty())
                     {
                         await httpContext.Response
                             .WithStatus(StatusCodes.Status403Forbidden)
-                            .WithBody($"Missing {nameof(SimpleAuthorizationClaims.Claims)}");
+                            .WithBody($"Missing {nameof(SimpleAuthDefaults.ClaimType)}");
                         return;
                     }
 
@@ -66,7 +65,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                             permissionAttribute.Permission
                         );
 
-                        var hasPermission = simpleAuthorizationClaims.Claims.Any(x =>
+                        var hasPermission = simpleAuthorizationClaims.Any(x =>
                             x.Contains(requiredClaim)
                         );
 

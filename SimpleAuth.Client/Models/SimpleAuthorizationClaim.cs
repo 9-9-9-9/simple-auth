@@ -10,27 +10,6 @@ using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Client.Models
 {
-    public class SimpleAuthorizationClaims
-    {
-        public List<SimpleAuthorizationClaim> Claims { get; set; }
-    }
-
-    public static class SimpleAuthorizationClaimExtensions
-    {
-        public static SimpleAuthorizationClaims ToSimpleAuthorizationClaims(this IEnumerable<RoleModel> roleModels)
-        {
-            return new SimpleAuthorizationClaims
-            {
-                Claims = roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList()
-            };
-        }
-
-        public static Claim ToClaim(this SimpleAuthorizationClaims simpleAuthorizationClaims, Func<SimpleAuthorizationClaims, string> serializer)
-        {
-            return new Claim(nameof(SimpleAuthorizationClaims), serializer(simpleAuthorizationClaims));
-        }
-    }
-
     public class SimpleAuthorizationClaim
     {
         public string Tenant { get; set; }
@@ -108,6 +87,24 @@ namespace SimpleAuth.Client.Models
             if (left == Constants.WildCard)
                 return true;
             return false;
+        }
+    }
+    
+    public static class SimpleAuthorizationClaimExtensions
+    {
+        public static IEnumerable<SimpleAuthorizationClaim> ToSimpleAuthorizationClaims(this IEnumerable<RoleModel> roleModels)
+        {
+            return roleModels.Select(x => new SimpleAuthorizationClaim(x));
+        }
+
+        public static Claim ToClaim(this IEnumerable<SimpleAuthorizationClaim> simpleAuthorizationClaims, Func<SimpleAuthorizationClaim[], string> serializer)
+        {
+            return new Claim(SimpleAuthDefaults.ClaimType, serializer(simpleAuthorizationClaims.OrEmpty().ToArray()));
+        }
+
+        public static Claim OfSimpleAuth(this IEnumerable<Claim> claims)
+        {
+            return claims.FirstOrDefault(x => x.Type == SimpleAuthDefaults.ClaimType);
         }
     }
 }
