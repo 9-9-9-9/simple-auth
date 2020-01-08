@@ -4,11 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SimpleAuth.Client;
-using SimpleAuth.Client.AspNetCore.Middlewares;
 using SimpleAuth.Client.Models;
-using SimpleAuth.Client.Services;
-using SimpleAuth.Core.DependencyInjection;
 
 namespace WebApiPlayground
 {
@@ -35,8 +31,8 @@ namespace WebApiPlayground
             });
             
             services
-                .AddAuthentication(SimpleAuthDefaults.AuthenticationScheme)
-                .AddCookie(SimpleAuthDefaults.AuthenticationScheme);
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

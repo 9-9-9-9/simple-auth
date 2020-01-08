@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Client;
@@ -33,9 +34,9 @@ namespace WebApiPlayground.Controllers
             IEnumerable<RoleModel> YieldResults()
             {
                 yield return Rm("g.a.e.t.weatherforecast", Permission.View);
-                yield return Rm("g.a.e.t.weatherforecast.a", Permission.View);
-                yield return Rm("g.a.e.t.weatherforecast.b", Permission.View);
+                yield return Rm("g.a.e.t.weatherforecast.*", Permission.View);
                 yield return Rm("g.a.e.t.best", Permission.View);
+                yield return Rm("g.a.e.t.best.a", Permission.View);
             }
 
             //
@@ -65,7 +66,7 @@ namespace WebApiPlayground.Controllers
                         Claims = roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList()
                     })), 
                 },
-                SimpleAuthDefaults.AuthenticationScheme);
+                CookieAuthenticationDefaults.AuthenticationScheme);
 
             var authProperties = new AuthenticationProperties
             {
@@ -76,7 +77,7 @@ namespace WebApiPlayground.Controllers
             };
 
             await HttpContext.SignInAsync(
-                SimpleAuthDefaults.AuthenticationScheme,
+                CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
@@ -85,11 +86,10 @@ namespace WebApiPlayground.Controllers
             return Ok();
         }
 
-        [Authorize]
         [Route("so")]
         public async Task<IActionResult> SignOut()
         {
-            await HttpContext.SignOutAsync(SimpleAuthDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Ok();
         }
     }

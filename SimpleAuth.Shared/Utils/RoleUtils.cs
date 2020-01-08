@@ -1,21 +1,10 @@
 using System;
-using System.Linq;
 using SimpleAuth.Core.Extensions;
 
 namespace SimpleAuth.Shared.Utils
 {
     public static class RoleUtils
     {
-        public enum RolePart
-        {
-            Corp = 1,
-            App = 2,
-            Env = 3,
-            Tenant = 4,
-            Module = 5,
-            SubModules = 6
-        }
-
         public static string JoinPartsFromModule(string module, string[] subModules)
         {
             return subModules.IsEmpty()
@@ -23,28 +12,28 @@ namespace SimpleAuth.Shared.Utils
                 : $"{module}{Constants.SplitterRoleParts}{string.Join(Constants.SplitterSubModules, subModules)}";
         }
 
-        public static string CutPartsBefore(RolePart takeFromRolePart, string text)
+        public static void Parse(string roleId, out string corp, out string app, out string env, out string tenant,
+            out string module, out string[] subModules)
         {
-            if (takeFromRolePart > RolePart.Module)
-                throw new ArgumentException(nameof(takeFromRolePart));
+            var spl = roleId.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
+            if (spl.Length < 5 || spl.Length > 6)
+                throw new ArgumentException(nameof(roleId));
+            corp = spl[0];
+            app = spl[1];
+            env = spl[2];
+            tenant = spl[3];
+            module = spl[4];
 
-            var spl = text.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
-            if (spl.Length < 5) // invalid number of parts
-                throw new ArgumentException($"{nameof(text)} ({text})");
-
-            return string.Join(Constants.SplitterRoleParts, spl.Skip((int) takeFromRolePart - 1));
-        }
-
-        public static string TakeSinglePart(RolePart takeSinglePart, string text)
-        {
-            if ((int)takeSinglePart < 1 || (int)takeSinglePart > 6)
-                throw new ArgumentException(nameof(takeSinglePart));
-
-            var spl = text.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
-            if (spl.Length < 5) // invalid number of parts
-                throw new ArgumentException($"{nameof(text)} ({text})");
-
-            return spl[(int) takeSinglePart - 1];
+            if (spl.Length == 6)
+            {
+                subModules = spl[5].Split(new[] {Constants.ChSplitterSubModules}, StringSplitOptions.None);
+                if (subModules.Length == 0)
+                    throw new ArgumentException($"{nameof(roleId)}: empty but declared submodules");
+            }
+            else
+            {
+                subModules = new string[0];
+            }
         }
     }
 }
