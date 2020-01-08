@@ -4,10 +4,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Client;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
 
@@ -51,7 +50,7 @@ namespace WebApiPlayground.Controllers
                     new Claim(ClaimTypes.Name, email),
                     new Claim(ClaimTypes.Role, "User")
                 }.Concat(roleModels.Select(x => new ModuleClaim(x, "sa"))),
-                CookieAuthenticationDefaults.AuthenticationScheme);
+                SimpleAuthDefaults.AuthenticationScheme);
 
             var authProperties = new AuthenticationProperties
             {
@@ -62,7 +61,7 @@ namespace WebApiPlayground.Controllers
             };
 
             await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
+                SimpleAuthDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
@@ -75,7 +74,7 @@ namespace WebApiPlayground.Controllers
         [Route("so")]
         public async Task<IActionResult> SignOut()
         {
-            await HttpContext.SignOutAsync();
+            await HttpContext.SignOutAsync(SimpleAuthDefaults.AuthenticationScheme);
             return Ok();
         }
     }
