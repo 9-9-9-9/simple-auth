@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -70,6 +73,13 @@ namespace Microsoft.AspNetCore.Builder
                 .RegisterModules<ServiceModules>()
                 .UseConfiguredTenantProvider();
             return services;
+        }
+
+        public static async Task<Claim> GenerateSimpleAuthClaimAsync(this IEnumerable<SimpleAuthorizationClaim> claims,
+            IServiceProvider serviceProvider)
+        {
+            var authenticationInfoProvider = serviceProvider.GetService<IAuthenticationInfoProvider>();
+            return await authenticationInfoProvider.GenerateSimpleAuthClaimAsync(claims);
         }
     }
 }
