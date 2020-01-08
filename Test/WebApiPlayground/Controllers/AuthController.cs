@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SimpleAuth.Client;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Shared.Enums;
@@ -58,9 +57,6 @@ namespace WebApiPlayground.Controllers
             var claimsIdentity = new ClaimsIdentity(
                 new []
                 {
-                    new Claim(ClaimTypes.NameIdentifier, email),
-                    new Claim(ClaimTypes.Name, email),
-                    new Claim(ClaimTypes.Role, "User"),
                     new Claim(nameof(SimpleAuthorizationClaims), _jsonService.Serialize(new SimpleAuthorizationClaims
                     {
                         Claims = roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList()
@@ -81,8 +77,6 @@ namespace WebApiPlayground.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
-            var user = HttpContext.User;
-            
             return Ok();
         }
 
