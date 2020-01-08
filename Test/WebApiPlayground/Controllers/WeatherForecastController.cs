@@ -10,11 +10,10 @@ namespace WebApiPlayground.Controllers
 {
     [ApiController]
     [Route("weatherforecast")]
-    [SaModule("weatherforecast")]
+    [SaModule("weatherforecast", false)]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
+        private static readonly string[] Summaries = {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
@@ -40,8 +39,23 @@ namespace WebApiPlayground.Controllers
                 .ToArray();
         }
         
-        [HttpGet("2"), SaPermission(Permission.View)]
+        [HttpGet("2")]
+        [SaModule("best")] // Override attribute of class
+        [SaPermission(Permission.View)]
         public IEnumerable<WeatherForecast> Get2()
+        {
+            var rng = new Random();
+            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+                {
+                    Date = DateTime.Now.AddDays(index),
+                    TemperatureC = rng.Next(-20, 55),
+                    Summary = Summaries[rng.Next(Summaries.Length)]
+                })
+                .ToArray();
+        }
+        
+        [HttpGet("3")]
+        public IEnumerable<WeatherForecast> Get3()
         {
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

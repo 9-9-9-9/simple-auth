@@ -28,36 +28,37 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             try
             {
                 var endpoint = GetEndpoint(httpContext);
-                var saM = endpoint?.Metadata.GetMetadata<SaModuleAttribute>();
-                if (saM != null)
-                {
-                    // ReSharper disable once JoinDeclarationAndInitializer
-                    // ReSharper disable once CollectionNeverUpdated.Local
-                    List<ModuleClaim> moduleClaims;
-#if DEBUG
-                    moduleClaims = new List<ModuleClaim>();
-#else
-                    if (!httpContext.User.Identity.IsAuthenticated)
-                    {
-                        httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-                        return;
-                    }
 
-                    moduleClaims = httpContext.User.Claims.OfType<ModuleClaim>().ToList();
-                    if (!moduleClaims.IsAny())
+                var saP = endpoint?.Metadata.OfType<SaPermissionAttribute>().OrEmpty().ToList();
+                var saM = endpoint?.Metadata.GetMetadata<SaModuleAttribute>();
+                if (saP.IsAny())
+                {
+                    if (saM != null)
                     {
-                        httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-                        return;
-                    }
+                        // ReSharper disable once JoinDeclarationAndInitializer
+                        // ReSharper disable once CollectionNeverUpdated.Local
+                        List<ModuleClaim> moduleClaims;
+#if DEBUG
+                        moduleClaims = new List<ModuleClaim>();
+#else
+                        if (!httpContext.User.Identity.IsAuthenticated)
+                        {
+                            httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            return;
+                        }
+
+                        moduleClaims = httpContext.User.Claims.OfType<ModuleClaim>().ToList();
+                        if (!moduleClaims.IsAny())
+                        {
+                            httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            return;
+                        }
 #endif
 
-                    var requireTenant = httpContext.RequestServices
-                        .GetService<ITenantProvider>()
-                        .GetTenant(httpContext);
+                        var requireTenant = httpContext.RequestServices
+                            .GetService<ITenantProvider>()
+                            .GetTenant(httpContext);
 
-                    var saP = endpoint.Metadata.OfType<SaPermissionAttribute>().OrEmpty().ToList();
-                    if (saP.IsAny())
-                    {
                         foreach (var permissionAttribute in saP)
                         {
                             var roleFromModule =
@@ -76,7 +77,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                             {
                                 await httpContext.Response
                                     .WithStatus(StatusCodes.Status403Forbidden)
-                                    .WithBody(roleFromModule);
+                                    .WithBody($"Require tenant '{requireTenant}', module '{roleFromModule}'");
                                 return;
                             }
 
@@ -92,6 +93,29 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                                 return;
                             }
                         }
+                    }
+                }
+                else
+                {
+                    if (saM != null)
+                    {
+                        if (saM.Restricted)
+                        {
+                            await httpContext.Response
+                                .WithStatus(StatusCodes.Status403Forbidden)
+                                .WithBody(
+                                    $"{nameof(SaModuleAttribute)}(module={saM.Module}) is restricted, require {nameof(SaPermissionAttribute)} pre-defined at Action"
+                                );
+                            return;
+                        }
+                        else
+                        {
+                            // pass
+                        }
+                    }
+                    else
+                    {
+                        // pass
                     }
                 }
 
