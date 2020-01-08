@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Services;
-using SimpleAuth.Client.Models;
 using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
 
@@ -51,7 +51,9 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                     }
 #endif
 
-                    var requireTenant = httpContext.RequestServices.GetService<ITenantProvider>().GetTenant(httpContext);
+                    var requireTenant = httpContext.RequestServices
+                        .GetService<ITenantProvider>()
+                        .GetTenant(httpContext);
 
                     var saP = endpoint.Metadata.OfType<SaPermissionAttribute>().OrEmpty().ToList();
                     if (saP.IsAny())
@@ -61,7 +63,15 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                             var roleFromModule =
                                 RoleUtils.JoinPartsFromModule(saM.Module, permissionAttribute.SubModules);
 
-                            var existingRole = moduleClaims.FirstOrDefault(x => x.Type == roleFromModule);
+                            var existingRole = moduleClaims.FirstOrDefault(x =>
+                                x.Type == roleFromModule
+                                &&
+                                (
+                                    x.Tenant == Constants.WildCard
+                                    ||
+                                    x.Tenant == requireTenant
+                                )
+                            );
                             if (existingRole == default)
                             {
                                 await httpContext.Response
@@ -69,8 +79,6 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                                     .WithBody(roleFromModule);
                                 return;
                             }
-                            
-                            //TODO impl check tenant using claim
 
                             if (existingRole.Permission.HasFlag(permissionAttribute.Permission))
                             {
