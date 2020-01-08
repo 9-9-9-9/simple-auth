@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
-using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
@@ -54,10 +53,12 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         return;
                     }
 
-                    var jsonService = httpContext.RequestServices.GetService<IJsonService>();
-                    var simpleAuthorizationClaims = jsonService.Deserialize<SimpleAuthorizationClaim[]>(saClaim.Value);
+                    var claimCachingService = httpContext.RequestServices.GetService<IClaimCachingService>();
+                    var simpleAuthorizationClaims = (
+                        await claimCachingService.GetClaimsAsync(saClaim.Value)
+                    ).OrEmpty().ToArray();
 
-                    if (simpleAuthorizationClaims.IsEmpty())
+                    if (simpleAuthorizationClaims.Length == 0)
                     {
                         await httpContext.Response
                             .WithStatus(StatusCodes.Status403Forbidden)
