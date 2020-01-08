@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Shared.Enums;
@@ -17,10 +18,12 @@ namespace WebApiPlayground.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IJsonService _jsonService;
+        private readonly IAuthenticationInfoProvider _authenticationInfoProvider;
 
-        public AuthController(IJsonService jsonService)
+        public AuthController(IJsonService jsonService, IAuthenticationInfoProvider authenticationInfoProvider)
         {
             _jsonService = jsonService;
+            _authenticationInfoProvider = authenticationInfoProvider;
         }
 
         private async Task<IEnumerable<RoleModel>> GetRoleModels()
@@ -51,10 +54,11 @@ namespace WebApiPlayground.Controllers
         {
             var roleModels = await GetRoleModels();
 
+            var claim = await _authenticationInfoProvider.GenerateSimpleAuthClaimAsync(roleModels.ToSimpleAuthorizationClaims());
             var claimsIdentity = new ClaimsIdentity(
                 new[]
                 {
-                    roleModels.ToSimpleAuthorizationClaims().ToClaim(x => _jsonService.Serialize(x))
+                    claim
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme);
 
