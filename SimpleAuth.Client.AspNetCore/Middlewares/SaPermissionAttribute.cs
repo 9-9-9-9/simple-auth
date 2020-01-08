@@ -16,8 +16,10 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             if (permission == Permission.None)
                 throw new ArgumentException(
                     $"{nameof(permission)}: can't define '{nameof(Permission.None)}' value here");
+            
             if (subModules?.Any(x => x == Constants.WildCard) == true)
                 throw new ArgumentException($"{nameof(subModules)}: can't use wildcard here");
+            
             Permission = permission;
             SubModules = subModules;
         }

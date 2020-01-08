@@ -65,9 +65,8 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         return;
                     }
 
-                    var requireTenant = httpContext.RequestServices
-                        .GetService<ITenantProvider>()
-                        .GetTenant(httpContext);
+                    var tenantProvider = httpContext.RequestServices.GetService<ITenantProvider>();
+                    var requireTenant = await tenantProvider.GetTenantAsync(httpContext);
 
                     foreach (var permissionAttribute in saP)
                     {
