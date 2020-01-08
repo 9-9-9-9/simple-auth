@@ -53,10 +53,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         return;
                     }
 
-                    var claimCachingService = httpContext.RequestServices.GetService<IClaimCachingService>();
-                    var simpleAuthorizationClaims = (
-                        await claimCachingService.GetClaimsAsync(saClaim.Value)
-                    ).OrEmpty().ToArray();
+                    var simpleAuthorizationClaims = (await authenticationInfoProvider.GetSimpleAuthClaimsAsync(saClaim)).OrEmpty().ToArray();
 
                     if (simpleAuthorizationClaims.Length == 0)
                     {

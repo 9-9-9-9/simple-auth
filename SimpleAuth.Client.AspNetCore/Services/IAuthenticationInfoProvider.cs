@@ -14,6 +14,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
         Task<IEnumerable<Claim>> GetClaims(HttpContext httpContext);
         Task<Claim> GetSimpleAuthClaim(HttpContext httpContext);
         Task<Claim> GenerateSimpleAuthClaimAsync(IEnumerable<SimpleAuthorizationClaim> claims);
+        Task<IEnumerable<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim);
     }
 
     public class DefaultAuthenticationInfoProvider : IAuthenticationInfoProvider
@@ -46,6 +47,13 @@ namespace SimpleAuth.Client.AspNetCore.Services
             var randomValue = Guid.NewGuid().ToString();
             await _claimCachingService.SaveClaimsAsync(randomValue, claims);
             return new Claim(SimpleAuthDefaults.ClaimType, randomValue);
+        }
+
+        public async Task<IEnumerable<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim)
+        {
+            if (claim?.Type != SimpleAuthDefaults.ClaimType)
+                throw new ArgumentException($"{nameof(claim)}: is not type '{SimpleAuthDefaults.ClaimType}'");
+            return (await _claimCachingService.GetClaimsAsync(claim.Value));
         }
     }
 }
