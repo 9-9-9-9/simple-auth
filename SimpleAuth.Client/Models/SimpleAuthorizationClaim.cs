@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
@@ -12,6 +13,22 @@ namespace SimpleAuth.Client.Models
     public class SimpleAuthorizationClaims
     {
         public List<SimpleAuthorizationClaim> Claims { get; set; }
+    }
+
+    public static class SimpleAuthorizationClaimExtensions
+    {
+        public static SimpleAuthorizationClaims ToSimpleAuthorizationClaims(this IEnumerable<RoleModel> roleModels)
+        {
+            return new SimpleAuthorizationClaims
+            {
+                Claims = roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList()
+            };
+        }
+
+        public static Claim ToClaim(this SimpleAuthorizationClaims simpleAuthorizationClaims, Func<SimpleAuthorizationClaims, string> serializer)
+        {
+            return new Claim(nameof(SimpleAuthorizationClaims), serializer(simpleAuthorizationClaims));
+        }
     }
 
     public class SimpleAuthorizationClaim

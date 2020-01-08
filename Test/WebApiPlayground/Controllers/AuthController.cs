@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -52,15 +51,10 @@ namespace WebApiPlayground.Controllers
         {
             var roleModels = await GetRoleModels();
 
-            const string email = "9-9-9-9";
-            
             var claimsIdentity = new ClaimsIdentity(
-                new []
+                new[]
                 {
-                    new Claim(nameof(SimpleAuthorizationClaims), _jsonService.Serialize(new SimpleAuthorizationClaims
-                    {
-                        Claims = roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList()
-                    })), 
+                    roleModels.ToSimpleAuthorizationClaims().ToClaim(x => _jsonService.Serialize(x))
                 },
                 CookieAuthenticationDefaults.AuthenticationScheme);
 
