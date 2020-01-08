@@ -40,11 +40,6 @@ namespace SimpleAuth.Shared.Models
                 Permission = role.Permission.Serialize()
             };
         }
-
-        public ModuleClaim ToClaim()
-        {
-            return new ModuleClaim(this, Constants.Identity.Issuer);
-        }
     }
 
     public class UpdateRolesModel

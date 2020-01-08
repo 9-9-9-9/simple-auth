@@ -68,6 +68,7 @@ namespace Microsoft.AspNetCore.Builder
             services
                 .RegisterModules<BasicServiceModules>()
                 .UseConfiguredTenantProvider();
+            services.AddSingleton<IJsonService, JsonNetService>();
             return services;
         }
     }

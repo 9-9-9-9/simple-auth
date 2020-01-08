@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -7,13 +6,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Services;
+using SimpleAuth.Client.Models;
+using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
-using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class SaAuthorizationMiddleware
     {
         private readonly RequestDelegate _next;
@@ -35,11 +36,24 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                 {
                     if (saM != null)
                     {
-                        var moduleClaims = httpContext.User.Claims.OfType<ModuleClaim>().ToList();
-                        if (!moduleClaims.IsAny())
+                        var claim =
+                            httpContext.User.Claims.FirstOrDefault(x => x.Type == nameof(SimpleAuthorizationClaims));
+                        if (claim == null)
                         {
-                            httpContext.Response
-                                .WithStatus(StatusCodes.Status403Forbidden);
+                            await httpContext.Response
+                                .WithStatus(StatusCodes.Status403Forbidden)
+                                .WithBody($"Missing {nameof(SimpleAuthorizationClaims)}");
+                            return;
+                        }
+
+                        var jsonService = httpContext.RequestServices.GetService<IJsonService>();
+                        var simpleAuthorizationClaims = jsonService.Deserialize<SimpleAuthorizationClaims>(claim.Value);
+                        
+                        if (simpleAuthorizationClaims.Claims.IsEmpty())
+                        {
+                            await httpContext.Response
+                                .WithStatus(StatusCodes.Status403Forbidden)
+                                .WithBody($"Missing {nameof(SimpleAuthorizationClaims.Claims)}");
                             return;
                         }
 
@@ -52,8 +66,8 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                             var roleFromModule =
                                 RoleUtils.JoinPartsFromModule(saM.Module, permissionAttribute.SubModules);
 
-                            var existingRole = moduleClaims.FirstOrDefault(x =>
-                                x.Type == roleFromModule
+                            var existingRole = simpleAuthorizationClaims.Claims.FirstOrDefault(x =>
+                                x.Module == roleFromModule
                                 &&
                                 (
                                     x.Tenant == Constants.WildCard
@@ -69,7 +83,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                                 return;
                             }
 
-                            if (existingRole.Permission.HasFlag(permissionAttribute.Permission))
+                            if (existingRole.PermissionEnum.HasFlag(permissionAttribute.Permission))
                             {
                                 // pass
                             }

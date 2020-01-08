@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Client;
+using SimpleAuth.Client.Models;
+using SimpleAuth.Client.Services;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
 
@@ -15,6 +17,13 @@ namespace WebApiPlayground.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
+        private readonly IJsonService _jsonService;
+
+        public AuthController(IJsonService jsonService)
+        {
+            _jsonService = jsonService;
+        }
+
         private async Task<IEnumerable<RoleModel>> GetRoleModels()
         {
             await Task.CompletedTask;
@@ -25,6 +34,8 @@ namespace WebApiPlayground.Controllers
             {
                 yield return Rm("g.a.e.t.weatherforecast", Permission.View);
                 yield return Rm("g.a.e.t.weatherforecast.a", Permission.View);
+                yield return Rm("g.a.e.t.weatherforecast.b", Permission.View);
+                yield return Rm("g.a.e.t.best", Permission.View);
             }
 
             //
@@ -48,8 +59,12 @@ namespace WebApiPlayground.Controllers
                 {
                     new Claim(ClaimTypes.NameIdentifier, email),
                     new Claim(ClaimTypes.Name, email),
-                    new Claim(ClaimTypes.Role, "User")
-                }.Concat(roleModels.Select(x => new ModuleClaim(x, "sa"))),
+                    new Claim(ClaimTypes.Role, "User"),
+                    new Claim(nameof(SimpleAuthorizationClaims), _jsonService.Serialize(new SimpleAuthorizationClaims
+                    {
+                        Claims = roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList()
+                    })), 
+                },
                 SimpleAuthDefaults.AuthenticationScheme);
 
             var authProperties = new AuthenticationProperties
