@@ -28,6 +28,19 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
 
             var saP = endpoint?.Metadata.OfType<SaPermissionAttribute>().OrEmpty().ToList();
             var saM = endpoint?.Metadata.GetMetadata<SaModuleAttribute>();
+
+            var isUserAuthenticated = httpContext.User.Identity.IsAuthenticated;
+            if (
+                (saP.IsAny() || saM != null)
+                &&
+                !isUserAuthenticated
+            )
+            {
+                httpContext.Response
+                    .WithStatus(StatusCodes.Status403Forbidden);
+                return;
+            }
+
             if (saP.IsAny())
             {
                 if (saM != null)
