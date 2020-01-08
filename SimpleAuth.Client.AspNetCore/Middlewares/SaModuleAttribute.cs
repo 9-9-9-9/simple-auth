@@ -1,4 +1,5 @@
 using System;
+using SimpleAuth.Shared;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
 {
@@ -10,6 +11,8 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
         
         public SaModuleAttribute(string module, bool restricted = true)
         {
+            if (module == Constants.WildCard)
+                throw new ArgumentException($"{nameof(module)}: can't use wildcard here");
             Module = module;
             Restricted = restricted;
         }

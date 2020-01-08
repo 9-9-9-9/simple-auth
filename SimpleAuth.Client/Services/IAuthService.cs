@@ -11,10 +11,10 @@ namespace SimpleAuth.Client.Services
 {
     public interface IAuthService : IClientService
     {
-        Task<ResponseUserModel> GetRolesAsync(string userId);
-        Task<ResponseUserModel> LoginUsingPasswordAsync(string userId, string password);
-        Task<ResponseUserModel> LoginUsingGoogleTokenAsync(LoginByGoogleRequest loginByGoogleRequest);
-        Task<bool> IsUserHavePermissionAsync(string userId, string roleId, Permission permission);
+        Task<ResponseUserModel> GetUserAsync(string userId);
+        Task<ResponseUserModel> GetUserAsync(string userId, string password);
+        Task<ResponseUserModel> GetUserAsync(LoginByGoogleRequest loginByGoogleRequest);
+        Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Permission permission);
     }
 
     public class DefaultAuthService : ClientService, IAuthService
@@ -35,7 +35,7 @@ namespace SimpleAuth.Client.Services
                 .WithFilterTenant();
         }
 
-        public async Task<ResponseUserModel> GetRolesAsync(string userId)
+        public async Task<ResponseUserModel> GetUserAsync(string userId)
         {
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
@@ -44,7 +44,7 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public async Task<ResponseUserModel> LoginUsingPasswordAsync(string userId, string password)
+        public async Task<ResponseUserModel> GetUserAsync(string userId, string password)
         {
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
@@ -54,7 +54,7 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public async Task<ResponseUserModel> LoginUsingGoogleTokenAsync(LoginByGoogleRequest loginByGoogleRequest)
+        public async Task<ResponseUserModel> GetUserAsync(LoginByGoogleRequest loginByGoogleRequest)
         {
             return await _httpService.DoHttpRequest2Async<ResponseUserModel>(
                 NewRequest()
@@ -64,7 +64,7 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public async Task<bool> IsUserHavePermissionAsync(string userId, string roleId, Permission permission)
+        public async Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Permission permission)
         {
             var res = await _httpService.DoHttpRequestAsync<string>(
                 NewRequest()
