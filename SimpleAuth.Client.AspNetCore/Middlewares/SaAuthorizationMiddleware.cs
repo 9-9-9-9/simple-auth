@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,49 +43,26 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             {
                 if (saM != null)
                 {
-                    var saClaim = await authenticationInfoProvider.GetSimpleAuthClaim(httpContext);
-                    if (saClaim == default)
-                    {
-                        await httpContext.Response
-                            .WithStatus(StatusCodes.Status403Forbidden)
-                            .WithBody($"Missing {SimpleAuthDefaults.ClaimType}");
-                        return;
-                    }
-
-                    var simpleAuthorizationClaims = (await authenticationInfoProvider.GetSimpleAuthClaimsAsync(saClaim)).OrEmpty().ToArray();
-
-                    if (simpleAuthorizationClaims.Length == 0)
-                    {
-                        await httpContext.Response
-                            .WithStatus(StatusCodes.Status403Forbidden)
-                            .WithBody($"Missing {nameof(SimpleAuthDefaults.ClaimType)}");
-                        return;
-                    }
+                    var claims = await authenticationInfoProvider.GetClaims(httpContext);
 
                     var tenantProvider = httpContext.RequestServices.GetService<ITenantProvider>();
                     var requireTenant = await tenantProvider.GetTenantAsync(httpContext);
 
-                    foreach (var permissionAttribute in saP)
+                    var requireClaims = saP.Select(x => new SimpleAuthorizationClaim(
+                        requireTenant,
+                        saM.Module,
+                        x.SubModules,
+                        x.Permission
+                    ));
+
+                    var missingClaims = (await claims.GetMissingClaimsAsync(requireClaims, httpContext.RequestServices)).OrEmpty().ToArray();
+                    if (missingClaims.Any())
                     {
-                        var requiredClaim = new SimpleAuthorizationClaim(
-                            requireTenant,
-                            saM.Module,
-                            permissionAttribute.SubModules,
-                            permissionAttribute.Permission
-                        );
-
-                        var hasPermission = simpleAuthorizationClaims.Any(x =>
-                            x.Contains(requiredClaim)
-                        );
-
-                        if (!hasPermission)
-                        {
-                            await httpContext.Response
-                                .WithStatus(StatusCodes.Status403Forbidden)
-                                .WithBody(
-                                    $"Require tenant '{requiredClaim.Tenant}', module '{requiredClaim.Module}', sub modules [{string.Join(",", requiredClaim.SubModules)}], permission {requiredClaim.Permission}");
-                            return;
-                        }
+                        await httpContext.Response
+                            .WithStatus(StatusCodes.Status403Forbidden)
+                            .WithBody(
+                                $"Require tenant '{missingClaims[0].Tenant}', module '{missingClaims[0].Module}', sub modules [{string.Join(",", missingClaims[0].SubModules)}], permission {missingClaims[0].Permission}");
+                        return;
                     }
                 }
             }

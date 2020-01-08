@@ -12,7 +12,8 @@ namespace SimpleAuth.Client.AspNetCore.Services
     {
         Task<bool> IsAuthenticated(HttpContext httpContext);
         Task<IEnumerable<Claim>> GetClaims(HttpContext httpContext);
-        Task<Claim> GetSimpleAuthClaim(HttpContext httpContext);
+        Task<Claim> GetSimpleAuthClaimAsync(HttpContext httpContext);
+        Claim GetSimpleAuthClaim(IEnumerable<Claim> claims);
         Task<Claim> GenerateSimpleAuthClaimAsync(IEnumerable<SimpleAuthorizationClaim> claims);
         Task<IEnumerable<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim);
     }
@@ -36,9 +37,13 @@ namespace SimpleAuth.Client.AspNetCore.Services
             return Task.FromResult(httpContext.User.Claims);
         }
 
-        public async Task<Claim> GetSimpleAuthClaim(HttpContext httpContext)
+        public async Task<Claim> GetSimpleAuthClaimAsync(HttpContext httpContext)
         {
-            var claims = await GetClaims(httpContext);
+            return GetSimpleAuthClaim(await GetClaims(httpContext));
+        }
+
+        public Claim GetSimpleAuthClaim(IEnumerable<Claim> claims)
+        {
             return claims.FirstOrDefault(x => x.Type == SimpleAuthDefaults.ClaimType);
         }
 
