@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Middlewares;
 using SimpleAuth.Client.AspNetCore.Services;
@@ -20,30 +13,6 @@ namespace Microsoft.AspNetCore.Builder
             this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<SaAuthorizationMiddleware>();
-        }
-
-        public static HttpResponse WithStatus(this HttpResponse httpResponse, int status)
-        {
-            httpResponse.StatusCode = status;
-            return httpResponse;
-        }
-
-        public static HttpResponse WithStatus(this HttpResponse httpResponse, HttpStatusCode status)
-        {
-            httpResponse.StatusCode = (int) status;
-            return httpResponse;
-        }
-
-        public static async Task<HttpResponse> WithBody(this HttpResponse httpResponse, string content)
-        {
-            return await httpResponse.WithBody(Encoding.UTF8.GetBytes(content), "text/plain; charset=UTF-8");
-        }
-
-        public static async Task<HttpResponse> WithBody(this HttpResponse httpResponse, byte[] buffer, string contentType)
-        {
-            httpResponse.ContentType = contentType;
-            await httpResponse.Body.WriteAsync(buffer);
-            return httpResponse;
         }
 
         public static IServiceCollection UseCustomTenantProvider<TTenantProvider>(this IServiceCollection serviceCollection)
@@ -73,13 +42,6 @@ namespace Microsoft.AspNetCore.Builder
                 .RegisterModules<ServiceModules>()
                 .UseConfiguredTenantProvider();
             return services;
-        }
-
-        public static async Task<Claim> GenerateSimpleAuthClaimAsync(this IEnumerable<SimpleAuthorizationClaim> claims,
-            IServiceProvider serviceProvider)
-        {
-            var authenticationInfoProvider = serviceProvider.GetService<IAuthenticationInfoProvider>();
-            return await authenticationInfoProvider.GenerateSimpleAuthClaimAsync(claims);
         }
     }
 }
