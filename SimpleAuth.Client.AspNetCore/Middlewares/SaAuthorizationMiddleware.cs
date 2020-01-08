@@ -45,8 +45,8 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             {
                 if (saM != null)
                 {
-                    var claim = (await authenticationInfoProvider.GetClaims(httpContext)).OfSimpleAuth();
-                    if (claim == default)
+                    var saClaim = await authenticationInfoProvider.GetSimpleAuthClaim(httpContext);
+                    if (saClaim == default)
                     {
                         await httpContext.Response
                             .WithStatus(StatusCodes.Status403Forbidden)
@@ -55,7 +55,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                     }
 
                     var jsonService = httpContext.RequestServices.GetService<IJsonService>();
-                    var simpleAuthorizationClaims = jsonService.Deserialize<SimpleAuthorizationClaim[]>(claim.Value);
+                    var simpleAuthorizationClaims = jsonService.Deserialize<SimpleAuthorizationClaim[]>(saClaim.Value);
 
                     if (simpleAuthorizationClaims.IsEmpty())
                     {

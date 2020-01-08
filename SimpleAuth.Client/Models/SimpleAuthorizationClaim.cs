@@ -101,10 +101,5 @@ namespace SimpleAuth.Client.Models
         {
             return new Claim(SimpleAuthDefaults.ClaimType, serializer(simpleAuthorizationClaims.OrEmpty().ToArray()));
         }
-
-        public static Claim OfSimpleAuth(this IEnumerable<Claim> claims)
-        {
-            return claims.FirstOrDefault(x => x.Type == SimpleAuthDefaults.ClaimType);
-        }
     }
 }
