@@ -13,16 +13,14 @@ namespace SimpleAuth.Client.AspNetCore.Services
 
     public class DefaultAuthenticationInfoProvider : IAuthenticationInfoProvider
     {
-        public async Task<bool> IsAuthenticated(HttpContext httpContext)
+        public Task<bool> IsAuthenticated(HttpContext httpContext)
         {
-            await Task.CompletedTask;
-            return httpContext.User.Identity.IsAuthenticated;
+            return Task.FromResult(httpContext.User.Identity.IsAuthenticated);
         }
 
-        public async Task<IEnumerable<Claim>> GetClaims(HttpContext httpContext)
+        public Task<IEnumerable<Claim>> GetClaims(HttpContext httpContext)
         {
-            await Task.CompletedTask;
-            return httpContext.User.Claims;
+            return Task.FromResult(httpContext.User.Claims);
         }
     }
 }
