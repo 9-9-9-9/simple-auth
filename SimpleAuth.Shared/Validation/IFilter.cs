@@ -187,7 +187,7 @@ namespace SimpleAuth.Shared.Validation
         }
     }
 
-    public class FilterSubModulePartInput : RolePartsFilter
+    public class FilterSubModulePartInput : RolePartsAcceptWildCardFilter
     {
     }
 
@@ -205,7 +205,9 @@ namespace SimpleAuth.Shared.Validation
             if (!vr.IsValid)
                 return vr;
 
-            foreach (var part in src.Split(Constants.ChSplitterSubModules))
+            var spl = src.Split(Constants.ChSplitterSubModules);
+
+            foreach (var part in spl)
             {
                 vr = new FilterSubModulePartInput().IsValid(part);
                 if (!vr.IsValid)
