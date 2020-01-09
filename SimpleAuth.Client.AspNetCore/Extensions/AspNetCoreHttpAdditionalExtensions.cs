@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,28 +13,21 @@ namespace Microsoft.AspNetCore.Http
 {
     public static class AspNetCoreHttpAdditionalExtensions
     {
-        public static HttpResponse WithStatus(this HttpResponse httpResponse, int status)
+        internal static HttpResponse WithStatus(this HttpResponse httpResponse, int status)
         {
             httpResponse.StatusCode = status;
             return httpResponse;
         }
 
-        public static HttpResponse WithStatus(this HttpResponse httpResponse, HttpStatusCode status)
+        internal static async Task WithBody(this HttpResponse httpResponse, string content)
         {
-            httpResponse.StatusCode = (int) status;
-            return httpResponse;
+            await httpResponse.WithBody(Encoding.UTF8.GetBytes(content), "text/plain; charset=UTF-8");
         }
 
-        public static async Task<HttpResponse> WithBody(this HttpResponse httpResponse, string content)
-        {
-            return await httpResponse.WithBody(Encoding.UTF8.GetBytes(content), "text/plain; charset=UTF-8");
-        }
-
-        public static async Task<HttpResponse> WithBody(this HttpResponse httpResponse, byte[] buffer, string contentType)
+        private static async Task WithBody(this HttpResponse httpResponse, byte[] buffer, string contentType)
         {
             httpResponse.ContentType = contentType;
             await httpResponse.Body.WriteAsync(buffer);
-            return httpResponse;
         }
 
         public static async Task<IEnumerable<SimpleAuthorizationClaim>> GetMissingClaimsAsync(
