@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
+using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
 {
@@ -46,30 +48,31 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                 {
                     var claims = await authenticationInfoProvider.GetClaims(httpContext);
 
+                    var configurationProvider = httpContext.RequestServices.GetService<ISimpleAuthConfigurationProvider>();
                     var tenantProvider = httpContext.RequestServices.GetService<ITenantProvider>();
+                    var requireCorp = configurationProvider.Corp;
+                    var requireApp = configurationProvider.App;
+                    var requireEnv = configurationProvider.Env;
                     var requireTenant = await tenantProvider.GetTenantAsync(httpContext);
-
-                    var requireClaims = saP.Select(x => new SimpleAuthorizationClaim(
-                        requireTenant,
-                        saM.Module,
-                        x.SubModules,
-                        x.Permission
-                    )).ToArray();
+                    
+                    var requireClaims = saP.Select(x => new SimpleAuthorizationClaim(new ClientRoleModel
+                    {
+                        Corp = requireCorp,
+                        App = requireApp,
+                        Env = requireEnv,
+                        Tenant = requireTenant,
+                        Module = saM.Module,
+                        SubModules = x.SubModules,
+                        Permission = x.Permission
+                    })).ToArray();
 
                     var missingClaims = (await claims.GetMissingClaimsAsync(requireClaims, httpContext.RequestServices)).OrEmpty().ToArray();
                     if (missingClaims.Any())
                     {
-                        if (missingClaims.Length == requireClaims.Length)
-                        {
-                            await httpContext.Response
-                                .WithStatus(StatusCodes.Status403Forbidden)
-                                .WithBody($"Missing {nameof(SimpleAuthorizationClaim)}");
-                            return;
-                        }
                         await httpContext.Response
                             .WithStatus(StatusCodes.Status403Forbidden)
                             .WithBody(
-                                $"Require tenant '{missingClaims[0].Tenant}', module '{missingClaims[0].Module}', sub modules [{string.Join(",", missingClaims[0].SubModules)}], permission {missingClaims[0].Permission}");
+                                $"Require {missingClaims[0].ClientRoleModel}");
                         return;
                     }
                 }

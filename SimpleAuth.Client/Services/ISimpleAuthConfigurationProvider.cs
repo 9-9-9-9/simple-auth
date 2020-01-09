@@ -6,6 +6,8 @@ namespace SimpleAuth.Client.Services
     {
         string CorpToken { get; }
         string AppToken { get; }
+        string Corp { get; }
+        string App { get; }
         string Env { get; }
         string Tenant { get; }
         string EndPointUrl { get; }
@@ -23,6 +25,8 @@ namespace SimpleAuth.Client.Services
 
         public string CorpToken => _simpleAuthSettings.CorpToken;
         public string AppToken => _simpleAuthSettings.AppToken;
+        public string Corp => _simpleAuthSettings.Corp;
+        public string App => _simpleAuthSettings.App;
         public string Env => _simpleAuthSettings.Env;
         public string Tenant => _simpleAuthSettings.Tenant;
         public string EndPointUrl { get; }

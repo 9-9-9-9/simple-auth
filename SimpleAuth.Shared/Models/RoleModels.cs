@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
+using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 
@@ -61,5 +63,18 @@ namespace SimpleAuth.Shared.Models
         public string Tenant { get; set; }
         public string Module { get; set; }
         public string[] SubModules { get; set; }
+        public Permission Permission { get; set; }
+        public override string ToString()
+        {
+            var sb = new StringBuilder($"{Corp}.{App}.{Env}.{Tenant}.{Module}");
+            if (SubModules.IsAny())
+            {
+                sb.Append('.');
+                sb.Append(string.Join(Constants.SplitterSubModules, SubModules));
+            }
+
+            sb.Append($", Permission: {Permission}");
+            return sb.ToString();
+        }
     }
 }

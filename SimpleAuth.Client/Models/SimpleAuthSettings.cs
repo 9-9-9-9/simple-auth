@@ -4,6 +4,8 @@ namespace SimpleAuth.Client.Models
     {
         public string CorpToken { get; set; }
         public string AppToken { get; set; }
+        public string Corp { get; set; }
+        public string App { get; set; }
         public string Env { get; set; }
         public string Tenant { get; set; }
         

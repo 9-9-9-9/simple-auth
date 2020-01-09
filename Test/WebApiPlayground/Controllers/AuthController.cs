@@ -34,10 +34,10 @@ namespace WebApiPlayground.Controllers
             //
             IEnumerable<RoleModel> YieldResults()
             {
-                yield return Rm("g.a.e.t.weatherforecast", Permission.View);
-                yield return Rm("g.a.e.t.weatherforecast.*", Permission.View);
-                yield return Rm("g.a.e.t.best", Permission.View);
-                yield return Rm("g.a.e.t.best.a", Permission.View);
+                yield return Rm("c.a.e.t.weatherforecast", Permission.View);
+                yield return Rm("c.a.e.t.weatherforecast.*", Permission.View);
+                yield return Rm("c.a.e.t.best", Permission.View);
+                yield return Rm("c.a.e.t.best.a", Permission.View);
             }
 
             //

@@ -27,6 +27,9 @@ namespace WebApiPlayground
                 SimpleAuthServerUrl = "http://standingtrust.com",
                 CorpToken = "c",
                 AppToken = "a",
+                Corp = "c",
+                App = "a",
+                Env = "e",
                 Tenant = "t"
             });
             
