@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
 using SimpleAuth.Client.Exceptions;
@@ -9,6 +10,7 @@ using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.Services
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public interface IAuthService : IClientService
     {
         Task<ResponseUserModel> GetUserAsync(string userId);
@@ -69,8 +71,7 @@ namespace SimpleAuth.Client.Services
             var res = await _httpService.DoHttpRequestAsync<string>(
                 NewRequest()
                     .Append(EndpointBuilder.User.CheckUserPermission(userId, roleId, permission.Serialize()))
-                    .Method(Constants.HttpMethods.GET), 
-                null
+                    .Method(Constants.HttpMethods.GET)
             );
             if (res.Item2 == HttpStatusCode.OK)
                 return true;
