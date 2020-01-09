@@ -1,16 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Shared.Enums;
-using SimpleAuth.Shared.Models;
 
 namespace WebApiPlayground.Controllers
 {
@@ -18,41 +14,19 @@ namespace WebApiPlayground.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IJsonService _jsonService;
+        private readonly IAuthService _authService;
 
-        public AuthController(IJsonService jsonService, IServiceProvider serviceProvider)
+        public AuthController(IServiceProvider serviceProvider, IAuthService authService)
         {
-            _jsonService = jsonService;
             _serviceProvider = serviceProvider;
-        }
-
-        private async Task<IEnumerable<RoleModel>> GetRoleModels()
-        {
-            await Task.CompletedTask;
-            return YieldResults();
-
-            //
-            IEnumerable<RoleModel> YieldResults()
-            {
-                yield return Rm("c.a.e.t.weatherforecast", Permission.View);
-                yield return Rm("c.a.e.t.weatherforecast.*", Permission.View);
-                yield return Rm("c.a.e.t.best", Permission.View);
-                yield return Rm("c.a.e.t.best.a", Permission.View);
-            }
-
-            //
-            RoleModel Rm(string roleId, Permission permission) => new RoleModel
-            {
-                Role = roleId,
-                Permission = permission.Serialize()
-            };
+            _authService = authService;
         }
 
         [AllowAnonymous]
         [HttpGet, HttpPost, Route("si")]
         public async Task<IActionResult> SignIn()
         {
-            var roleModels = await GetRoleModels();
+            var roleModels = (await _authService.GetUserAsync(string.Empty)).ActiveRoles;
 
             var claim = await roleModels.ToSimpleAuthorizationClaims().GenerateSimpleAuthClaimAsync(_serviceProvider);
             var claimsIdentity = new ClaimsIdentity(

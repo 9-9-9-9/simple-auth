@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleAuth.Client.Models;
+using SimpleAuth.Client.Services;
+using WebApiPlayground.Services;
 
 namespace WebApiPlayground
 {
@@ -39,6 +41,9 @@ namespace WebApiPlayground
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
+            
+            // dummy
+            services.AddSingleton<IAuthService, DummyAuthService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
