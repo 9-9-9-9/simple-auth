@@ -8,7 +8,7 @@ namespace SimpleAuth.Client.Models
         public string Env { get; set; }
         public string Tenant { get; set; }
         
-        public string SimpleAuthServerUrl { get; set; } = "http://standingtrust.com"; //TODO https
+        public string SimpleAuthServerUrl { get; set; } = "https://standingtrust.com"; //TODO https
     }
 
     public class SimpleAuthTokenSettings

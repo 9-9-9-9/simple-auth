@@ -3,6 +3,7 @@ using System.Linq;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
+using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Shared.Domains
 {
@@ -11,6 +12,13 @@ namespace SimpleAuth.Shared.Domains
         public string RoleId { get; set; }
         public bool Locked { get; set; }
         public Permission Permission { get; set; }
+
+        public ClientRoleModel ToClientRoleModel()
+        {
+            RoleUtils.Parse(RoleId, out var clientRoleModel);
+            clientRoleModel.Permission = Permission;
+            return clientRoleModel;
+        }
     }
     
     public static class RoleExtensions

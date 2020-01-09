@@ -14,7 +14,7 @@ namespace SimpleAuth.Shared.Utils
                 : $"{module}{Constants.SplitterRoleParts}{string.Join(Constants.SplitterSubModules, subModules)}";
         }
 
-        public static void Parse(string roleId, string permission, out ClientRoleModel clientRoleModel)
+        public static void Parse(string roleId, out ClientRoleModel clientRoleModel)
         {
             var spl = roleId.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
             if (spl.Length < 5 || spl.Length > 6)
@@ -39,9 +39,15 @@ namespace SimpleAuth.Shared.Utils
                 Env = spl[2],
                 Tenant = spl[3],
                 Module = spl[4],
-                SubModules = subModules,
-                Permission = permission.Deserialize()
+                SubModules = subModules
             };
+        }
+
+        public static void Parse(string roleId, string permission, out ClientRoleModel clientRoleModel)
+        {
+            Parse(roleId, out var tmpClientRoleModel);
+            tmpClientRoleModel.Permission = permission.Deserialize();
+            clientRoleModel = tmpClientRoleModel;
         }
         
         public static bool ContainsOrEquals(ClientRoleModel big, ClientRoleModel small, ComparisionFlag comparisionFlag)

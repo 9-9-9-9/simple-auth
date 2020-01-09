@@ -10,6 +10,7 @@ using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
+using SimpleAuth.Shared.Utils;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
 using Role = SimpleAuth.Shared.Domains.Role;
 using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
@@ -25,7 +26,7 @@ namespace SimpleAuth.Services
         Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromAllGroups(User user, string corp);
         Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null, string tenant = null);
-        Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app, string env = null, string tenant = null);
+        Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app);
         Task UpdateLockStatusAsync(User user);
         Task UpdatePasswordAsync(User user);
     }
@@ -228,42 +229,18 @@ namespace SimpleAuth.Services
             return roles;
         }
 
-        public async Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app,
-            string env = null, string tenant = null)
+        public async Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app)
         {
             if (permission == Permission.None)
                 throw new ArgumentException(nameof(permission));
+
+            var activeRoles = await GetActiveRolesAsync(userId, corp, app);
+            var userActiveClientRoleModels = activeRoles.Select(x => x.ToClientRoleModel());
             
-            var isThisRoleLocked = await _roleRepository.FindSingleAsync(new Expression<Func<Entities.Role, bool>>[]
-            {
-                x =>
-                    x.Corp == corp
-                    &&
-                    x.App == app
-                    &&
-                    x.Locked
-                    &&
-                    x.Id == roleId
-            }) != default;
+            RoleUtils.Parse(roleId, out var requireClientRoleModel);
+            requireClientRoleModel.Permission = permission;
 
-            if (isThisRoleLocked)
-                return false;
-            
-            var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
-
-            var permissionsOfSameRoleRecord = roleRecords
-                .Where(x => x.RoleId == roleId)
-                .ToList();
-
-            if (permissionsOfSameRoleRecord.IsEmpty())
-                return false;
-
-            var roles = permissionsOfSameRoleRecord
-                .Select(x => x.ToDomainObject())
-                .DistinctRoles()
-                .ToList();
-            
-            return roles.First().Permission.HasFlag(permission);
+            return userActiveClientRoleModels.Any(x => RoleUtils.ContainsOrEquals(x, requireClientRoleModel, RoleUtils.ComparisionFlag.All));
         }
 
         private async Task<IEnumerable<RoleRecord>> FindRoleRecordsBasedOnFilterAsync(string userId, string corp, string app, string env, string tenant)
