@@ -1,5 +1,3 @@
-using SimpleAuth.Shared.Enums;
-
 namespace SimpleAuth.Client.Utils
 {
     public static class EndpointBuilder

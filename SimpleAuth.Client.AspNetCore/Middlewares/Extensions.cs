@@ -4,17 +4,13 @@ using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.DependencyInjection;
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace Microsoft.AspNetCore.Builder
 {
     public static class Extensions
     {
-        public static IApplicationBuilder UseSaAuthorization(
-            this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<SaAuthorizationMiddleware>();
-        }
-
         public static IServiceCollection UseCustomTenantProvider<TTenantProvider>(this IServiceCollection serviceCollection)
             where TTenantProvider : class, ITenantProvider
         {

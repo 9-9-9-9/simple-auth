@@ -20,6 +20,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             _next = next;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public async Task InvokeAsync(HttpContext httpContext)
         {
             var authenticationInfoProvider = httpContext.RequestServices.GetService<IAuthenticationInfoProvider>();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using SimpleAuth.Client.Models;
 
 namespace SimpleAuth.Client.AspNetCore.Services
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public interface IAuthenticationInfoProvider
     {
         Task<bool> IsAuthenticated(HttpContext httpContext);
