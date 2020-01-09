@@ -25,8 +25,11 @@ namespace WebApiPlayground
             services.UseSimpleAuthDefaultServices(new SimpleAuthSettings
             {
                 SimpleAuthServerUrl = "http://standingtrust.com",
-                CorpToken = "c",
-                AppToken = "a",
+                TokenSettings = new SimpleAuthTokenSettings
+                {
+                    CorpToken = "",
+                    AppToken = ""
+                },
                 Corp = "c",
                 App = "a",
                 Env = "e",

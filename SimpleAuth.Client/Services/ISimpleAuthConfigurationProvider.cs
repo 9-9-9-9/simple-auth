@@ -23,8 +23,8 @@ namespace SimpleAuth.Client.Services
             EndPointUrl = _simpleAuthSettings.SimpleAuthServerUrl?.TrimEnd('/');
         }
 
-        public string CorpToken => _simpleAuthSettings.CorpToken;
-        public string AppToken => _simpleAuthSettings.AppToken;
+        public string CorpToken => _simpleAuthSettings.TokenSettings.CorpToken;
+        public string AppToken => _simpleAuthSettings.TokenSettings.AppToken;
         public string Corp => _simpleAuthSettings.Corp;
         public string App => _simpleAuthSettings.App;
         public string Env => _simpleAuthSettings.Env;
