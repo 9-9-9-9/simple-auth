@@ -1,5 +1,6 @@
 using System;
 using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Shared.Utils
 {
@@ -12,18 +13,13 @@ namespace SimpleAuth.Shared.Utils
                 : $"{module}{Constants.SplitterRoleParts}{string.Join(Constants.SplitterSubModules, subModules)}";
         }
 
-        public static void Parse(string roleId, out string corp, out string app, out string env, out string tenant,
-            out string module, out string[] subModules)
+        public static void Parse(string roleId, out ClientRoleModel clientRoleModel)
         {
             var spl = roleId.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
             if (spl.Length < 5 || spl.Length > 6)
                 throw new ArgumentException(nameof(roleId));
-            corp = spl[0];
-            app = spl[1];
-            env = spl[2];
-            tenant = spl[3];
-            module = spl[4];
 
+            string[] subModules;
             if (spl.Length == 6)
             {
                 subModules = spl[5].Split(new[] {Constants.ChSplitterSubModules}, StringSplitOptions.None);
@@ -34,6 +30,16 @@ namespace SimpleAuth.Shared.Utils
             {
                 subModules = new string[0];
             }
+            
+            clientRoleModel = new ClientRoleModel
+            {
+                Corp = spl[0],
+                App = spl[1],
+                Env = spl[2],
+                Tenant = spl[3],
+                Module = spl[4],
+                SubModules = subModules
+            };
         }
     }
 }

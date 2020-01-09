@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
+using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 
 namespace SimpleAuth.Shared.Models
@@ -32,7 +32,7 @@ namespace SimpleAuth.Shared.Models
         public string Role { get; set; }
         public string Permission { get; set; }
 
-        public static RoleModel Cast(Domains.Role role)
+        public static RoleModel Cast(Role role)
         {
             return new RoleModel
             {
@@ -51,5 +51,15 @@ namespace SimpleAuth.Shared.Models
     public class DeleteRolesModel
     {
         public RoleModel[] Roles { get; set; }
+    }
+
+    public class ClientRoleModel : ICorpRelated, IAppRelated, IEnvRelated, ITenantRelated, IModuleRelated, IRawSubModulesRelated
+    {
+        public string Corp { get; set; }
+        public string App { get; set; }
+        public string Env { get; set; }
+        public string Tenant { get; set; }
+        public string Module { get; set; }
+        public string[] SubModules { get; set; }
     }
 }

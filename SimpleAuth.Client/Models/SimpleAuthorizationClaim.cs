@@ -39,10 +39,10 @@ namespace SimpleAuth.Client.Models
 
         public SimpleAuthorizationClaim(RoleModel roleModel)
         {
-            RoleUtils.Parse(roleModel.Role, out _, out _, out _, out var tenant, out var module, out var submodules);
-            Tenant = tenant;
-            Module = module;
-            SubModules = submodules;
+            RoleUtils.Parse(roleModel.Role, out var clientRoleModel);
+            Tenant = clientRoleModel.Tenant;
+            Module = clientRoleModel.Module;
+            SubModules = clientRoleModel.SubModules;
             Permission = roleModel.Permission.Deserialize();
         }
 
