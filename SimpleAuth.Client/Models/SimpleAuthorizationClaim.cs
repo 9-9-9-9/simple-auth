@@ -11,12 +11,14 @@ namespace SimpleAuth.Client.Models
 {
     public class SimpleAuthorizationClaim
     {
+        // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
         public string Tenant { get; set; }
         public string Module { get; set; }
         public string[] SubModules { get; set; }
-
         public Permission Permission { get; set; }
+        // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
 
+        // ReSharper disable UnusedMember.Global
         public SimpleAuthorizationClaim()
         {
         }
@@ -25,6 +27,7 @@ namespace SimpleAuth.Client.Models
             : this(tenant, module, subModules, permission.Deserialize())
         {
         }
+        // ReSharper restore UnusedMember.Global
 
         public SimpleAuthorizationClaim(string tenant, string module, string[] subModules, Permission permission)
         {
