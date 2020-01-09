@@ -11,7 +11,7 @@ using SimpleAuth.Shared.Models;
 namespace SimpleAuth.Client.Services
 {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public interface IAuthService : IClientService
+    public interface IUserAuthService : IClientService
     {
         Task<ResponseUserModel> GetUserAsync(string userId);
         Task<ResponseUserModel> GetUserAsync(string userId, string password);
@@ -19,11 +19,11 @@ namespace SimpleAuth.Client.Services
         Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Permission permission);
     }
 
-    public class DefaultAuthService : ClientService, IAuthService
+    public class DefaultUserAuthService : ClientService, IUserAuthService
     {
         private readonly IHttpService _httpService;
 
-        public DefaultAuthService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
+        public DefaultUserAuthService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
             IHttpService httpService) : base(simpleAuthConfigurationProvider)
         {
             _httpService = httpService;

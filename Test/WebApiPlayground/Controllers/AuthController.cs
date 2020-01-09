@@ -14,19 +14,19 @@ namespace WebApiPlayground.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IAuthService _authService;
+        private readonly IUserAuthService _userAuthService;
 
-        public AuthController(IServiceProvider serviceProvider, IAuthService authService)
+        public AuthController(IServiceProvider serviceProvider, IUserAuthService userAuthService)
         {
             _serviceProvider = serviceProvider;
-            _authService = authService;
+            _userAuthService = userAuthService;
         }
 
         [AllowAnonymous]
         [HttpGet, HttpPost, Route("si")]
         public async Task<IActionResult> SignIn()
         {
-            var roleModels = (await _authService.GetUserAsync(string.Empty)).ActiveRoles;
+            var roleModels = (await _userAuthService.GetUserAsync(string.Empty)).ActiveRoles;
 
             var claim = await roleModels.ToSimpleAuthorizationClaims().GenerateSimpleAuthClaimAsync(_serviceProvider);
             var claimsIdentity = new ClaimsIdentity(

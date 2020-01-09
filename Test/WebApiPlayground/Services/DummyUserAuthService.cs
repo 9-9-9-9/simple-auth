@@ -8,7 +8,7 @@ using SimpleAuth.Shared.Models;
 
 namespace WebApiPlayground.Services
 {
-    public class DummyAuthService : IAuthService
+    public class DummyUserAuthService : IUserAuthService
     {
         public Task<ResponseUserModel> GetUserAsync(string userId)
         {
