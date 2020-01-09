@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
@@ -7,13 +10,39 @@ namespace SimpleAuth.Shared.Utils
 {
     public static class RoleUtils
     {
-        public static string JoinPartsFromModule(string module, string[] subModules)
+        public static string ComputeRoleId(string corp, string app, string env, string tenant, string module,
+            string subModules)
         {
-            return subModules.IsEmpty()
-                ? module
-                : $"{module}{Constants.SplitterRoleParts}{string.Join(Constants.SplitterSubModules, subModules)}";
-        }
+            var sb = new StringBuilder();
+            sb.Append(corp);
+            sb.Append(Constants.SplitterRoleParts);
+            sb.Append(app);
+            sb.Append(Constants.SplitterRoleParts);
+            sb.Append(env);
+            sb.Append(Constants.SplitterRoleParts);
+            sb.Append(tenant);
+            sb.Append(Constants.SplitterRoleParts);
+            sb.Append(module);
 
+            if (!subModules.IsBlank())
+            {
+                sb.Append(Constants.SplitterRoleParts);
+                sb.Append(subModules);
+            }
+
+            return sb.ToString().NormalizeInput();
+        }
+        public static string ComputeRoleId(string corp, string app, string env, string tenant, string module,
+            string[] subModules)
+        {
+            return ComputeRoleId(corp, app, env, tenant, module, JoinSubModules(subModules));
+        }
+        
+        public static string JoinSubModules(IEnumerable<string> subModules)
+        {
+            return string.Join(Constants.SplitterSubModules, subModules.Or(new string[0]));
+        }
+        
         public static void Parse(string roleId, out ClientRoleModel clientRoleModel)
         {
             var spl = roleId.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
@@ -95,14 +124,36 @@ namespace SimpleAuth.Shared.Utils
                     throw new ArgumentNullException(nameof(sBig));
                 if (sSmall.IsBlank())
                     throw new ArgumentNullException(nameof(sSmall));
-                if (sSmall == Constants.WildCard)
-                    throw new ArgumentException($"Argument '{nameof(sSmall)}' can not be a wildcard");
                 if (sBig == sSmall)
                     return true;
                 if (sBig == Constants.WildCard)
                     return true;
                 return false;
             }
+        }
+
+        public static IEnumerable<ClientRoleModel> Distinct(IEnumerable<ClientRoleModel> source)
+        {
+            var org = source.ToList();
+            var toBeRemoved = new HashSet<ClientRoleModel>();
+            foreach (var candidateBig in org)
+            {
+                if (toBeRemoved.Contains(candidateBig))
+                    continue;
+                foreach (var candidateSmall in org)
+                {
+                    if (candidateBig == candidateSmall)
+                        continue;
+                 
+                    if (toBeRemoved.Contains(candidateSmall))
+                        continue;
+
+                    if (ContainsOrEquals(candidateBig, candidateSmall, ComparisionFlag.All))
+                        toBeRemoved.Add(candidateSmall);
+                }    
+            }
+
+            return org.Except(toBeRemoved);
         }
 
         [Flags]

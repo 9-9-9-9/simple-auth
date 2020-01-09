@@ -516,18 +516,18 @@ namespace Test.SimpleAuth.Shared.Test.Services
             #endregion
 
             var roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a");
-            Assert.AreEqual(5, roles.Count);
+            Assert.AreEqual(1, roles.Count);
 
             Assert.That(async () => await uSvc.GetActiveRolesAsync(user.Id, corp, "a", "*"), Throws.TypeOf<ArgumentException>());
             
             roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", null, "t1");
-            Assert.AreEqual(4, roles.Count);
+            Assert.AreEqual(1, roles.Count);
             
             roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", null, "t2");
-            Assert.AreEqual(3, roles.Count);
+            Assert.AreEqual(1, roles.Count);
             
             roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", "e", "t2");
-            Assert.AreEqual(3, roles.Count);
+            Assert.AreEqual(1, roles.Count);
             
             roles = await uSvc.GetActiveRolesAsync(user.Id, corp, "a", "e2", "t2");
             Assert.AreEqual(1, roles.Count);

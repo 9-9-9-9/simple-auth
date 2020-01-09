@@ -10,6 +10,7 @@ using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
+using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
 using Role = SimpleAuth.Shared.Domains.Role;
@@ -224,6 +225,9 @@ namespace SimpleAuth.Services
             roles = roles
                 .Where(x => !lockedRoles.Contains(x.RoleId))
                 .DistinctRoles()
+                .Select(x => x.ToClientRoleModel())
+                .DistinctRoles()
+                .Select(x => x.ToRole())
                 .ToList();
 
             return roles;
