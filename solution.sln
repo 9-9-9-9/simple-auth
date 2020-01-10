@@ -1,37 +1,43 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Server", "SimpleAuth.Server\SimpleAuth.Server.csproj", "{CB80837A-61BF-4AF1-B7E3-A2E5396206B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.Server", "SimpleAuth.Server\SimpleAuth.Server.csproj", "{CB80837A-61BF-4AF1-B7E3-A2E5396206B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Core", "SimpleAuth.Core\SimpleAuth.Core.csproj", "{75A02AD6-918A-42C8-9746-EA1CF55D6A2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.Core", "SimpleAuth.Core\SimpleAuth.Core.csproj", "{75A02AD6-918A-42C8-9746-EA1CF55D6A2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Shared", "SimpleAuth.Shared\SimpleAuth.Shared.csproj", "{D353D14C-F3E9-48EC-8FA0-C1C9543987CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.Shared", "SimpleAuth.Shared\SimpleAuth.Shared.csproj", "{D353D14C-F3E9-48EC-8FA0-C1C9543987CC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.SimpleAuth.Core", "Test\Test.SimpleAuth.Core\Test.SimpleAuth.Core.csproj", "{670DB8FA-BA9D-43F4-9DEF-8779530E0B1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.SimpleAuth.Core", "Test\Test.SimpleAuth.Core\Test.SimpleAuth.Core.csproj", "{670DB8FA-BA9D-43F4-9DEF-8779530E0B1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.SimpleAuth.Server", "Test\Test.SimpleAuth.Server\Test.SimpleAuth.Server.csproj", "{ED8E4BF0-80E0-4DC0-B057-967624B20198}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.SimpleAuth.Server", "Test\Test.SimpleAuth.Server\Test.SimpleAuth.Server.csproj", "{ED8E4BF0-80E0-4DC0-B057-967624B20198}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.SimpleAuth.Shared", "Test\Test.SimpleAuth.Shared\Test.SimpleAuth.Shared.csproj", "{64E9F169-E9C8-4722-9DB4-05A22D774EF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.SimpleAuth.Shared", "Test\Test.SimpleAuth.Shared\Test.SimpleAuth.Shared.csproj", "{64E9F169-E9C8-4722-9DB4-05A22D774EF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Sqlite", "SimpleAuth.Sqlite\SimpleAuth.Sqlite.csproj", "{14B875BC-676A-4CEB-BD5D-5CBCFA647AC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.Sqlite", "SimpleAuth.Sqlite\SimpleAuth.Sqlite.csproj", "{14B875BC-676A-4CEB-BD5D-5CBCFA647AC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Services", "SimpleAuth.Services\SimpleAuth.Services.csproj", "{7325FFF0-C094-4532-87B5-524494CC96F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.Services", "SimpleAuth.Services\SimpleAuth.Services.csproj", "{7325FFF0-C094-4532-87B5-524494CC96F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.InMemoryDb", "SimpleAuth.InMemoryDb\SimpleAuth.InMemoryDb.csproj", "{6B77701C-4261-4F2B-AB0A-6AF1334CA96C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.InMemoryDb", "SimpleAuth.InMemoryDb\SimpleAuth.InMemoryDb.csproj", "{6B77701C-4261-4F2B-AB0A-6AF1334CA96C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DatabasesImplementation", "DatabasesImplementation", "{032F5A05-F6B9-4778-BC1B-CBAB321D6C62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Client", "SimpleAuth.Client\SimpleAuth.Client.csproj", "{4D27D496-1AC3-49B3-BF50-5F485B3FE327}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.Client", "SimpleAuth.Client\SimpleAuth.Client.csproj", "{4D27D496-1AC3-49B3-BF50-5F485B3FE327}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevPlayground", "Test\DevPlayground\DevPlayground.csproj", "{A976AA8C-4297-48BD-AB20-B2C04FE26495}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevPlayground", "Test\DevPlayground\DevPlayground.csproj", "{A976AA8C-4297-48BD-AB20-B2C04FE26495}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Client.AspNetCore", "SimpleAuth.Client.AspNetCore\SimpleAuth.Client.AspNetCore.csproj", "{3AAD14CE-D13E-4034-B435-9BC3693932F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleAuth.Client.AspNetCore", "SimpleAuth.Client.AspNetCore\SimpleAuth.Client.AspNetCore.csproj", "{3AAD14CE-D13E-4034-B435-9BC3693932F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiPlayground", "Test\WebApiPlayground\WebApiPlayground.csproj", "{1DE93AA1-4136-4B10-B1B2-2760EBFE9C44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiPlayground", "Test\WebApiPlayground\WebApiPlayground.csproj", "{1DE93AA1-4136-4B10-B1B2-2760EBFE9C44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdministratorConsole", "ManagementTools\AdministratorConsole\AdministratorConsole.csproj", "{C36B6A92-EC79-41C2-9B51-79768AE16764}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ManagementTools", "ManagementTools", "{F97DA732-802E-4C94-800D-AF1E8772E829}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApps.Shared", "ManagementTools\ConsoleApps.Shared\ConsoleApps.Shared.csproj", "{B683E7D5-836E-457C-BE49-5B983FA42383}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,9 +47,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CB80837A-61BF-4AF1-B7E3-A2E5396206B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -202,6 +205,33 @@ Global
 		{1DE93AA1-4136-4B10-B1B2-2760EBFE9C44}.Release|x64.Build.0 = Release|Any CPU
 		{1DE93AA1-4136-4B10-B1B2-2760EBFE9C44}.Release|x86.ActiveCfg = Release|Any CPU
 		{1DE93AA1-4136-4B10-B1B2-2760EBFE9C44}.Release|x86.Build.0 = Release|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Debug|x64.Build.0 = Debug|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Debug|x86.Build.0 = Debug|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Release|x64.ActiveCfg = Release|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Release|x64.Build.0 = Release|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Release|x86.ActiveCfg = Release|Any CPU
+		{C36B6A92-EC79-41C2-9B51-79768AE16764}.Release|x86.Build.0 = Release|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Debug|x64.Build.0 = Debug|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Debug|x86.Build.0 = Debug|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Release|x64.ActiveCfg = Release|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Release|x64.Build.0 = Release|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Release|x86.ActiveCfg = Release|Any CPU
+		{B683E7D5-836E-457C-BE49-5B983FA42383}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{670DB8FA-BA9D-43F4-9DEF-8779530E0B1E} = {4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}
@@ -211,5 +241,10 @@ Global
 		{6B77701C-4261-4F2B-AB0A-6AF1334CA96C} = {032F5A05-F6B9-4778-BC1B-CBAB321D6C62}
 		{A976AA8C-4297-48BD-AB20-B2C04FE26495} = {4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}
 		{1DE93AA1-4136-4B10-B1B2-2760EBFE9C44} = {4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}
+		{C36B6A92-EC79-41C2-9B51-79768AE16764} = {F97DA732-802E-4C94-800D-AF1E8772E829}
+		{B683E7D5-836E-457C-BE49-5B983FA42383} = {F97DA732-802E-4C94-800D-AF1E8772E829}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B53DD286-B6DE-4EBF-8E02-1081D86E57B1}
 	EndGlobalSection
 EndGlobal

@@ -4,6 +4,7 @@ namespace SimpleAuth.Client.Services
 {
     public interface ISimpleAuthConfigurationProvider : IClientService
     {
+        string MasterToken { get; }
         string CorpToken { get; }
         string AppToken { get; }
         string Corp { get; }
@@ -23,6 +24,7 @@ namespace SimpleAuth.Client.Services
             EndPointUrl = _simpleAuthSettings.SimpleAuthServerUrl?.TrimEnd('/');
         }
 
+        public string MasterToken => _simpleAuthSettings.TokenSettings.MasterToken;
         public string CorpToken => _simpleAuthSettings.TokenSettings.CorpToken;
         public string AppToken => _simpleAuthSettings.TokenSettings.AppToken;
         public string Corp => _simpleAuthSettings.Corp;

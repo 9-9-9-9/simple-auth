@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
+    <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+    <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
+    <ProjectReference Include="..\ConsoleApps.Shared\ConsoleApps.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

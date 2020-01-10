@@ -13,6 +13,7 @@ namespace SimpleAuth.Client.Models
 
     public class SimpleAuthTokenSettings
     {
+        public string MasterToken { get; set; }
         public string CorpToken { get; set; }
         public string AppToken { get; set; }
     }

@@ -105,11 +105,15 @@ namespace SimpleAuth.Client.Services
             var httpClient = new HttpClient(handler);
 
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            
+
+            if (requestBuilder.UseMasterToken)
+                httpClient.DefaultRequestHeaders.Add(Constants.Headers.MasterToken,
+                    _simpleAuthConfigurationProvider.MasterToken);
+
             if (requestBuilder.UseCorpToken)
                 httpClient.DefaultRequestHeaders.Add(Constants.Headers.CorpPermission,
                     _simpleAuthConfigurationProvider.CorpToken);
-            
+
             if (requestBuilder.UseAppToken)
                 httpClient.DefaultRequestHeaders.Add(Constants.Headers.AppPermission,
                     _simpleAuthConfigurationProvider.AppToken);

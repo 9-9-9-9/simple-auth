@@ -44,7 +44,7 @@ namespace SimpleAuth.Server.Controllers
                 App = string.Empty
             });
 
-            return StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(new RequireCorpToken
+            return StatusCodes.Status201Created.WithMessage(_encryption.Encrypt(new RequireCorpToken
             {
                 Header = Constants.Headers.CorpPermission,
                 Corp = corp,
@@ -66,7 +66,7 @@ namespace SimpleAuth.Server.Controllers
                 App = app
             });
 
-            return StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(new RequestAppHeaders
+            return StatusCodes.Status201Created.WithMessage(_encryption.Encrypt(new RequestAppHeaders
             {
                 Header = Constants.Headers.AppPermission,
                 Corp = corp,
