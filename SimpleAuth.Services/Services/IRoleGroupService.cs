@@ -19,7 +19,7 @@ namespace SimpleAuth.Services
     public interface IRoleGroupService : IDomainService
     {
         IEnumerable<RoleGroup> SearchRoleGroups(string term, string corp, string app, FindOptions findOptions = null);
-        RoleGroup GetRoleGroupByName(string name, string corp, string app);
+        Task<RoleGroup> GetRoleGroupByName(string name, string corp, string app);
         IEnumerable<RoleGroup> FindByName(string[] nameList, string corp, string app);
         Task AddRoleGroupAsync(CreateRoleGroupModel newRoleGroup);
         Task UpdateLockStatusAsync(RoleGroup roleGroup);
@@ -32,12 +32,12 @@ namespace SimpleAuth.Services
     public class DefaultRoleGroupService : DomainService<IRoleGroupRepository, Entities.RoleGroup>,
         IRoleGroupService
     {
-        private readonly ICachedUserRolesRepository _cachedUserRolesRepository;
+        private readonly IRoleRepository _roleRepository;
 
-        public DefaultRoleGroupService(IServiceProvider serviceProvider,
-            ICachedUserRolesRepository cachedUserRolesRepository) : base(serviceProvider)
+        public DefaultRoleGroupService(IServiceProvider serviceProvider, 
+            IRoleRepository roleRepository) : base(serviceProvider)
         {
-            _cachedUserRolesRepository = cachedUserRolesRepository;
+            _roleRepository = roleRepository;
         }
 
         public IEnumerable<RoleGroup> SearchRoleGroups(string term, string corp, string app,
@@ -47,26 +47,19 @@ namespace SimpleAuth.Services
                 .Select(x => x.ToDomainObject());
         }
 
-        public RoleGroup GetRoleGroupByName(string name, string corp, string app)
+        public async Task<RoleGroup> GetRoleGroupByName(string name, string corp, string app)
         {
-            return GetRoleGroupByExpression(x => x.Name == name, corp, app, new FindOptions {Take = 1})
-                .FirstOrDefault();
-        }
-
-        private IEnumerable<RoleGroup> GetRoleGroupByExpression(
-            Expression<Func<Entities.RoleGroup, bool>> expression,
-            string corp, string app, FindOptions findOptions = null)
-        {
-            return Repository
-                .FindMany(new[]
-                {
-                    expression,
-                    x =>
-                        x.Corp == corp
-                        &&
-                        x.App == app
-                }, findOptions)
-                .Select(x => x.ToDomainObject());
+            return (
+                await Repository
+                    .FindSingleAsync(
+                        x =>
+                            x.Name == name
+                            &&
+                            x.Corp == corp
+                            &&
+                            x.App == app
+                    )
+            )?.ToDomainObject();
         }
 
         public IEnumerable<RoleGroup> FindByName(string[] nameList, string corp, string app)
@@ -91,9 +84,12 @@ namespace SimpleAuth.Services
 
         public async Task AddRoleGroupAsync(CreateRoleGroupModel newRoleGroup)
         {
-            if (Repository.Find(x => x.Name == newRoleGroup.Name
-                                     && x.Corp == newRoleGroup.Corp
-                                     && x.App == newRoleGroup.App, new FindOptions {Take = 1}).Any())
+            var findSingleAsync = await Repository.FindSingleAsync(x =>
+                x.Name == newRoleGroup.Name
+                && x.Corp == newRoleGroup.Corp
+                && x.App == newRoleGroup.App
+            );
+            if (findSingleAsync != default)
             {
                 throw new EntityAlreadyExistsException(newRoleGroup.Name);
             }
@@ -120,17 +116,15 @@ namespace SimpleAuth.Services
                 App = newRoleGroup.App,
                 Locked = false,
                 RoleRecords = initRoles
-                    .Select(r => BaseEntityExtensions.WithRandomId(r.ToEntityObject()))
+                    .Select(r => r.ToEntityObject().WithRandomId())
                     .ToList()
             });
         }
 
         public async Task UpdateLockStatusAsync(RoleGroup roleGroup)
         {
-            var entity = GetEntity(roleGroup);
+            var entity = await GetEntity(roleGroup);
             entity.Locked = roleGroup.Locked;
-
-            _cachedUserRolesRepository.Clear(entity.Corp, entity.App);
 
             await Repository.UpdateAsync(entity);
         }
@@ -154,7 +148,7 @@ namespace SimpleAuth.Services
                     })
                 )
                 .DistinctRoles()
-                .Select(r => BaseEntityExtensions.WithRandomId(r.ToEntityObject()))
+                .Select(r => r.ToEntityObject().WithRandomId())
                 .ToList();
 
             await UpdateRolesAsync(roleGroup, newRoles);
@@ -174,7 +168,7 @@ namespace SimpleAuth.Services
             }
 
             await UpdateRolesAsync(roleGroup, roleGroup.Roles
-                .Select(r => BaseEntityExtensions.WithRandomId<RoleRecord>(r.ToEntityObject()))
+                .Select(r => r.ToEntityObject().WithRandomId())
                 .ToList()
             );
         }
@@ -206,21 +200,27 @@ namespace SimpleAuth.Services
         {
             newRoles = newRoles.OrEmpty().Where(r => r.Permission != Permission.None).ToList();
 
-            _cachedUserRolesRepository.Clear(roleGroup.Corp, roleGroup.App);
+            newRoles.ForEach(async (x) =>
+            {
+                var role = await _roleRepository.FindSingleAsync(r => r.Id == x.RoleId);
+                if (role == default)
+                    throw new EntityNotExistsException(x.RoleId);
+                x.Env = role.Env;
+                x.Tenant = role.Tenant;
+            });
 
-            await Repository.UpdateRoleRecordsAsync(GetEntity(roleGroup), newRoles);
+            await Repository.UpdateRoleRecordsAsync(await GetEntity(roleGroup), newRoles);
 
             roleGroup.Roles = newRoles.Select(r => r.ToDomainObject()).ToArray();
         }
 
-        private Entities.RoleGroup GetEntity(RoleGroup roleGroup)
+        private async Task<Entities.RoleGroup> GetEntity(RoleGroup roleGroup)
         {
-            var entity = Repository.Find(x => x.Name == roleGroup.Name
-                                              && x.Corp == roleGroup.Corp
-                                              && x.App == roleGroup.App, new FindOptions
-            {
-                Take = 1,
-            }).FirstOrDefault();
+            var entity = await Repository.FindSingleAsync(x =>
+                x.Name == roleGroup.Name
+                && x.Corp == roleGroup.Corp
+                && x.App == roleGroup.App
+            );
             if (entity == null)
                 throw new EntityNotExistsException(roleGroup.Name);
             return entity;

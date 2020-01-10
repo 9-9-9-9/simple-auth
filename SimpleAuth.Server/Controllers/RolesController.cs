@@ -63,7 +63,7 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpPost, HttpPut, HttpPatch, HttpDelete, Route("{roleId}/lock")]
+        [HttpPost, HttpPut, HttpDelete, Route("{roleId}/lock")]
         public async Task<IActionResult> UpdateLock(string roleId)
         {
             var spl = roleId.Split(Constants.SplitterRoleParts, 3);

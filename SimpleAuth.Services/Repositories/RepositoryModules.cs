@@ -31,8 +31,6 @@ namespace SimpleAuth.Repositories
             serviceCollection.AddTransient<ITokenInfoRepository, TokenInfoRepository>();
             serviceCollection.AddTransient<IRepository<TokenInfo>, TokenInfoRepository>();
 
-            serviceCollection.AddSingleton<ICachedUserRolesRepository, CachedUserRolesRepository>();
-            
             serviceCollection.AddSingleton<ICachedTokenInfoRepository, CachedTokenInfoRepository>();
         }
     }

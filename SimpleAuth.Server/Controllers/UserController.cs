@@ -10,6 +10,7 @@ using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Server.Services;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
@@ -35,7 +36,7 @@ namespace SimpleAuth.Server.Controllers
             _userValidationService = userValidationService;
         }
 
-        [HttpPost, HttpPut, HttpPatch, Route("{userId}/lock")]
+        [HttpPost, HttpPut, Route("{userId}/lock")]
         public async Task<IActionResult> LockUser(string userId)
         {
             var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
@@ -59,9 +60,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost("{userId}/password")]
-        public IActionResult CheckPass(string userId, [FromQuery] string password)
+        public async Task<IActionResult> CheckPass(string userId, [FromBody] string password)
         {
-            return ProcedureDefaultResponseIfError(() =>
+            return await ProcedureDefaultResponseIfError(async () =>
             {
                 var usr = Repository.Find(userId);
                 var localUserInfo = usr?.UserInfos?.FirstOrDefault(x => x.Corp == RequestAppHeaders.Corp);
@@ -76,12 +77,12 @@ namespace SimpleAuth.Server.Controllers
                 if (!pwdMatch)
                     return Unauthorized();
 
-                return GetUser(userId);
+                return await GetUser(userId);
             });
         }
 
-        [HttpPut, HttpPatch("{userId}/password")]
-        public async Task<IActionResult> ChangePass(string userId, [FromQuery] string newPassword)
+        [HttpPut("{userId}/password")]
+        public async Task<IActionResult> ChangePass(string userId, [FromBody] string newPassword)
         {
             var vr = _userValidationService.IsValidPassword(newPassword);
             if (!vr.IsValid)
@@ -158,7 +159,7 @@ namespace SimpleAuth.Server.Controllers
                         "Token already expired"
                     );
 
-                var model = GetBaseResponseUserModel(emailAsUserId);
+                var model = await GetBaseResponseUserModelAsync(emailAsUserId);
                 model.GoogleToken = ggToken;
                 model.ExpireAt(expiryDate);
 
@@ -167,15 +168,33 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("{userId}/roles")]
-        public IActionResult GetActiveRoles(string userId)
+        public async Task<IActionResult> GetActiveRoles(string userId)
         {
-            return GetUser(userId);
+            return await GetUser(userId);
         }
 
         [HttpGet("{userId}")]
-        public IActionResult GetUser(string userId)
+        public async Task<IActionResult> GetUser(string userId)
         {
-            return ProcedureDefaultResponseIfError(() => ReturnResponseUserModel(GetBaseResponseUserModel(userId)));
+            return await ProcedureDefaultResponseIfError(() =>
+                GetBaseResponseUserModelAsync(userId).ContinueWith(x => ReturnResponseUserModel(x.Result))
+            );
+        }
+
+        [HttpGet, HttpPost, Route("{userId}/roles/{roleId}/{permission}")]
+        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
+        {
+            return await ProcedureDefaultResponseIfError(() =>
+                Service.IsHaveActivePermissionAsync(
+                    userId,
+                    roleId,
+                    permission.Deserialize(),
+                    RequestAppHeaders.Corp, RequestAppHeaders.App
+                ).ContinueWith(
+                    x => (x.Result ? StatusCodes.Status200OK : StatusCodes.Status406NotAcceptable)
+                        .WithEmpty()
+                )
+            );
         }
 
         [HttpPost]
@@ -214,13 +233,17 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        private ResponseUserModel GetBaseResponseUserModel(string userId)
+        private async Task<ResponseUserModel> GetBaseResponseUserModelAsync(string userId)
         {
             var user = Service.GetUser(userId, RequestAppHeaders.Corp);
             if (user == null)
                 throw new EntityNotExistsException(userId);
 
-            var activeRoles = Service.GetActiveRoles(userId, RequestAppHeaders.Corp, RequestAppHeaders.App);
+            var filterRoleEnv = GetHeader(Constants.Headers.FilterByEnv);
+            var filterRoleTenant = GetHeader(Constants.Headers.FilterByTenant);
+
+            var activeRoles = await Service.GetActiveRolesAsync(userId, RequestAppHeaders.Corp, RequestAppHeaders.App,
+                filterRoleEnv, filterRoleTenant);
             return new ResponseUserModel
             {
                 Id = userId,

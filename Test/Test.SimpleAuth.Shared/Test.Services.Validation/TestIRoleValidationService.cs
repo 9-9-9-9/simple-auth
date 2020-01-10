@@ -20,7 +20,7 @@ namespace Test.SimpleAuth.Shared.Services.Validation
         [TestCase("c", "a", "e", "t", "m", "|1", ExpectedResult = false)]
         [TestCase("c", "a", "e", "t", "m", "'1", ExpectedResult = false)]
         [TestCase("c", "a", "e", "t", "m", " '1", ExpectedResult = false)]
-        [TestCase("c", "a", "e", "t", "m", "*", ExpectedResult = false)] // "No wildcard in sub modules mtf"
+        [TestCase("c", "a", "e", "t", "m", "*", ExpectedResult = true)]
         [TestCase("*", "a", "e", "t", "m", null, ExpectedResult = false)] // "No wildcard as Corp mtf"
         [TestCase("c", "*", "e", "t", "m", null, ExpectedResult = false)] // "No wildcard as App mtf"
         [TestCase("c", "a", "*", "t", "m", null, ExpectedResult = true)]

@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
+using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
+using SimpleAuth.Shared.Models;
+using SimpleAuth.Shared.Utils;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
 using Role = SimpleAuth.Shared.Domains.Role;
 using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
@@ -22,7 +26,8 @@ namespace SimpleAuth.Services
         Task AssignUserToGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromAllGroups(User user, string corp);
-        ICollection<Role> GetActiveRoles(string user, string corp, string app);
+        Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null, string tenant = null);
+        Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app);
         Task UpdateLockStatusAsync(User user);
         Task UpdatePasswordAsync(User user);
     }
@@ -32,20 +37,18 @@ namespace SimpleAuth.Services
         private readonly IEncryptionService _encryptionService;
         private readonly IRoleGroupRepository _roleGroupRepository;
         private readonly IRoleGroupUserRepository _roleGroupUserRepository;
-        private readonly ICachedUserRolesRepository _cachedUserRolesRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly ILocalUserInfoRepository _localUserInfoRepository;
 
         public DefaultUserService(IServiceProvider serviceProvider, IEncryptionService encryptionService,
-            IRoleGroupRepository roleGroupRepository, IRoleGroupUserRepository roleGroupUserRepository,
-            ICachedUserRolesRepository cachedUserRolesRepository, IRoleRepository roleRepository,
-            ILocalUserInfoRepository localUserInfoRepository) : base(
-            serviceProvider)
+            IRoleGroupRepository roleGroupRepository, IRoleGroupUserRepository roleGroupUserRepository, 
+            IRoleRepository roleRepository,
+            ILocalUserInfoRepository localUserInfoRepository) : 
+            base(serviceProvider)
         {
             _encryptionService = encryptionService;
             _roleGroupRepository = roleGroupRepository;
             _roleGroupUserRepository = roleGroupUserRepository;
-            _cachedUserRolesRepository = cachedUserRolesRepository;
             _roleRepository = roleRepository;
             _localUserInfoRepository = localUserInfoRepository;
         }
@@ -133,8 +136,6 @@ namespace SimpleAuth.Services
             if (missingRoleGroups.Any())
                 throw new EntityNotExistsException(missingRoleGroups.Select(g => g.Name));
 
-            _cachedUserRolesRepository.Clear(corp, app);
-
             await Repository.AssignUserToGroups(new Entities.User
             {
                 Id = user.Id
@@ -168,8 +169,6 @@ namespace SimpleAuth.Services
                 throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
                     .Except(tobeRemoved.Select(g => g.RoleGroup.Name)));
 
-            _cachedUserRolesRepository.Clear(corp, app);
-
             await Repository.UnAssignUserFromGroups(new Entities.User
             {
                 Id = user.Id
@@ -190,11 +189,6 @@ namespace SimpleAuth.Services
 
             var tobeRemoved = lookupUser.RoleGroupUsers.Where(rg => rg.RoleGroup.Corp == corp).ToList();
 
-            tobeRemoved.Select(x => (x.RoleGroup.Corp, x.RoleGroup.App)).Distinct().ToList().ForEach(x =>
-            {
-                _cachedUserRolesRepository.Clear(x.Corp, x.App);
-            });
-
             await Repository.UnAssignUserFromGroups(new Entities.User
                 {
                     Id = user.Id
@@ -205,39 +199,12 @@ namespace SimpleAuth.Services
             );
         }
 
-        public ICollection<Role> GetActiveRoles(string userId, string corp, string app)
+        public async Task<ICollection<Role>> GetActiveRolesAsync(string userId, string corp, string app, string env = null,
+            string tenant = null)
         {
-            if (userId.IsBlank())
-                throw new ArgumentNullException(nameof(userId));
+            var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
 
-            if (corp.IsBlank())
-                throw new ArgumentNullException(nameof(corp));
-
-            if (app.IsBlank())
-                throw new ArgumentNullException(nameof(app));
-
-            var cachedRoles = _cachedUserRolesRepository.Get(userId, corp, app) as List<Role>;
-            if (cachedRoles.IsAny())
-                return cachedRoles;
-
-            var user = Repository.Find(userId);
-            var localUserInfo = user?.UserInfos?.FirstOrDefault(x => x.Corp == corp);
-            if (localUserInfo == null)
-                throw new EntityNotExistsException($"{userId} at {corp}");
-
-            var roleGroups = user.RoleGroupUsers
-                .Where(x =>
-                    x.RoleGroup.Corp == corp
-                    &&
-                    x.RoleGroup.App == app
-                    &&
-                    !x.RoleGroup.Locked
-                )
-                .Select(x => x.RoleGroup)
-                .ToList();
-
-            var roles = roleGroups
-                .SelectMany(x => x.RoleRecords)
+            var roles = roleRecords
                 .Select(x => x.ToDomainObject())
                 .ToList();
 
@@ -258,11 +225,71 @@ namespace SimpleAuth.Services
             roles = roles
                 .Where(x => !lockedRoles.Contains(x.RoleId))
                 .DistinctRoles()
+                .Select(x => x.ToClientRoleModel())
+                .DistinctRoles()
+                .Select(x => x.ToRole())
                 .ToList();
 
-            _cachedUserRolesRepository.Push(roles, userId, corp, app);
-
             return roles;
+        }
+
+        public async Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app)
+        {
+            if (permission == Permission.None)
+                throw new ArgumentException(nameof(permission));
+
+            var activeRoles = await GetActiveRolesAsync(userId, corp, app);
+            var userActiveClientRoleModels = activeRoles.Select(x => x.ToClientRoleModel());
+            
+            RoleUtils.Parse(roleId, out var requireClientRoleModel);
+            requireClientRoleModel.Permission = permission;
+
+            return userActiveClientRoleModels.Any(x => RoleUtils.ContainsOrEquals(x, requireClientRoleModel, RoleUtils.ComparisionFlag.All));
+        }
+
+        private async Task<IEnumerable<RoleRecord>> FindRoleRecordsBasedOnFilterAsync(string userId, string corp, string app, string env, string tenant)
+        {
+            if (userId.IsBlank())
+                throw new ArgumentNullException(nameof(userId));
+
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+
+            if (app.IsBlank())
+                throw new ArgumentNullException(nameof(app));
+
+            if (Constants.WildCard.Equals(env))
+                throw new ArgumentException($"{nameof(env)}: filter does not accept wildcard");
+
+            if (Constants.WildCard.Equals(tenant))
+                throw new ArgumentException($"{nameof(tenant)}: filter does not accept wildcard");
+
+            var user = await Repository.FindAsync(userId);
+            var localUserInfo = user?.UserInfos?.FirstOrDefault(x => x.Corp == corp);
+            if (localUserInfo == null)
+                throw new EntityNotExistsException($"{userId} at {corp}");
+
+            var roleGroups = user.RoleGroupUsers
+                .Where(x =>
+                    x.RoleGroup.Corp == corp
+                    &&
+                    x.RoleGroup.App == app
+                    &&
+                    !x.RoleGroup.Locked
+                )
+                .Select(x => x.RoleGroup)
+                .ToList();
+
+            var roleRecords = roleGroups
+                .SelectMany(x => x.RoleRecords);
+
+            if (!env.IsBlank())
+                roleRecords = roleRecords.Where(rr => rr.Env == Constants.WildCard || rr.Env == env);
+
+            if (!tenant.IsBlank())
+                roleRecords = roleRecords.Where(rr => rr.Tenant == Constants.WildCard || rr.Tenant == tenant);
+            
+            return roleRecords;
         }
 
         public async Task UpdateLockStatusAsync(User user)

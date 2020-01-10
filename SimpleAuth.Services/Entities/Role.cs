@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using SimpleAuth.Core.Extensions;
-using SimpleAuth.Shared;
 using SimpleAuth.Shared.Models;
+using SimpleAuth.Shared.Utils;
 using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAuth.Services.Entities
@@ -30,23 +28,7 @@ namespace SimpleAuth.Services.Entities
     {
         public Role ComputeId()
         {
-            var sb = new StringBuilder();
-            sb.Append(Corp);
-            sb.Append(Constants.SplitterRoleParts);
-            sb.Append(App);
-            sb.Append(Constants.SplitterRoleParts);
-            sb.Append(Env);
-            sb.Append(Constants.SplitterRoleParts);
-            sb.Append(Tenant);
-            sb.Append(Constants.SplitterRoleParts);
-            sb.Append(Module);
-            if (!SubModules.IsBlank())
-            {
-                sb.Append(Constants.SplitterRoleParts);
-                sb.Append(SubModules);
-            }
-
-            Id = sb.ToString().NormalizeInput();
+            Id = RoleUtils.ComputeRoleId(Corp, App, Env, Tenant, Module, SubModules);
             return this;
         }
     }
@@ -55,10 +37,10 @@ namespace SimpleAuth.Services.Entities
     {
         public static string JoinSubModules(this IEnumerable<string> subModules)
         {
-            return string.Join(Constants.SplitterSubModules, subModules.Or(new string[0]));
+            return RoleUtils.JoinSubModules(subModules);
         }
         
-        public static RoleRecord ToEntityObject(this SimpleAuth.Shared.Domains.Role role)
+        public static RoleRecord ToEntityObject(this Shared.Domains.Role role)
         {
             return new RoleRecord
             {

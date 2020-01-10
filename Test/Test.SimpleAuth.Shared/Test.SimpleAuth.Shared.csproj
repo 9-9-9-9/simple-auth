@@ -21,10 +21,5 @@
       <ProjectReference Include="..\..\SimpleAuth.InMemoryDb\SimpleAuth.InMemoryDb.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Test.DbIntergration" />
-      <Folder Include="Test.Sqlite.Services" />
-    </ItemGroup>
     
 </Project>

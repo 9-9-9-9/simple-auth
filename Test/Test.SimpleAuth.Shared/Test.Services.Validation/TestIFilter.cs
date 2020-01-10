@@ -65,8 +65,6 @@ namespace Test.SimpleAuth.Shared.Services.Validation
         {
             TestFilter<FilterCorpInput, string>(expectedIsValid, input);
             TestFilter<FilterAppInput, string>(expectedIsValid, input);
-            TestFilter<FilterSubModulePartInput, string>(expectedIsValid, input);
-            TestFilter<FilterArrSubModulesInput, string[]>(expectedIsValid, new[] {input, input});
         }
 
         [TestCase(true, "a")]
@@ -83,12 +81,17 @@ namespace Test.SimpleAuth.Shared.Services.Validation
             TestFilter<FilterEnvInput, string>(expectedIsValid, input);
             TestFilter<FilterTenantInput, string>(expectedIsValid, input);
             TestFilter<FilterModuleInput, string>(expectedIsValid, input);
+            TestFilter<FilterSubModulePartInput, string>(expectedIsValid, input);
+            TestFilter<FilterArrSubModulesInput, string[]>(expectedIsValid, new[] {input, input});
         }
 
         [TestCase(true, null)]
-        [TestCase(false, "*")]
+        [TestCase(true, "*")]
         [TestCase(false, "-")]
         [TestCase(true, "a|b")]
+        [TestCase(true, "a|*")]
+        [TestCase(true, "*|b")]
+        [TestCase(false, "*|B")]
         [TestCase(false, "A|b")]
         [TestCase(false, "a|B")]
         [TestCase(false, "A|B")]
@@ -99,7 +102,7 @@ namespace Test.SimpleAuth.Shared.Services.Validation
         [TestCase(true, "a")]
         [TestCase(true, "a|b|c")]
         [TestCase(false, "a|0|-")]
-        [TestCase(false, "a|0|*")]
+        [TestCase(true, "a|0|*")]
         public void FilterStrSubModulesInput(bool expectedIsValid, string input)
         {
             TestFilter<FilterStrSubModulesInput, string>(expectedIsValid, input);

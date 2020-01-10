@@ -9,7 +9,7 @@ namespace SimpleAuth.Shared.Exceptions
         {
         }
         
-        public EntityNotExistsException(IEnumerable<object> missing) : base(string.Join(',', missing.DropNull()))
+        public EntityNotExistsException(IEnumerable<object> missing) : base(string.Join(",", missing.DropNull()))
         {
         }
     }

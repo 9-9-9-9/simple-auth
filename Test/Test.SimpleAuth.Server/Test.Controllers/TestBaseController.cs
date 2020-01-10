@@ -211,7 +211,7 @@ namespace Test.SimpleAuth.Server.Test.Controllers
                                 It.IsAny<string>(),
                                 It.IsAny<string>()
                             )
-                        ).Returns(result)
+                        ).ReturnsAsync(result)
                     );
             }
 

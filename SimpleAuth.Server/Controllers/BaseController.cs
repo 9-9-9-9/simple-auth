@@ -59,6 +59,14 @@ namespace SimpleAuth.Server.Controllers
             }
         }
 
+        protected string GetHeader(string key)
+        {
+            var stringValues = HttpContext.Request.Headers[key];
+            if (stringValues.IsEmpty())
+                return null;
+            return stringValues.FirstOrDefault(x => !x.IsBlank());
+        }
+
         protected IActionResult CrossAppToken()
         {
             return StatusCodes.Status403Forbidden.WithMessage($"Cross app token by {Constants.Headers.AppPermission}");

@@ -43,13 +43,13 @@ namespace SimpleAuth.Shared.Enums
         public static string Serialize(this Permission permission)
         {
             if (permission == Permission.Full)
-                return "*";
+                return Constants.WildCard;
             return ((byte) permission).ToString();
         }
 
         public static Permission Deserialize(this string permission)
         {
-            if ("*".Equals(permission))
+            if (Constants.WildCard.Equals(permission))
                 return Permission.Full;
             return (Permission) byte.Parse(permission);
         }

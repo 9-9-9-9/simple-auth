@@ -7,5 +7,4 @@ bin/
 */*/Migrations/*
 *.db
 *.db-*
-Test/CodeCoverageResult*
 coverage*

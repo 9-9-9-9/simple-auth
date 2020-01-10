@@ -60,14 +60,17 @@ namespace SimpleAuth.Repositories
             var dbGroups = ctx.Set<RoleGroup>();
             var dbRecords = ctx.Set<RoleRecord>();
 
+            roleGroup = await Include(dbGroups).SingleAsync(x => x.Id == roleGroup.Id);
+            
             if (roleGroup.RoleRecords.IsAny())
-            {
                 dbRecords.RemoveRange(roleGroup.RoleRecords);
-            }
 
             if (newRoles.IsAny())
             {
-                newRoles.ForEach(r => { ctx.Entry(r).State = EntityState.Added; });
+                newRoles.ForEach(r =>
+                {
+                    ctx.Entry(r).State = EntityState.Added;
+                });
                 await dbRecords.AddRangeAsync(newRoles);
             }
 
