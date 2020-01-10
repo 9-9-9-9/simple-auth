@@ -8,7 +8,7 @@ namespace Test.SimpleAuth.Shared.Test.Utils
 {
     public class TestRoleUtils
     {
-        private const string Splitor = "`";
+        private const string Delimiter = "`";
 
         [TestCase(2, "0`1", "*.*.*.*.*`View", "*.*.*.*.*`Edit")]
         [TestCase(1, "0", "*.*.*.*.*`Full", "*.*.*.*.b`View")]
@@ -19,11 +19,10 @@ namespace Test.SimpleAuth.Shared.Test.Utils
         {
             var clientRoleModels = roles
                 .Select(x => x.Split("`"))
-                .Select(x => (x[0], (Permission) Enum.Parse(typeof(Permission), x[1])))
                 .Select(x =>
                 {
-                    RoleUtils.Parse(x.Item1, out var clientRoleModel);
-                    clientRoleModel.Permission = x.Item2;
+                    RoleUtils.Parse(x[0], out var clientRoleModel);
+                    clientRoleModel.Permission = (Permission) Enum.Parse(typeof(Permission), x[1]);
                     return clientRoleModel;
                 }).ToArray();
 
@@ -31,9 +30,28 @@ namespace Test.SimpleAuth.Shared.Test.Utils
 
             Assert.AreEqual(expectedNumberOfRolesRemaining, clientRoleModels.Length);
 
-            var remaining = clientRoleModels.Select(x => $"{x.ComputeId()}{Splitor}{x.Permission}").ToList();
-            foreach (var idx in expectRemainingIndexes.Split(Splitor).Select(int.Parse))
+            var remaining = clientRoleModels.Select(x => $"{x.ComputeId()}{Delimiter}{x.Permission}").ToList();
+            foreach (var idx in expectRemainingIndexes.Split(Delimiter).Select(int.Parse))
                 Assert.IsTrue(remaining.Contains(roles[idx]));
+        }
+
+        [TestCase("c.a.e.t.m", "c", "a", "e", "t", "m", "")]
+        [TestCase("c.a.e.t.m", "c", "a", "e", "t", "m", null)]
+        [TestCase("c.a.e.t.m.s", "c", "a", "e", "t", "m", "s")]
+        [TestCase("c.a.e.t.m.s|s2", "c", "a", "e", "t", "m", "s", "s2")]
+        public void TestComputeRoleId(string roleId, string corp, string app, string env, string tenant, string module,
+            params string[] subModules)
+        {
+            Assert.AreEqual(roleId, RoleUtils.ComputeRoleId(corp, app, env, tenant, module, subModules));
+        }
+
+        [TestCase("c.a.e.t.m", "c", "a", "e", "t", "m", "")]
+        [TestCase("c.a.e.t.m", "c", "a", "e", "t", "m", null)]
+        [TestCase("c.a.e.t.m.s", "c", "a", "e", "t", "m", "s")]
+        public void TestComputeRoleId(string roleId, string corp, string app, string env, string tenant, string module,
+            string subModules)
+        {
+            Assert.AreEqual(roleId, RoleUtils.ComputeRoleId(corp, app, env, tenant, module, subModules));
         }
     }
 }
