@@ -57,7 +57,7 @@ namespace SimpleAuth.Shared.Models
         public RoleModel[] Roles { get; set; }
     }
 
-    public class ClientRoleModel : ICorpRelated, IAppRelated, IEnvRelated, ITenantRelated, IModuleRelated, IRawSubModulesRelated
+    public partial class ClientRoleModel : ICorpRelated, IAppRelated, IEnvRelated, ITenantRelated, IModuleRelated, IRawSubModulesRelated
     {
         public string Corp { get; set; }
         public string App { get; set; }
@@ -116,6 +116,14 @@ namespace SimpleAuth.Shared.Models
                 // ReSharper restore NonReadonlyMemberInGetHashCode
                 return hashCode;
             }
+        }
+    }
+    
+    public partial class ClientRoleModel
+    {
+        public string ComputeId()
+        {
+            return RoleUtils.ComputeRoleId(Corp, App, Env, Tenant, Module, SubModules);
         }
     }
 
