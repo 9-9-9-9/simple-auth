@@ -11,7 +11,7 @@ namespace SimpleAuth.Services
             serviceCollection.AddTransient<IRoleService, DefaultRoleService>();
             serviceCollection.AddTransient<IRoleGroupService, DefaultRoleGroupService>();
             serviceCollection.AddTransient<IUserService, DefaultUserService>();
-            serviceCollection.AddTransient<ITokenInfoService, DefaultTokenInfoService>();
+            serviceCollection.AddSingleton<ITokenInfoService, DefaultTokenInfoService>();
         }
     }
 }
