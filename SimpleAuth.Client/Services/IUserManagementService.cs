@@ -9,6 +9,7 @@ namespace SimpleAuth.Client.Services
     public interface IUserManagementService
     {
         Task AssignUserToGroupsAsync(string userId, ModifyUserRoleGroupsModel modifyUserRoleGroupsModel);
+        Task CreateUserAsync(CreateUserModel createUserModel);
     }
 
     public class DefaultUserManagementService : ClientService, IUserManagementService
@@ -35,6 +36,17 @@ namespace SimpleAuth.Client.Services
                     .Append(EndpointBuilder.User.AssignUserToRoleGroups(userId))
                     .Method(Constants.HttpMethods.PUT),
                 modifyUserRoleGroupsModel.JsonSerialize()
+            );
+        }
+
+        public Task CreateUserAsync(CreateUserModel createUserModel)
+        {
+            return _httpService.DoHttpRequestWithoutResponseAsync(
+                true,
+                NewRequest()
+                    .Append(EndpointBuilder.User.CreateUser)
+                    .Method(Constants.HttpMethods.POST),
+                createUserModel.JsonSerialize()
             );
         }
     }

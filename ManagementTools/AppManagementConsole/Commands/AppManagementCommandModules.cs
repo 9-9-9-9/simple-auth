@@ -8,6 +8,8 @@ namespace AppManagementConsole.Commands
     {
         public override void RegisterModules(IServiceCollection serviceCollection)
         {
+            serviceCollection.RegisterCommand<CreateUserCommand>();
+            serviceCollection.RegisterCommand<GetUserCommand>();
             serviceCollection.RegisterCommand<AddRoleCommand>();
             serviceCollection.RegisterCommand<AddRoleGroupCommand>();
             serviceCollection.RegisterCommand<ListingRolesOfGroupCommand>();

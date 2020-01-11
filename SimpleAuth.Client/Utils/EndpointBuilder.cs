@@ -11,6 +11,7 @@ namespace SimpleAuth.Client.Utils
             public static string CheckGoogleToken(string userId) => $"api/users/{userId}/roles";
             public static string CheckUserPermission(string userId, string roleId, string permission) => $"api/users/{userId}/roles/{roleId}/{permission}";
             public static string AssignUserToRoleGroups(string userId) => $"api/users/{userId}/role-groups";
+            public const string CreateUser = "api/users";
         }
 
         public static class Administration

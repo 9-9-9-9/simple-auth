@@ -240,7 +240,7 @@ namespace SimpleAuth.Server.Controllers
             if ((modifyUserRoleGroupsModel?.RoleGroups?.Length ?? 0) == 0)
                 return BadRequest();
 
-            return await ProcedureResponseForPersistAction(async () =>
+            return await ProcedureDefaultResponse(async () =>
                 {
                     var user = Service.GetUser(userId, RequestAppHeaders.Corp);
                     if (user == default)
