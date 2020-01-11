@@ -110,7 +110,7 @@ namespace SimpleAuth.Client.Services
                     $"{requestBuilder.HttpMethod} is not being supported by this function <{nameof(DoHttpRequestAsync)}>");
 
 #if DEBUG
-            "Request completed".Write();
+            $"Request completed ({response.IsSuccessStatusCode} {response.StatusCode})".Write();
 #endif
             return response;
         }

@@ -6,17 +6,16 @@ using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.Services
 {
-    public interface IRoleManagementService
+    public interface IRoleGroupManagementService
     {
-        Task AddRoleAsync(CreateRoleModel createRoleModel);
+        Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel);
     }
 
-    public class DefaultRoleManagementService : ClientService, IRoleManagementService
+    public class DefaultRoleGroupManagementService : ClientService, IRoleGroupManagementService
     {
         private readonly IHttpService _httpService;
 
-        public DefaultRoleManagementService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
-            IHttpService httpService) : base(simpleAuthConfigurationProvider)
+        public DefaultRoleGroupManagementService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider, IHttpService httpService) : base(simpleAuthConfigurationProvider)
         {
             _httpService = httpService;
         }
@@ -27,14 +26,14 @@ namespace SimpleAuth.Client.Services
                 .WithAppToken();
         }
 
-        public async Task AddRoleAsync(CreateRoleModel createRoleModel)
+        public async Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel)
         {
             await _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
-                    .Append(EndpointBuilder.RoleManagement.AddRole)
+                    .Append(EndpointBuilder.RoleGroupManagement.AddRoleGroup)
                     .Method(Constants.HttpMethods.POST),
-                createRoleModel.JsonSerialize()
+                createRoleGroupModel.JsonSerialize()
             );
         }
     }
