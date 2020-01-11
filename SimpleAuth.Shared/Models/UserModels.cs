@@ -53,4 +53,9 @@ namespace SimpleAuth.Shared.Models
 
         [DataMember(Name = "hd")] public string Hd { get; set; }
     }
+
+    public class ModifyUserRoleGroupsModel
+    {
+        public string[] RoleGroups { get; set; }
+    }
 }

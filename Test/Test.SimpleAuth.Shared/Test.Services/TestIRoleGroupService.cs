@@ -524,7 +524,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 }
             });
 
-            await uSvc.AssignUserToGroups(new User
+            await uSvc.AssignUserToGroupsAsync(new User
             {
                 Id = "1",
             }, new[]

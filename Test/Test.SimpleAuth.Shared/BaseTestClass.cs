@@ -173,7 +173,7 @@ namespace Test.SimpleAuth.Shared
 
         protected async Task AssignUserToGroup(IUserService svc, string userId, string name, string corp, string app)
         {
-            await svc.AssignUserToGroups(new User
+            await svc.AssignUserToGroupsAsync(new User
                 {
                     Id = userId,
                 },
@@ -190,7 +190,7 @@ namespace Test.SimpleAuth.Shared
 
         protected async Task AssignUserToGroups(IUserService svc, string userId, params string[] groupIdentities)
         {
-            await svc.AssignUserToGroups(new User
+            await svc.AssignUserToGroupsAsync(new User
                 {
                     Id = userId,
                 },
