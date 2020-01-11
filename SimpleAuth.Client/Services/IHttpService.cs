@@ -90,6 +90,21 @@ namespace SimpleAuth.Client.Services
                     }
                 }
             }
+            else
+            {
+                try
+                {
+                    var responseContentString = await response.Content.ReadAsStringAsync();
+                    if (responseContentString != null)
+                        $"Response error with message: {responseContentString}".Write();
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+                    $"Unable to try reading response with err message: {e.Message}".Write();
+#endif
+                }
+            }
 
             return (response.IsSuccessStatusCode, response.StatusCode, responseContent);
         }
@@ -147,6 +162,22 @@ namespace SimpleAuth.Client.Services
             using var httpClient = NewHttpClient(requestBuilder);
 
             var response = await DoRequest(httpClient, requestBuilder, payload);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                try
+                {
+                    var responseContentString = await response.Content.ReadAsStringAsync();
+                    if (responseContentString != null)
+                        $"Response error with message: {responseContentString}".Write();
+                }
+                catch (Exception e)
+                {
+#if DEBUG
+                    $"Unable to try reading response with err message: {e.Message}".Write();
+#endif
+                }
+            }
 
             return (response.IsSuccessStatusCode, response.StatusCode);
         }

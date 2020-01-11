@@ -29,7 +29,7 @@ namespace AppManagementConsole.Commands
                 Corp = _simpleAuthConfigurationProvider.Corp,
                 App = _simpleAuthConfigurationProvider.App,
                 CopyFromRoleGroups = roleGroups
-            });
+            }).ContinueWith(_ => Print("Added"));
         }
 
         public override string[] GetParametersName()

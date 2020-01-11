@@ -41,7 +41,7 @@ namespace AppManagementConsole.Commands
                 Tenant = args[1],
                 Module = args[2],
                 SubModules = subModules.ToArray()
-            });
+            }).ContinueWith(_ => Print("Added"));
         }
 
         public override string[] GetParametersName()

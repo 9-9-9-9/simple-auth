@@ -118,9 +118,9 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        [HttpDelete, Route("{name}/roles")]
+        [HttpDelete, Route("{groupName}/roles")]
         public async Task<IActionResult> DeleteRoles(
-            string name,
+            string groupName,
             [FromBody] DeleteRolesModel model)
         {
             if (!ModelState.IsValid)
@@ -128,7 +128,7 @@ namespace SimpleAuth.Server.Controllers
 
             return await ProcedureDefaultResponse(async () =>
             {
-                var group = await FindRoleGroupAsync(name, RequestAppHeaders.Corp, RequestAppHeaders.App);
+                var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
                 if (model.Roles.IsAny())
                     await Service.DeleteRolesFromGroupAsync(group, model.Roles);
                 else

@@ -50,7 +50,7 @@ namespace SimpleAuth.Server.Middlewares
                     {
                         actionExecutingContext.Result =
                             StatusCodes.Status426UpgradeRequired.WithMessage(
-                                $"Mis-match token {nameof(TokenInfo.Version)}");
+                                $"Mis-match token {nameof(TokenInfo.Version)}, expected {obj.Version}, current {currentTokenVersion}");
                         return;
                     }
                     

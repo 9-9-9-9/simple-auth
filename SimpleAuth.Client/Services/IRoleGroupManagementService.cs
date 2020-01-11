@@ -10,6 +10,7 @@ namespace SimpleAuth.Client.Services
     {
         Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel);
         Task<Shared.Domains.RoleGroup> GetRoleGroupAsync(string roleGroupName);
+        Task AddRoleToGroupAsync(string roleGroupName, UpdateRolesModel updateRolesModel);
     }
 
     public class DefaultRoleGroupManagementService : ClientService, IRoleGroupManagementService
@@ -28,9 +29,9 @@ namespace SimpleAuth.Client.Services
                 .WithAppToken();
         }
 
-        public async Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel)
+        public Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel)
         {
-            await _httpService.DoHttpRequestWithoutResponseAsync(
+            return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
                     .Append(EndpointBuilder.RoleGroupManagement.AddRoleGroup)
@@ -39,12 +40,23 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public async Task<Shared.Domains.RoleGroup> GetRoleGroupAsync(string roleGroupName)
+        public Task<Shared.Domains.RoleGroup> GetRoleGroupAsync(string roleGroupName)
         {
-            return await _httpService.DoHttpRequestWithResponseContentAsync<Shared.Domains.RoleGroup>(
+            return _httpService.DoHttpRequestWithResponseContentAsync<Shared.Domains.RoleGroup>(
                 NewRequest()
                     .Append(EndpointBuilder.RoleGroupManagement.GetRoles(roleGroupName))
                     .Method(Constants.HttpMethods.GET)
+            );
+        }
+
+        public Task AddRoleToGroupAsync(string roleGroupName, UpdateRolesModel updateRolesModel)
+        {
+            return _httpService.DoHttpRequestWithoutResponseAsync(
+                true,
+                NewRequest()
+                    .Append(EndpointBuilder.RoleGroupManagement.AddRoleToGroup(roleGroupName))
+                    .Method(Constants.HttpMethods.PUT),
+                updateRolesModel.JsonSerialize()
             );
         }
     }

@@ -49,7 +49,12 @@ namespace ConsoleApps.Shared.Commands
 
         protected Task Print(Task<string> valueFactory)
         {
-            return valueFactory.ContinueWith(x => x.Result.Write());
+            return valueFactory.ContinueWith(x => Print(x.Result));
+        }
+        
+        protected void Print(string message)
+        {
+            message.Write();
         }
     }
 
