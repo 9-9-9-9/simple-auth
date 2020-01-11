@@ -78,12 +78,16 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("encrypt")]
         public IActionResult EncryptPlainText([FromQuery, Required] string data)
         {
+            if (data.IsBlank())
+                return StatusCodes.Status400BadRequest.WithMessage(nameof(data));
             return StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(data));
         }
 
         [HttpGet("decrypt")]
         public IActionResult DecryptData([FromQuery, Required] string data)
         {
+            if (data.IsBlank())
+                return StatusCodes.Status400BadRequest.WithMessage(nameof(data));
             try
             {
                 return StatusCodes.Status200OK.WithMessage(_encryption.Decrypt(data));

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
 
@@ -6,14 +7,14 @@ namespace SimpleAuth.Client.Utils
 {
     public class RequestBuilder
     {
-        public string Url { get; private set; }
+        public string Url { get; internal set; }
         public bool UseMasterToken { get; set; }
         public bool UseCorpToken { get; set; }
         public bool UseAppToken { get; set; }
         public bool UserFilterEnv { get; set; }
         public bool UseFilterTenant { get; set; }
         public string HttpMethod { get; set; } = Constants.HttpMethods.POST;
-        public string[] QueryParameters { get; set; }
+        public IDictionary<string, string> QueryParameters { get; set; }
         public string Payload { get; set; }
 
         public RequestBuilder(string url)
@@ -66,9 +67,9 @@ namespace SimpleAuth.Client.Utils
             return this;
         }
 
-        public RequestBuilder WithQuery(params string[] args)
+        public RequestBuilder WithQuery(IDictionary<string, string> queryParameters)
         {
-            QueryParameters = args;
+            QueryParameters = queryParameters;
             return this;
         }
 

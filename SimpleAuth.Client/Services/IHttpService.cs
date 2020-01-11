@@ -1,9 +1,12 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using SimpleAuth.Client.Exceptions;
 using SimpleAuth.Client.InternalExtensions;
 using SimpleAuth.Client.Utils;
@@ -17,7 +20,7 @@ namespace SimpleAuth.Client.Services
         Task<(bool, HttpStatusCode, TResult)> DoHttpRequestAsync<TResult>(
             RequestBuilder requestBuilder,
             string payload = null);
-        
+
         Task<TResult> DoHttpRequest2Async<TResult>(
             RequestBuilder requestBuilder,
             string payload = null);
@@ -59,6 +62,10 @@ namespace SimpleAuth.Client.Services
             var requestUrl = requestBuilder.Url;
             HttpResponseMessage response;
 
+#if DEBUG
+            $"Requesting {requestUrl}".Write();
+#endif
+
             if (Constants.HttpMethods.GET == requestBuilder.HttpMethod)
                 response = await httpClient.GetAsync(requestUrl);
             else if (Constants.HttpMethods.POST == requestBuilder.HttpMethod)
@@ -78,7 +85,7 @@ namespace SimpleAuth.Client.Services
                 if (responseContentString != null)
                 {
                     if (typeof(TResult) == typeof(string))
-                        responseContent = (TResult)(object)responseContentString;
+                        responseContent = (TResult) (object) responseContentString;
                     else
                         responseContent = responseContentString.JsonDeserialize<TResult>();
                 }
@@ -117,16 +124,33 @@ namespace SimpleAuth.Client.Services
             if (requestBuilder.UseAppToken)
                 httpClient.DefaultRequestHeaders.Add(Constants.Headers.AppPermission,
                     _simpleAuthConfigurationProvider.AppToken);
-            
+
             if (requestBuilder.UserFilterEnv)
                 httpClient.DefaultRequestHeaders.Add(Constants.Headers.FilterByEnv,
                     _simpleAuthConfigurationProvider.Env);
-            
+
             if (requestBuilder.UseFilterTenant)
                 httpClient.DefaultRequestHeaders.Add(Constants.Headers.FilterByTenant,
                     _simpleAuthConfigurationProvider.Tenant);
 
             httpClient.Timeout = TimeSpan.FromMinutes(5);
+
+            if (!requestBuilder.QueryParameters.IsEmpty())
+            {
+                int? port = null;
+                if (Regex.IsMatch(requestBuilder.Url, @"\:\d+[\/\?]?"))
+                {
+                    var uri = new Uri(requestBuilder.Url);
+                    port = uri.Port;
+                }
+
+                var builder = new UriBuilder(requestBuilder.Url) {Port = port ?? -1};
+                var query = HttpUtility.ParseQueryString(builder.Query);
+                requestBuilder.QueryParameters.ToList().ForEach(kvp => query[kvp.Key] = kvp.Value);
+                builder.Query = query.ToString();
+                requestBuilder.Url = builder.ToString();
+            }
+
             return httpClient;
         }
     }

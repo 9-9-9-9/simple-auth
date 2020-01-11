@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SimpleAuth.Client.Utils;
 using SimpleAuth.Shared;
@@ -18,10 +16,13 @@ namespace SimpleAuth.Client.Services
     public class DefaultAdministrationService : ClientService, IAdministrationService
     {
         private readonly IHttpService _httpService;
-        public DefaultAdministrationService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider, IHttpService httpService) : base(simpleAuthConfigurationProvider)
+
+        public DefaultAdministrationService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
+            IHttpService httpService) : base(simpleAuthConfigurationProvider)
         {
             _httpService = httpService;
         }
+
         protected override RequestBuilder NewRequest()
         {
             return base.NewRequest()
@@ -51,9 +52,12 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.EncryptPlainText())
-                    .WithQuery(data)
+                    .WithQuery(new Dictionary<string, string>
+                    {
+                        {"data", data}
+                    })
                     .Method(Constants.HttpMethods.GET)
-                );
+            );
         }
 
         public async Task<string> DecryptUsingMasterEncryptionKey(string data)
@@ -61,7 +65,10 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.DecryptData())
-                    .WithQuery(data)
+                    .WithQuery(new Dictionary<string, string>
+                    {
+                        {"data", data}
+                    })
                     .Method(Constants.HttpMethods.GET)
             );
         }

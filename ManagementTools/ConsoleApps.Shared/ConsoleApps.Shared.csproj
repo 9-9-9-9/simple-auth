@@ -9,4 +9,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
+    <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+    <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

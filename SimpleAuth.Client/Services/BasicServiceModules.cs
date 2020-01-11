@@ -7,6 +7,8 @@ namespace SimpleAuth.Client.Services
     {
         public override void RegisterModules(IServiceCollection serviceCollection)
         {
+            serviceCollection.AddSingleton<IAdministrationService, DefaultAdministrationService>();
+            
             serviceCollection.AddSingleton<IUserAuthService, DefaultUserAuthService>();
             
             serviceCollection.AddSingleton<ISimpleAuthConfigurationProvider, DefaultSimpleAuthConfigurationProvider>();

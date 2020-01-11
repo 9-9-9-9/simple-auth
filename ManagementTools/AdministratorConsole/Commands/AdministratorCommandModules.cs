@@ -8,7 +8,10 @@ namespace AdministratorConsole.Commands
     {
         public override void RegisterModules(IServiceCollection serviceCollection)
         {
-            serviceCollection.RegisterCommandWR<GenerateCorpPermissionTokenCommand, string>();
+            serviceCollection.RegisterCommand<GenerateCorpPermissionTokenCommand>();
+            serviceCollection.RegisterCommand<GenerateAppPermissionTokenCommand>();
+            serviceCollection.RegisterCommand<EncryptCommand>();
+            serviceCollection.RegisterCommand<DecryptCommand>();
         }
     }
 }

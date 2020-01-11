@@ -14,7 +14,7 @@ namespace SimpleAuth.Client.Exceptions
         private static string BuildErrorMessage(HttpStatusCode statusCode)
         {
             //TODO handle cases
-            return $"Request failure, status code {statusCode} ({(byte)statusCode})";
+            return $"Request failure, status code {statusCode} ({(short)statusCode})";
         }
     }
 }

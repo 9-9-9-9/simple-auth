@@ -1,11 +1,11 @@
-﻿using ConsoleApps.Shared.Commands;
-using SimpleAuth.Client.Services;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ConsoleApps.Shared.Commands;
+using SimpleAuth.Client.Services;
 
 namespace AdministratorConsole.Commands
 {
-    public class EncryptCommand : RequestCommandWithResponse<string>
+    public class EncryptCommand : AbstractCommand, ICommand
     {
         private readonly IAdministrationService _administrationService;
 
@@ -14,17 +14,21 @@ namespace AdministratorConsole.Commands
             _administrationService = administrationService;
         }
 
-        protected override Task<string> DoRequest(params string[] args)
-        {
-            return _administrationService.EncryptUsingMasterEncryptionKey(args[0]);
-        }
-
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)
         {
             yield break;
         }
 
-        protected override int NumberOfParameters => 1;
         protected override int[] IdxParametersCanNotBeBlank => new[] { 0 };
+
+        protected override Task DoMainJob(string[] args)
+        {
+            return Print(_administrationService.EncryptUsingMasterEncryptionKey(args[0]));
+        }
+
+        public override string[] GetParametersName()
+        {
+            return new[] {"Text to be encrypted"};
+        }
     }
 }
