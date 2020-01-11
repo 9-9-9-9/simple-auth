@@ -12,6 +12,7 @@ namespace AppManagementConsole.Commands
             serviceCollection.RegisterCommand<AddRoleGroupCommand>();
             serviceCollection.RegisterCommand<ListingRolesOfGroupCommand>();
             serviceCollection.RegisterCommand<AddRoleToGroupCommand>();
+            serviceCollection.RegisterCommand<AssignUserToRoleGroupCommand>();
         }
     }
 }

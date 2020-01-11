@@ -43,6 +43,7 @@ namespace ConsoleApps.Shared.Commands
                 yield return arg;
         }
 
+        // Do not make this method default with virtual here, developer will forgot additional important check
         protected abstract IEnumerable<string> GetOthersArgumentsProblems(params string[] args);
 
         protected abstract int[] IdxParametersCanNotBeBlank { get; }
