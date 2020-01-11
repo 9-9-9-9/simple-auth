@@ -30,7 +30,7 @@ namespace AppManagementConsole.Commands
                     else
                         sb.AppendLine("Group doesn't have any role");
                     if (roleGroup.Locked)
-                        sb.AppendLine($"Group {roleGroup.Name} is being locked");
+                        sb.AppendLine($"Group {roleGroup.Name} is being LOCKED");
 
                     return sb.ToString();
                 })
