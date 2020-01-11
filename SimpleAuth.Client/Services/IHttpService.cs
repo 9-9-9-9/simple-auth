@@ -12,6 +12,7 @@ using SimpleAuth.Client.InternalExtensions;
 using SimpleAuth.Client.Utils;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
+using SimpleAuth.Shared.Exceptions;
 
 namespace SimpleAuth.Client.Services
 {
@@ -77,7 +78,16 @@ namespace SimpleAuth.Client.Services
                     if (typeof(TResult) == typeof(string))
                         responseContent = (TResult) (object) responseContentString;
                     else
-                        responseContent = responseContentString.JsonDeserialize<TResult>();
+                    {
+                        try
+                        {
+                            responseContent = responseContentString.JsonDeserialize<TResult>();
+                        }
+                        catch (Exception e)
+                        {
+                            throw new SimpleAuthException($"Can not deserialize json '{responseContentString}'", e);
+                        }
+                    }
                 }
             }
 

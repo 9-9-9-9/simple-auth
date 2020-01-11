@@ -29,6 +29,7 @@ namespace SimpleAuth.Client.Utils
         public static class RoleGroupManagement
         {
             public const string AddRoleGroup = "api/role-groups";
+            public static string GetRoles(string roleGroupName) => $"api/role-groups/{roleGroupName}";
         }
     }
 }

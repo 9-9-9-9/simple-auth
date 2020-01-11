@@ -54,6 +54,7 @@ namespace ConsoleApps.Shared
                 });
 
                 await ProcessCommand(selectedCommand, arguments.ToArray());
+                "Execution of command was finished successfully".Write();
                 Console.ReadLine();
             }
         }

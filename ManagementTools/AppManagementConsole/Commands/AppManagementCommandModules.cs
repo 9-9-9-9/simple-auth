@@ -14,6 +14,7 @@ namespace AppManagementConsole.Commands
             serviceCollection.RegisterCommand<AddRoleWith_3_SubModules>();
             serviceCollection.RegisterCommand<AddRoleWith_4_SubModules>();
             serviceCollection.RegisterCommand<AddRoleGroupCommand>();
+            serviceCollection.RegisterCommand<ListingRolesOfGroupCommand>();
         }
     }
 }

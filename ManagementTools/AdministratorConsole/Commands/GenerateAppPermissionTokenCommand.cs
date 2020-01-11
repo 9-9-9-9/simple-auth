@@ -5,7 +5,7 @@ using SimpleAuth.Client.Services;
 
 namespace AdministratorConsole.Commands
 {
-    public class GenerateAppPermissionTokenCommand : AbstractCommand, ICommand
+    public class GenerateAppPermissionTokenCommand : AbstractCommand
     {
         private readonly IAdministrationService _administrationService;
 

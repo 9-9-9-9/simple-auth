@@ -7,7 +7,7 @@ using SimpleAuth.Shared.Models;
 
 namespace AppManagementConsole.Commands
 {
-    public class AddRoleCommand : AbstractCommand, ICommand
+    public class AddRoleCommand : AbstractCommand
     {
         private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
         private readonly IRoleManagementService _roleManagementService;

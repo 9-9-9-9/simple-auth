@@ -5,7 +5,7 @@ using SimpleAuth.Client.Services;
 
 namespace AdministratorConsole.Commands
 {
-    public class EncryptCommand : AbstractCommand, ICommand
+    public class EncryptCommand : AbstractCommand
     {
         private readonly IAdministrationService _administrationService;
 

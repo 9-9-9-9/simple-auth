@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AdministratorConsole.Commands
 {
-    public class DecryptCommand : AbstractCommand, ICommand
+    public class DecryptCommand : AbstractCommand
     {
         private readonly IAdministrationService _administrationService;
 
