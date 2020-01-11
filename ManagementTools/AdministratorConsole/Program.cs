@@ -35,12 +35,12 @@ namespace AdministratorConsole
                 {
                     TokenSettings = new SimpleAuthTokenSettings
                     {
-                        MasterToken = "dbF5x5I+83EVOl8yApRhbrhUbnVdkWVf5yoxzwL5oO35dpLIV2BhngAbPyhpCrpYB+NL1PrzQOqslU5UbPiGNCEv3TxdLBt7lbSBgFvMAJ/EtIdj1JKxG5y3nJbI3F9xZ34NqcXqTnhCq4UVxk+Sb4L9zYcq59uZjAT6rYZqUk/DfsvunfZxnvpBMMqI1TbDy1py6a0mMbfTBzZuJdQ0+wdgm+R1F7en4pPBfqYTG8MD7fOmDLOkX/aHWxCSJ41J5EAIAWZlgNl5qRluzR8lfG5B7GLFJXzE85gjbqLHwgATSlZWi2RHYxYAA8SpQHrNPNPWC5QggFnFrmp0OSvcaw==",
+                        MasterToken =
+                            "dbF5x5I+83EVOl8yApRhbrhUbnVdkWVf5yoxzwL5oO35dpLIV2BhngAbPyhpCrpYB+NL1PrzQOqslU5UbPiGNCEv3TxdLBt7lbSBgFvMAJ/EtIdj1JKxG5y3nJbI3F9xZ34NqcXqTnhCq4UVxk+Sb4L9zYcq59uZjAT6rYZqUk/DfsvunfZxnvpBMMqI1TbDy1py6a0mMbfTBzZuJdQ0+wdgm+R1F7en4pPBfqYTG8MD7fOmDLOkX/aHWxCSJ41J5EAIAWZlgNl5qRluzR8lfG5B7GLFJXzE85gjbqLHwgATSlZWi2RHYxYAA8SpQHrNPNPWC5QggFnFrmp0OSvcaw==",
                     },
-                    SimpleAuthServerUrl = 
-                        "http://localhost:5000"
-                    //"http://standingtrust.com"
-                    ,
+                    SimpleAuthServerUrl =
+                        //"http://localhost:5000"
+                        "http://standingtrust.com",
                 })
                 .RegisterModules<AdministratorCommandModules>()
                 .RegisterModules<BasicServiceModules>();

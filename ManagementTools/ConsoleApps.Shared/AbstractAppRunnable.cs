@@ -10,7 +10,7 @@ namespace ConsoleApps.Shared
 {
     public abstract class AbstractAppRunnable
     {
-        public virtual Task RunAsync()
+        public virtual async Task RunAsync()
         {
             IServiceCollection services = new ServiceCollection();
             services = RegisterServiceCollections(services);
@@ -22,29 +22,33 @@ namespace ConsoleApps.Shared
                 .Select((x, i) => (i + 1, x))
                 .ToDictionary(tp => tp.Item1, tp => tp.x);
 
-            "====================================".Write();
-            "Commands".Write();
-            commandDict.ToList().ForEach(kvp => $"{kvp.Key}. {kvp.Value.GetType()}".Write());
-            "0. Exit".Write();
-
-            var opt = ReadInputInt();
-            
-            if (opt == 0)
-                Environment.Exit(0);
-            
-            if (!commandDict.ContainsKey(opt))
-                throw new InvalidOperationException($"There is no option number {opt}");
-
-            var selectedCommand = commandDict[opt];
-            var arguments = new List<string>();
-            
-            selectedCommand.GetParametersName().ToList().ForEach(x =>
+            while (true)
             {
-                $"{x}: ".Write();
-                arguments.Add(GetInputString());
-            });
+                "====================================".Write();
+                "Commands".Write();
+                commandDict.ToList().ForEach(kvp => $"{kvp.Key}. {kvp.Value.GetType().Name}".Write());
+                "0. Exit".Write();
 
-            return ProcessCommand(selectedCommand, arguments.ToArray());
+                var opt = ReadInputInt();
+            
+                if (opt == 0)
+                    Environment.Exit(0);
+            
+                if (!commandDict.ContainsKey(opt))
+                    throw new InvalidOperationException($"There is no option number {opt}");
+
+                var selectedCommand = commandDict[opt];
+                var arguments = new List<string>();
+            
+                selectedCommand.GetParametersName().ToList().ForEach(x =>
+                {
+                    $"{x}: ".Write();
+                    arguments.Add(GetInputString());
+                });
+
+                await ProcessCommand(selectedCommand, arguments.ToArray());
+                Console.ReadLine();
+            }
         }
 
         protected virtual Task ProcessCommand(ICommand command, string[] args)
