@@ -41,11 +41,11 @@ namespace SimpleAuth.Server.Middlewares
                     }
 
                     var tokenInfoService = actionExecutingContext.ResolveService<ITokenInfoService>();
-                    var currentTokenVersion = tokenInfoService.GetCurrentVersion(new TokenInfo
+                    var currentTokenVersion = tokenInfoService.GetCurrentVersionAsync(new TokenInfo
                     {
                         Corp = obj.Corp,
                         App = string.Empty
-                    });
+                    }).Result;
                     if (obj.Version != currentTokenVersion)
                     {
                         actionExecutingContext.Result =
