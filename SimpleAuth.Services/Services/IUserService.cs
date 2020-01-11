@@ -23,9 +23,9 @@ namespace SimpleAuth.Services
     {
         User GetUser(string userId, string corp);
         Task CreateUserAsync(User user, LocalUserInfo localUserInfo);
-        Task AssignUserToGroups(User user, RoleGroup[] roleGroups);
-        Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups);
-        Task UnAssignUserFromAllGroups(User user, string corp);
+        Task AssignUserToGroupsAsync(User user, RoleGroup[] roleGroups);
+        Task UnAssignUserFromGroupsAsync(User user, RoleGroup[] roleGroups);
+        Task UnAssignUserFromAllGroupsAsync(User user, string corp);
         Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null, string tenant = null);
         Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app);
         Task UpdateLockStatusAsync(User user);
@@ -103,7 +103,7 @@ namespace SimpleAuth.Services
             }.WithRandomId());
         }
 
-        public async Task AssignUserToGroups(User user, RoleGroup[] roleGroups)
+        public async Task AssignUserToGroupsAsync(User user, RoleGroup[] roleGroups)
         {
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException($"Groups must belong to same application");
@@ -142,7 +142,7 @@ namespace SimpleAuth.Services
             }, lookupRoleGroups);
         }
 
-        public async Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups)
+        public async Task UnAssignUserFromGroupsAsync(User user, RoleGroup[] roleGroups)
         {
             if (roleGroups.IsEmpty())
                 return;
@@ -175,7 +175,7 @@ namespace SimpleAuth.Services
             }, tobeRemoved.Select(x => x.RoleGroup).ToArray());
         }
 
-        public async Task UnAssignUserFromAllGroups(User user, string corp)
+        public async Task UnAssignUserFromAllGroupsAsync(User user, string corp)
         {
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));

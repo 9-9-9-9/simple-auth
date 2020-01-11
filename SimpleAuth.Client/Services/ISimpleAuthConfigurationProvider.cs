@@ -1,9 +1,11 @@
+using Microsoft.Extensions.Options;
 using SimpleAuth.Client.Models;
 
 namespace SimpleAuth.Client.Services
 {
     public interface ISimpleAuthConfigurationProvider : IClientService
     {
+        string MasterToken { get; }
         string CorpToken { get; }
         string AppToken { get; }
         string Corp { get; }
@@ -17,12 +19,13 @@ namespace SimpleAuth.Client.Services
     {
         private readonly SimpleAuthSettings _simpleAuthSettings;
 
-        public DefaultSimpleAuthConfigurationProvider(SimpleAuthSettings simpleAuthSettings)
+        public DefaultSimpleAuthConfigurationProvider(IOptions<SimpleAuthSettings> simpleAuthSettings)
         {
-            _simpleAuthSettings = simpleAuthSettings;
+            _simpleAuthSettings = simpleAuthSettings.Value;
             EndPointUrl = _simpleAuthSettings.SimpleAuthServerUrl?.TrimEnd('/');
         }
 
+        public string MasterToken => _simpleAuthSettings.TokenSettings.MasterToken;
         public string CorpToken => _simpleAuthSettings.TokenSettings.CorpToken;
         public string AppToken => _simpleAuthSettings.TokenSettings.AppToken;
         public string Corp => _simpleAuthSettings.Corp;

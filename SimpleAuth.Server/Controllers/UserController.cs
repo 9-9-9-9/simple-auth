@@ -204,7 +204,7 @@ namespace SimpleAuth.Server.Controllers
                 return BadRequest();
 
             var user = Service.GetUser(model.UserId, RequestAppHeaders.Corp);
-            if (user != null)
+            if (user != default)
                 return Conflict();
 
             var vr = new Func<ValidationResult>[]
@@ -233,10 +233,36 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        [HttpPost, HttpPut, Route("{userId}/role-groups")]
+        public async Task<IActionResult> AssignUserToGroupsAsync(string userId,
+            [FromBody] ModifyUserRoleGroupsModel modifyUserRoleGroupsModel)
+        {
+            if ((modifyUserRoleGroupsModel?.RoleGroups?.Length ?? 0) == 0)
+                return BadRequest();
+
+            return await ProcedureDefaultResponse(async () =>
+                {
+                    var user = Service.GetUser(userId, RequestAppHeaders.Corp);
+                    if (user == default)
+                        throw new EntityNotExistsException(
+                            $"{userId} at {RequestAppHeaders.App} of {RequestAppHeaders.Corp}");
+                    await Service.AssignUserToGroupsAsync(new Shared.Domains.User
+                    {
+                        Id = userId
+                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new Shared.Domains.RoleGroup
+                    {
+                        Name = x,
+                        Corp = RequestAppHeaders.Corp,
+                        App = RequestAppHeaders.App
+                    }).ToArray());
+                }
+            );
+        }
+
         private async Task<ResponseUserModel> GetBaseResponseUserModelAsync(string userId)
         {
             var user = Service.GetUser(userId, RequestAppHeaders.Corp);
-            if (user == null)
+            if (user == default)
                 throw new EntityNotExistsException(userId);
 
             var filterRoleEnv = GetHeader(Constants.Headers.FilterByEnv);

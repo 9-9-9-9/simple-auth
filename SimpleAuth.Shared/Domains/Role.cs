@@ -19,6 +19,15 @@ namespace SimpleAuth.Shared.Domains
             clientRoleModel.Permission = Permission;
             return clientRoleModel;
         }
+
+        public RoleModel Cast()
+        {
+            return new RoleModel
+            {
+                Role = RoleId,
+                Permission = Permission.Serialize()
+            };
+        }
     }
     
     public static class RoleExtensions

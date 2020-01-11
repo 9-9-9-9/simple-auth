@@ -40,7 +40,7 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
             var tkn = M<ITokenInfoService>();
 
             svc.Setup(x => x.GetService(typeof(IEncryptionService))).Returns(new DummyEncryptionService());
-            tkn.Setup(x => x.GetCurrentVersion(It.IsAny<TokenInfo>())).Returns(1);
+            tkn.Setup(x => x.GetCurrentVersionAsync(It.IsAny<TokenInfo>())).ReturnsAsync(1);
             svc.Setup(x => x.GetService(typeof(ITokenInfoService))).Returns(tkn.Object);
             ctx.SetupGet(x => x.RequestServices).Returns(svc.Object);
             svc.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(fac.Object);

@@ -41,16 +41,16 @@ namespace SimpleAuth.Server.Middlewares
                     }
 
                     var tokenInfoService = actionExecutingContext.ResolveService<ITokenInfoService>();
-                    var currentTokenVersion = tokenInfoService.GetCurrentVersion(new TokenInfo
+                    var currentTokenVersion = tokenInfoService.GetCurrentVersionAsync(new TokenInfo
                     {
                         Corp = obj.Corp,
                         App = obj.App
-                    });
+                    }).Result;
                     if (obj.Version != currentTokenVersion)
                     {
                         actionExecutingContext.Result =
                             StatusCodes.Status426UpgradeRequired.WithMessage(
-                                $"Mis-match token {nameof(TokenInfo.Version)}");
+                                $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {obj.Version}");
                         return;
                     }
                         

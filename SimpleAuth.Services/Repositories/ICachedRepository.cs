@@ -51,7 +51,7 @@ namespace SimpleAuth.Repositories
                 throw new ArgumentNullException(nameof(key));
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));
-            if (app.IsBlank())
+            if (app == null)
                 throw new ArgumentNullException(nameof(app));
         }
 
@@ -59,7 +59,7 @@ namespace SimpleAuth.Repositories
         {
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));
-            if (app.IsBlank())
+            if (app == null)
                 throw new ArgumentNullException(nameof(app));
         }
 

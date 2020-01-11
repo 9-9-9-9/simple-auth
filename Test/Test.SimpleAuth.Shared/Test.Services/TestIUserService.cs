@@ -284,7 +284,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             try
             {
-                await uSvc.UnAssignUserFromGroups(new User
+                await uSvc.UnAssignUserFromGroupsAsync(new User
                     {
                         Id = userId,
                     },
@@ -344,10 +344,10 @@ namespace Test.SimpleAuth.Shared.Test.Services
             await AssignUserToGroups(uSvc, user.Id, $"g3.{randomCorp2}.a");
 
 
-            Assert.That(async () => await uSvc.UnAssignUserFromAllGroups(user, null),
+            Assert.That(async () => await uSvc.UnAssignUserFromAllGroupsAsync(user, null),
                 Throws.TypeOf<ArgumentNullException>());
 
-            await uSvc.UnAssignUserFromAllGroups(user, randomCorp1);
+            await uSvc.UnAssignUserFromAllGroupsAsync(user, randomCorp1);
 
             user = uSvc.GetUser(user.Id, randomCorp1);
             Assert.AreEqual(0, user.RoleGroups?.Length ?? -1);

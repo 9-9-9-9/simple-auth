@@ -44,7 +44,7 @@ namespace SimpleAuth.Server.Controllers
                 App = string.Empty
             });
 
-            return StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(new RequireCorpToken
+            return StatusCodes.Status201Created.WithMessage(_encryption.Encrypt(new RequireCorpToken
             {
                 Header = Constants.Headers.CorpPermission,
                 Corp = corp,
@@ -66,7 +66,7 @@ namespace SimpleAuth.Server.Controllers
                 App = app
             });
 
-            return StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(new RequestAppHeaders
+            return StatusCodes.Status201Created.WithMessage(_encryption.Encrypt(new RequestAppHeaders
             {
                 Header = Constants.Headers.AppPermission,
                 Corp = corp,
@@ -78,12 +78,16 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("encrypt")]
         public IActionResult EncryptPlainText([FromQuery, Required] string data)
         {
+            if (data.IsBlank())
+                return StatusCodes.Status400BadRequest.WithMessage(nameof(data));
             return StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(data));
         }
 
         [HttpGet("decrypt")]
         public IActionResult DecryptData([FromQuery, Required] string data)
         {
+            if (data.IsBlank())
+                return StatusCodes.Status400BadRequest.WithMessage(nameof(data));
             try
             {
                 return StatusCodes.Status200OK.WithMessage(_encryption.Decrypt(data));

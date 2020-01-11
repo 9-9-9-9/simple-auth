@@ -9,7 +9,6 @@ namespace SimpleAuth.Shared.Models
     {
         [Required]
         public string UserId { get; set; }
-        public string Corp { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
     }
@@ -52,5 +51,10 @@ namespace SimpleAuth.Shared.Models
         [DataMember(Name = "email")] public string Email { get; set; }
 
         [DataMember(Name = "hd")] public string Hd { get; set; }
+    }
+
+    public class ModifyUserRoleGroupsModel
+    {
+        public string[] RoleGroups { get; set; }
     }
 }
