@@ -21,7 +21,16 @@ namespace SimpleAuth.Client.Services
             RequestBuilder requestBuilder,
             string payload = null);
 
-        Task<TResult> DoHttpRequest2Async<TResult>(
+        Task<(bool, HttpStatusCode)> DoHttpRequestWithoutResponseAsync(
+            RequestBuilder requestBuilder,
+            string payload = null);
+
+        Task DoHttpRequestWithoutResponseAsync(
+            bool expectSuccessStatusCode,
+            RequestBuilder requestBuilder,
+            string payload = null);
+
+        Task<TResult> DoHttpRequestWithResponseContentAsync<TResult>(
             RequestBuilder requestBuilder,
             string payload = null);
     }
@@ -56,6 +65,28 @@ namespace SimpleAuth.Client.Services
             }
 
             using var httpClient = NewHttpClient(requestBuilder);
+
+            var response = await DoRequest(httpClient, requestBuilder, payload);
+
+            TResult responseContent = default;
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContentString = await response.Content.ReadAsStringAsync();
+                if (responseContentString != null)
+                {
+                    if (typeof(TResult) == typeof(string))
+                        responseContent = (TResult) (object) responseContentString;
+                    else
+                        responseContent = responseContentString.JsonDeserialize<TResult>();
+                }
+            }
+
+            return (response.IsSuccessStatusCode, response.StatusCode, responseContent);
+        }
+
+        private async Task<HttpResponseMessage> DoRequest(HttpClient httpClient, RequestBuilder requestBuilder,
+            string payload)
+        {
             HttpContent httpContent =
                 payload == null ? null : new StringContent(payload, Encoding.UTF8, "application/json");
 
@@ -78,28 +109,53 @@ namespace SimpleAuth.Client.Services
                 throw new NotSupportedException(
                     $"{requestBuilder.HttpMethod} is not being supported by this function <{nameof(DoHttpRequestAsync)}>");
 
-            TResult responseContent = default;
-            if (response.IsSuccessStatusCode)
+#if DEBUG
+            "Request completed".Write();
+#endif
+            return response;
+        }
+
+        public async Task<(bool, HttpStatusCode)> DoHttpRequestWithoutResponseAsync(RequestBuilder requestBuilder,
+            string payload = null)
+        {
+            if (requestBuilder == null)
+                throw new ArgumentNullException(nameof(requestBuilder));
+
+            if (!payload.IsBlank())
             {
-                var responseContentString = await response.Content.ReadAsStringAsync();
-                if (responseContentString != null)
+                if (
+                    Constants.HttpMethods.GET == requestBuilder.HttpMethod
+                    ||
+                    Constants.HttpMethods.DELETE == requestBuilder.HttpMethod
+                )
                 {
-                    if (typeof(TResult) == typeof(string))
-                        responseContent = (TResult) (object) responseContentString;
-                    else
-                        responseContent = responseContentString.JsonDeserialize<TResult>();
+                    throw new NotSupportedException(
+                        $"Http method {requestBuilder.HttpMethod} does not supports '{nameof(payload)}' parameter");
                 }
             }
 
-            return (response.IsSuccessStatusCode, response.StatusCode, responseContent);
+            using var httpClient = NewHttpClient(requestBuilder);
+
+            var response = await DoRequest(httpClient, requestBuilder, payload);
+
+            return (response.IsSuccessStatusCode, response.StatusCode);
         }
 
-        public async Task<TResult> DoHttpRequest2Async<TResult>(RequestBuilder requestBuilder, string payload = null)
+        public async Task DoHttpRequestWithoutResponseAsync(bool expectSuccessStatusCode, RequestBuilder requestBuilder,
+            string payload = null)
         {
-            var res = await DoHttpRequestAsync<TResult>(requestBuilder, payload);
-            if (res.Item1)
-                return res.Item3;
-            throw new SimpleAuthHttpRequestException(res.Item2);
+            var (success, httpStatusCode) = await DoHttpRequestWithoutResponseAsync(requestBuilder, payload);
+            if (!success)
+                throw new SimpleAuthHttpRequestException(httpStatusCode);
+        }
+
+        public async Task<TResult> DoHttpRequestWithResponseContentAsync<TResult>(RequestBuilder requestBuilder,
+            string payload = null)
+        {
+            var (success, httpStatusCode, result) = await DoHttpRequestAsync<TResult>(requestBuilder, payload);
+            if (!success)
+                throw new SimpleAuthHttpRequestException(httpStatusCode);
+            return result;
         }
 
         private HttpClient NewHttpClient(RequestBuilder requestBuilder)

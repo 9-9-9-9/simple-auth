@@ -20,5 +20,10 @@ namespace SimpleAuth.Client.Utils
             public static string EncryptPlainText() => "admin/encrypt";
             public static string DecryptData() => "admin/decrypt";
         }
+
+        public static class Role
+        {
+            public const string AddRole = "api/roles";
+        }
     }
 }

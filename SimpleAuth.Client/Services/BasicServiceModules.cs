@@ -9,6 +9,8 @@ namespace SimpleAuth.Client.Services
         {
             serviceCollection.AddSingleton<IAdministrationService, DefaultAdministrationService>();
             
+            serviceCollection.AddSingleton<IRoleManagementService, DefaultRoleManagementService>();
+            
             serviceCollection.AddSingleton<IUserAuthService, DefaultUserAuthService>();
             
             serviceCollection.AddSingleton<ISimpleAuthConfigurationProvider, DefaultSimpleAuthConfigurationProvider>();

@@ -30,9 +30,15 @@ namespace SimpleAuth.Client.Services
                 .WithMasterToken();
         }
 
+        private RequestBuilder NewRequestForCorpManagement()
+        {
+            return base.NewRequest()
+                .WithCorpToken();
+        }
+
         public async Task<string> GenerateCorpPermissionTokenAsync(string corp)
         {
-            return await _httpService.DoHttpRequest2Async<string>(
+            return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.GenerateCorpPermissionToken(corp))
                     .Method(Constants.HttpMethods.GET)
@@ -41,7 +47,7 @@ namespace SimpleAuth.Client.Services
 
         public async Task<string> GenerateAppPermissionTokenAsync(string corp, string app)
         {
-            return await _httpService.DoHttpRequest2Async<string>(
+            return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(corp, app))
                     .Method(Constants.HttpMethods.GET)
@@ -50,9 +56,8 @@ namespace SimpleAuth.Client.Services
 
         public async Task<string> GenerateAppPermissionTokenAsync(string app)
         {
-            return await _httpService.DoHttpRequest2Async<string>(
-                base.NewRequest()
-                    .WithCorpToken()
+            return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
+                NewRequestForCorpManagement()
                     .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(app))
                     .Method(Constants.HttpMethods.GET)
             );
@@ -60,7 +65,7 @@ namespace SimpleAuth.Client.Services
 
         public async Task<string> EncryptUsingMasterEncryptionKey(string data)
         {
-            return await _httpService.DoHttpRequest2Async<string>(
+            return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.EncryptPlainText())
                     .WithQuery(new Dictionary<string, string>
@@ -73,7 +78,7 @@ namespace SimpleAuth.Client.Services
 
         public async Task<string> DecryptUsingMasterEncryptionKey(string data)
         {
-            return await _httpService.DoHttpRequest2Async<string>(
+            return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.DecryptData())
                     .WithQuery(new Dictionary<string, string>
