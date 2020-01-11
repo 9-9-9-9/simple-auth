@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using SimpleAuth.Client.Models;
 
 namespace SimpleAuth.Client.Services
@@ -18,9 +19,9 @@ namespace SimpleAuth.Client.Services
     {
         private readonly SimpleAuthSettings _simpleAuthSettings;
 
-        public DefaultSimpleAuthConfigurationProvider(SimpleAuthSettings simpleAuthSettings)
+        public DefaultSimpleAuthConfigurationProvider(IOptions<SimpleAuthSettings> simpleAuthSettings)
         {
-            _simpleAuthSettings = simpleAuthSettings;
+            _simpleAuthSettings = simpleAuthSettings.Value;
             EndPointUrl = _simpleAuthSettings.SimpleAuthServerUrl?.TrimEnd('/');
         }
 

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ConsoleApps.Shared.Commands;
 using SimpleAuth.Core.Extensions;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using SimpleAuth.Client.Models;
 
 namespace ConsoleApps.Shared
 {
@@ -12,7 +14,12 @@ namespace ConsoleApps.Shared
     {
         public virtual async Task RunAsync()
         {
+            var builder = new ConfigurationBuilder();
+            builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            var configuration = builder.Build();
+            
             IServiceCollection services = new ServiceCollection();
+            services.Configure<SimpleAuthSettings>(configuration.GetSection(nameof(SimpleAuthSettings)));
             services = RegisterServiceCollections(services);
 
             var serviceProvider = services.BuildServiceProvider();
