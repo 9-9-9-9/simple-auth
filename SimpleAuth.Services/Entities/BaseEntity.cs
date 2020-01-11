@@ -7,12 +7,17 @@ namespace SimpleAuth.Services.Entities
     public abstract class BaseEntity
     {
     }
-    
+
     public abstract class BaseEntity<T> : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public T Id { get; set; }
+    }
+
+    public interface IRowVersionedRecord
+    {
+        byte[] RowVersion { get; set; }
     }
 
     public static class BaseEntityExtensions

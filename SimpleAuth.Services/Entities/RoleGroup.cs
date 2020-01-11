@@ -7,7 +7,7 @@ using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAuth.Services.Entities
 {
-    public partial class RoleGroup : BaseEntity<Guid>, ILockable, ICorpRelated, IAppRelated
+    public partial class RoleGroup : BaseEntity<Guid>, ILockable, ICorpRelated, IAppRelated, IRowVersionedRecord
     {
         [Index, Required] public string Name { get; set; }
 
@@ -20,6 +20,9 @@ namespace SimpleAuth.Services.Entities
         [Index, Required] public string App { get; set; }
 
         public ICollection<RoleGroupUser> RoleGroupUsers { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 
     public partial class RoleGroup

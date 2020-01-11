@@ -5,7 +5,7 @@ using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAuth.Services.Entities
 {
-    public partial class LocalUserInfo : BaseEntity<Guid>, ICorpRelated, ILockable
+    public partial class LocalUserInfo : BaseEntity<Guid>, ICorpRelated, ILockable, IRowVersionedRecord
     {
         [Index, Required] public string UserId { get; set; }
         [Index] public string Email { get; set; }
@@ -15,6 +15,8 @@ namespace SimpleAuth.Services.Entities
 
         public bool Locked { get; set; }
         // TODO: implement Lock Out
+        
+        public byte[] RowVersion { get; set; }
     }
 
     public partial class LocalUserInfo

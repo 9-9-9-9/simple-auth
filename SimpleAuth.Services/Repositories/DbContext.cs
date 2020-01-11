@@ -24,13 +24,13 @@ namespace SimpleAuth.Repositories
             modelBuilder.Entity<LocalUserInfo>().HasIndex(info => new {info.NormalizedEmail, info.Corp}).IsUnique();
             modelBuilder.Entity<TokenInfo>().HasIndex(info => new {info.Corp, info.App}).IsUnique();
 
-            RegisterIndex<LocalUserInfo>(modelBuilder);
-            RegisterIndex<Role>(modelBuilder);
-            RegisterIndex<RoleGroup>(modelBuilder);
-            RegisterIndex<RoleGroupUser>(modelBuilder);
-            RegisterIndex<RoleRecord>(modelBuilder);
-            RegisterIndex<TokenInfo>(modelBuilder);
-            RegisterIndex<User>(modelBuilder);
+            RegisterAttributes<LocalUserInfo>(modelBuilder);
+            RegisterAttributes<Role>(modelBuilder);
+            RegisterAttributes<RoleGroup>(modelBuilder);
+            RegisterAttributes<RoleGroupUser>(modelBuilder);
+            RegisterAttributes<RoleRecord>(modelBuilder);
+            RegisterAttributes<TokenInfo>(modelBuilder);
+            RegisterAttributes<User>(modelBuilder);
 
             modelBuilder.Entity<RoleGroupUser>()
                 .HasKey(bc => new {bc.UserId, bc.RoleGroupId});
@@ -44,7 +44,7 @@ namespace SimpleAuth.Repositories
                 .HasForeignKey(bc => bc.RoleGroupId);
         }
 
-        private void RegisterIndex<T>(ModelBuilder modelBuilder) where T : class
+        private void RegisterAttributes<T>(ModelBuilder modelBuilder) where T : class
         {
             if (typeof(ICorpRelated).IsAssignableFrom(typeof(T)))
                 modelBuilder.Entity<T>().HasIndex(x => (x as ICorpRelated).Corp);
@@ -62,6 +62,10 @@ namespace SimpleAuth.Repositories
                 modelBuilder.Entity<T>().HasIndex(x => (x as IPermissionRelated).Permission);
             if (typeof(ILockable).IsAssignableFrom(typeof(T)))
                 modelBuilder.Entity<T>().HasIndex(x => (x as ILockable).Locked);
+            if (typeof(IRowVersionedRecord).IsAssignableFrom(typeof(T)))
+                modelBuilder.Entity<T>().Property(x => (x as IRowVersionedRecord).RowVersion)
+                    .IsConcurrencyToken()
+                    .ValueGeneratedOnAddOrUpdate();
         }
     }
 }
