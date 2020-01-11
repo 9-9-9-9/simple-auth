@@ -16,6 +16,7 @@ namespace SimpleAuth.Client.Utils
         {
             public static string GenerateCorpPermissionToken(string corp) => $"admin/token/{corp}";
             public static string GenerateAppPermissionToken(string corp, string app) => $"admin/token/{corp}/{app}";
+            public static string GenerateAppPermissionToken(string app) => $"corp/token/{app}";
             public static string EncryptPlainText() => "admin/encrypt";
             public static string DecryptData() => "admin/decrypt";
         }

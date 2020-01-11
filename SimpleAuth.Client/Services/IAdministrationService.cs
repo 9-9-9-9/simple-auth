@@ -9,6 +9,7 @@ namespace SimpleAuth.Client.Services
     {
         Task<string> GenerateCorpPermissionTokenAsync(string corp);
         Task<string> GenerateAppPermissionTokenAsync(string corp, string app);
+        Task<string> GenerateAppPermissionTokenAsync(string app);
         Task<string> EncryptUsingMasterEncryptionKey(string data);
         Task<string> DecryptUsingMasterEncryptionKey(string data);
     }
@@ -43,6 +44,16 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequest2Async<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(corp, app))
+                    .Method(Constants.HttpMethods.GET)
+            );
+        }
+
+        public async Task<string> GenerateAppPermissionTokenAsync(string app)
+        {
+            return await _httpService.DoHttpRequest2Async<string>(
+                base.NewRequest()
+                    .WithCorpToken()
+                    .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(app))
                     .Method(Constants.HttpMethods.GET)
             );
         }
