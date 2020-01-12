@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
@@ -75,19 +74,33 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpPost, HttpPut, Route("{name}/lock")]
-        public async Task<IActionResult> UpdateLock(string name)
+        [HttpPost("{groupName}/lock")]
+        public async Task<IActionResult> LockRoleGroup(string groupName)
         {
-            var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
-
             return await ProcedureDefaultResponse(async () =>
                 {
                     await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
                     {
-                        Name = name,
+                        Name = groupName,
                         Corp = RequestAppHeaders.Corp,
                         App = RequestAppHeaders.App,
-                        Locked = @lock
+                        Locked = true
+                    });
+                }
+            );
+        }
+
+        [HttpDelete("{groupName}/lock")]
+        public async Task<IActionResult> UnlockRoleGroup(string groupName)
+        {
+            return await ProcedureDefaultResponse(async () =>
+                {
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
+                    {
+                        Name = groupName,
+                        Corp = RequestAppHeaders.Corp,
+                        App = RequestAppHeaders.App,
+                        Locked = false
                     });
                 }
             );
