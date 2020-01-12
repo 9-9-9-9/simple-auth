@@ -1,6 +1,6 @@
 namespace SimpleAuth.Server
 {
-    public class DbContext : SqliteDbContext
+    public class DbContext : PostgresDbContext
     {
     }
 }

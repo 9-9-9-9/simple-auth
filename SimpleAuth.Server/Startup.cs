@@ -39,7 +39,7 @@ namespace SimpleAuthServer
 
             services.RegisterModules<SimpleAuth.Shared.ProjectRegistrableModules>();
             services.RegisterModules<SimpleAuth.Services.ProjectRegistrableModules>();
-            services.RegisterModules<SimpleAuth.Sqlite.ProjectRegistrableModules>();
+            services.RegisterModules<SimpleAuth.Postgres.ProjectRegistrableModules>();
             services.AddTransient<SimpleAuthDbContext, DbContext>();
 
             services.AddSingleton<IGoogleService, DefaultGoogleService>();
