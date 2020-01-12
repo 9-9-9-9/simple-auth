@@ -1,3 +1,5 @@
+-- DROP SCHEMA simpleauth CASCADE;
+
 SET search_path TO simpleauth;
 
 CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
@@ -5,8 +7,9 @@ CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
     "ProductVersion" TEXT NOT NULL
 );
 
+-- DROP TABLE "RoleGroups";
 CREATE TABLE "RoleGroups" (
-    "Id" TEXT NOT NULL CONSTRAINT "PK_RoleGroups" PRIMARY KEY,
+    "Id" uuid NOT NULL CONSTRAINT "PK_RoleGroups" PRIMARY KEY,
     "Name" TEXT NOT NULL,
     "Locked" INTEGER NOT NULL,
     "Corp" TEXT NOT NULL,
@@ -25,7 +28,7 @@ CREATE TABLE "Roles" (
 );
 
 CREATE TABLE "TokenInfos" (
-    "Id" TEXT NOT NULL CONSTRAINT "PK_TokenInfos" PRIMARY KEY,
+    "Id" UUID NOT NULL CONSTRAINT "PK_TokenInfos" PRIMARY KEY,
     "Corp" TEXT NOT NULL,
     "App" TEXT NULL,
     "Version" INTEGER NOT NULL
@@ -36,16 +39,18 @@ CREATE TABLE "Users" (
     "NormalizedId" TEXT NOT NULL
 );
 
+-- DROP TABLE "RoleRecords";
 CREATE TABLE "RoleRecords" (
-    "Id" TEXT NOT NULL CONSTRAINT "PK_RoleRecords" PRIMARY KEY,
+    "Id" UUID NOT NULL CONSTRAINT "PK_RoleRecords" PRIMARY KEY,
     "RoleId" TEXT NOT NULL,
     "Permission" INTEGER NOT NULL,
-    "RoleGroupId" TEXT NULL,
+    "RoleGroupId" uuid NULL,
     CONSTRAINT "FK_RoleRecords_RoleGroups_RoleGroupId" FOREIGN KEY ("RoleGroupId") REFERENCES "RoleGroups" ("Id") ON DELETE RESTRICT
 );
 
+-- DROP TABLE "LocalUserInfo";
 CREATE TABLE "LocalUserInfos" (
-    "Id" TEXT NOT NULL CONSTRAINT "PK_LocalUserInfos" PRIMARY KEY,
+    "Id" UUID NOT NULL CONSTRAINT "PK_LocalUserInfos" PRIMARY KEY,
     "UserId" TEXT NOT NULL,
     "Email" TEXT NULL,
     "NormalizedEmail" TEXT NULL,
@@ -55,9 +60,10 @@ CREATE TABLE "LocalUserInfos" (
     CONSTRAINT "FK_LocalUserInfos_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
 );
 
+-- DROP TABLE "RoleGroupUsers";
 CREATE TABLE "RoleGroupUsers" (
     "UserId" TEXT NOT NULL,
-    "RoleGroupId" TEXT NOT NULL,
+    "RoleGroupId" UUID NOT NULL,
     CONSTRAINT "PK_RoleGroupUsers" PRIMARY KEY ("UserId", "RoleGroupId"),
     CONSTRAINT "FK_RoleGroupUsers_RoleGroups_RoleGroupId" FOREIGN KEY ("RoleGroupId") REFERENCES "RoleGroups" ("Id") ON DELETE CASCADE,
     CONSTRAINT "FK_RoleGroupUsers_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
