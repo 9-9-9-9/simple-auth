@@ -121,9 +121,7 @@ namespace SimpleAuth.Repositories
                 var newRecord = new RoleGroupUser
                 {
                     UserId = lookupUser.Id,
-                    User = lookupUser,
                     RoleGroupId = gr.Id,
-                    RoleGroup = gr
                 };
                 ctx.Set<RoleGroupUser>().Add(newRecord);
 

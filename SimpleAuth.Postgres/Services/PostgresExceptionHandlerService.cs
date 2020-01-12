@@ -24,7 +24,7 @@ namespace SimpleAuth.Postgres.Services
                     {
                         case 23505: // Unique constraint error
                             //case 547: // Constraint check violation
-                            //case 2601: // Duplicated key row error
+                            //case 23505: // Duplicated key row error
                             // Constraint violation exception
                             // A custom exception of yours for concurrency issues
                             return new ConstraintViolationException("Constrain violated", sqlException);

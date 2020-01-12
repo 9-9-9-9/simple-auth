@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
 CREATE TABLE "RoleGroups" (
     "Id" uuid NOT NULL CONSTRAINT "PK_RoleGroups" PRIMARY KEY,
     "Name" TEXT NOT NULL,
-    "Locked" INTEGER NOT NULL,
+    "Locked" BOOL NOT NULL,
     "Corp" TEXT NOT NULL,
     "App" TEXT NOT NULL
 );
@@ -24,7 +24,7 @@ CREATE TABLE "Roles" (
     "Tenant" TEXT NOT NULL,
     "Module" TEXT NOT NULL,
     "SubModules" TEXT NULL,
-    "Locked" INTEGER NOT NULL
+    "Locked" BOOL NOT NULL
 );
 
 CREATE TABLE "TokenInfos" (
@@ -45,6 +45,8 @@ CREATE TABLE "RoleRecords" (
     "RoleId" TEXT NOT NULL,
     "Permission" INTEGER NOT NULL,
     "RoleGroupId" uuid NULL,
+    "Env" TEXT NOT NULL,
+    "Tenant" TEXT NOT NULL,
     CONSTRAINT "FK_RoleRecords_RoleGroups_RoleGroupId" FOREIGN KEY ("RoleGroupId") REFERENCES "RoleGroups" ("Id") ON DELETE RESTRICT
 );
 
@@ -56,7 +58,7 @@ CREATE TABLE "LocalUserInfos" (
     "NormalizedEmail" TEXT NULL,
     "Corp" TEXT NOT NULL,
     "EncryptedPassword" TEXT NULL,
-    "Locked" INTEGER NOT NULL,
+    "Locked" BOOL NOT NULL,
     CONSTRAINT "FK_LocalUserInfos_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
 );
 
