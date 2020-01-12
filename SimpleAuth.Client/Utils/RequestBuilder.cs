@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Specialized;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
 
@@ -14,8 +14,9 @@ namespace SimpleAuth.Client.Utils
         public bool UserFilterEnv { get; set; }
         public bool UseFilterTenant { get; set; }
         public string HttpMethod { get; set; } = Constants.HttpMethods.POST;
-        public IDictionary<string, string> QueryParameters { get; set; }
+        public NameValueCollection QueryParameters { get; set; }
         public string Payload { get; set; }
+        public string ContentType { get; set; } = "application/json";
 
         public RequestBuilder(string url)
         {
@@ -67,15 +68,29 @@ namespace SimpleAuth.Client.Utils
             return this;
         }
 
-        public RequestBuilder WithQuery(IDictionary<string, string> queryParameters)
+        public RequestBuilder WithQuery(NameValueCollection queryParameters)
         {
             QueryParameters = queryParameters;
+            return this;
+        }
+
+        public RequestBuilder WithQuery(string key, string value)
+        {
+            if (QueryParameters == default)
+                QueryParameters = new NameValueCollection();
+            QueryParameters[key] = value;
             return this;
         }
 
         public RequestBuilder WithPayload(string payload)
         {
             Payload = payload;
+            return this;
+        }
+
+        public RequestBuilder WithoutContentType()
+        {
+            ContentType = null;
             return this;
         }
     }

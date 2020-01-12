@@ -31,18 +31,13 @@ namespace AppManagementConsole.Commands
             if (!Enum.TryParse(typeof(Permission), strPermission, true, out var enumPermission))
                 throw new ArgumentException($"{strPermission} is not a valid permission");
 
-            return _roleGroupManagementService.DeleteRolesAsync(roleGroupName, new DeleteRolesModel
-            {
-                Roles = new[]
+            return _roleGroupManagementService.DeleteRolesAsync(roleGroupName, 
+                new RoleModel
                 {
-                    new RoleModel
-                    {
-                        Role =
-                            $"{_simpleAuthConfigurationProvider.Corp}{Constants.SplitterRoleParts}{_simpleAuthConfigurationProvider.App}{Constants.SplitterRoleParts}{roleIdWithoutCorpAndApp}",
-                        Permission = ((Permission) enumPermission).Serialize()
-                    }
-                }
-            });
+                    Role =
+                        $"{_simpleAuthConfigurationProvider.Corp}{Constants.SplitterRoleParts}{_simpleAuthConfigurationProvider.App}{Constants.SplitterRoleParts}{roleIdWithoutCorpAndApp}",
+                    Permission = ((Permission) enumPermission).Serialize()
+                });
         }
 
         private static readonly string ValidPermissionInput = string.Join(',', Enum.GetValues(typeof(Permission))

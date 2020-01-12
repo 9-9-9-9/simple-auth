@@ -7,6 +7,7 @@ namespace SimpleAuth.Shared
         public const string WildCard = "*";
         public const string SplitterRoleParts = ".";
         public const char ChSplitterRoleParts = '.';
+        public const char ChSplitterMergedRoleIdWithPermission = '#';
 
         public static class Length
         {

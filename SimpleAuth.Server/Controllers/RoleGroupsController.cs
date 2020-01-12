@@ -8,8 +8,10 @@ using SimpleAuth.Repositories;
 using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
+using SimpleAuth.Shared.Utils;
 using SimpleAuth.Shared.Validation;
 
 namespace SimpleAuth.Server.Controllers
@@ -121,10 +123,14 @@ namespace SimpleAuth.Server.Controllers
         [HttpDelete, Route("{groupName}/roles")]
         public async Task<IActionResult> DeleteRoles(
             string groupName,
-            [FromBody] DeleteRolesModel model)
+            [FromQuery] string[] roles,
+            [FromQuery] bool all)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(nameof(ModelState));
+            if (all && roles.IsAny())
+                return BadRequest();
+
+            if (!all && !roles.IsAny())
+                return BadRequest();
 
             return await ProcedureDefaultResponse(async () =>
             {
@@ -134,10 +140,16 @@ namespace SimpleAuth.Server.Controllers
                     Corp = RequestAppHeaders.Corp,
                     App = RequestAppHeaders.App
                 };
-                if (model.Roles.IsAny())
-                    await Service.DeleteRolesFromGroupAsync(group, model.Roles);
-                else
+                if (all)
                     await Service.DeleteAllRolesFromGroupAsync(group);
+                else
+                    await Service.DeleteRolesFromGroupAsync(group, roles.Select(RoleUtils.UnMerge)
+                        .Select(tp => new RoleModel
+                        {
+                            Role = tp.Item1,
+                            Permission = tp.Item2.Serialize()
+                        })
+                        .ToArray());
             });
         }
 

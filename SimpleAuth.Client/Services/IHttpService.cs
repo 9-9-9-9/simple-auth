@@ -110,7 +110,7 @@ namespace SimpleAuth.Client.Services
         }
 
         private async Task<HttpResponseMessage> DoRequest(HttpClient httpClient, RequestBuilder requestBuilder,
-            string payload)
+            string payload = null)
         {
             HttpContent httpContent =
                 payload == null ? null : new StringContent(payload, Encoding.UTF8, "application/json");
@@ -208,7 +208,8 @@ namespace SimpleAuth.Client.Services
 
             var httpClient = new HttpClient(handler);
 
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            if (!requestBuilder.ContentType.IsBlank())
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(requestBuilder.ContentType));
 
             if (requestBuilder.UseMasterToken)
                 httpClient.DefaultRequestHeaders.Add(Constants.Headers.MasterToken,
@@ -232,7 +233,7 @@ namespace SimpleAuth.Client.Services
 
             httpClient.Timeout = TimeSpan.FromMinutes(5);
 
-            if (!requestBuilder.QueryParameters.IsEmpty())
+            if (requestBuilder.QueryParameters?.HasKeys() == true)
             {
                 int? port = null;
                 if (Regex.IsMatch(requestBuilder.Url, @"\:\d+[\/\?]?"))
@@ -243,7 +244,7 @@ namespace SimpleAuth.Client.Services
 
                 var builder = new UriBuilder(requestBuilder.Url) {Port = port ?? -1};
                 var query = HttpUtility.ParseQueryString(builder.Query);
-                requestBuilder.QueryParameters.ToList().ForEach(kvp => query[kvp.Key] = kvp.Value);
+                requestBuilder.QueryParameters.AllKeys.ToList().ForEach(k => query[k] = requestBuilder.QueryParameters[k]);
                 builder.Query = query.ToString();
                 requestBuilder.Url = builder.ToString();
             }
