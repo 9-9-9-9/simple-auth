@@ -17,6 +17,7 @@ namespace SimpleAuth.Client.Services
         Task AddRoleToGroupAsync(string roleGroupName, UpdateRolesModel updateRolesModel);
         Task DeleteRolesAsync(string roleGroupName, params RoleModel[] roleModels);
         Task DeleteAllRolesAsync(string roleGroupName);
+        Task SetLockRoleGroup(string roleGroupName, bool @lock);
     }
 
     public class DefaultRoleGroupManagementService : ClientService, IRoleGroupManagementService
@@ -91,14 +92,14 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        private Task SubmitDeleteRolesAsync(string roleGroupName, DeleteRolesModel deleteRolesModel)
+        public Task SetLockRoleGroup(string roleGroupName, bool @lock)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
-                    .Append(EndpointBuilder.RoleGroupManagement.DeleteRoles(roleGroupName))
-                    .Method(Constants.HttpMethods.DELETE),
-                deleteRolesModel.JsonSerialize()
+                    .WithoutContentType()
+                    .Append(EndpointBuilder.RoleGroupManagement.UpdateLock(roleGroupName))
+                    .Method(@lock ? Constants.HttpMethods.POST : Constants.HttpMethods.DELETE)
             );
         }
     }

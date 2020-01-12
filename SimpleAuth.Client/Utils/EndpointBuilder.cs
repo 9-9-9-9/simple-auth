@@ -34,6 +34,7 @@ namespace SimpleAuth.Client.Utils
             public static string GetRoles(string roleGroupName) => $"api/role-groups/{roleGroupName}";
             public static string AddRoleToGroup(string roleGroupName) => $"api/role-groups/{roleGroupName}/roles";
             public static string DeleteRoles(string roleGroupName) => $"api/role-groups/{roleGroupName}/roles";
+            public static string UpdateLock(string roleGroupName) => $"api/role-groups/{roleGroupName}/lock";
         }
     }
 }
