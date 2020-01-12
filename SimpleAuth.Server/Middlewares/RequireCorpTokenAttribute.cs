@@ -18,48 +18,43 @@ namespace SimpleAuth.Server.Middlewares
             var token = actionExecutingContext.HttpContext.Request.Headers[Constants.Headers.CorpPermission];
 
             var encryptionService = actionExecutingContext.ResolveService<IEncryptionService>();
-            try
-            {
-                var decryptedToken = encryptionService.Decrypt(token);
-                if (decryptedToken.IsBlank())
-                {
-                    actionExecutingContext.Result = StatusCodes.Status403Forbidden.WithEmpty();
-                }
-                else
-                {
-                    var obj = decryptedToken.FromJson<RequireCorpToken>();
-                    if (obj == null || obj.Corp.IsBlank() || obj.Version == 0)
-                    {
-                        actionExecutingContext.Result = StatusCodes.Status412PreconditionFailed.WithEmpty();
-                        return;
-                    }
-                    
-                    if (obj.Header.IsBlank() || obj.Header != Constants.Headers.CorpPermission)
-                    {
-                        actionExecutingContext.Result = StatusCodes.Status403Forbidden.WithMessage(nameof(RequireCorpToken.Header));
-                        return;
-                    }
 
-                    var tokenInfoService = actionExecutingContext.ResolveService<ITokenInfoService>();
-                    var currentTokenVersion = tokenInfoService.GetCurrentVersionAsync(new TokenInfo
-                    {
-                        Corp = obj.Corp,
-                        App = string.Empty
-                    }).Result;
-                    if (obj.Version != currentTokenVersion)
-                    {
-                        actionExecutingContext.Result =
-                            StatusCodes.Status426UpgradeRequired.WithMessage(
-                                $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {obj.Version}");
-                        return;
-                    }
-                    
-                    actionExecutingContext.HttpContext.Items[Constants.Headers.CorpPermission] = obj;
-                }
-            }
-            catch
+            var decryptedToken = encryptionService.Decrypt(token);
+            if (decryptedToken.IsBlank())
             {
                 actionExecutingContext.Result = StatusCodes.Status403Forbidden.WithEmpty();
+            }
+            else
+            {
+                var obj = decryptedToken.FromJson<RequireCorpToken>();
+                if (obj == null || obj.Corp.IsBlank() || obj.Version == 0)
+                {
+                    actionExecutingContext.Result = StatusCodes.Status412PreconditionFailed.WithEmpty();
+                    return;
+                }
+
+                if (obj.Header.IsBlank() || obj.Header != Constants.Headers.CorpPermission)
+                {
+                    actionExecutingContext.Result =
+                        StatusCodes.Status403Forbidden.WithMessage(nameof(RequireCorpToken.Header));
+                    return;
+                }
+
+                var tokenInfoService = actionExecutingContext.ResolveService<ITokenInfoService>();
+                var currentTokenVersion = tokenInfoService.GetCurrentVersionAsync(new TokenInfo
+                {
+                    Corp = obj.Corp,
+                    App = string.Empty
+                }).Result;
+                if (obj.Version != currentTokenVersion)
+                {
+                    actionExecutingContext.Result =
+                        StatusCodes.Status426UpgradeRequired.WithMessage(
+                            $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {obj.Version}");
+                    return;
+                }
+
+                actionExecutingContext.HttpContext.Items[Constants.Headers.CorpPermission] = obj;
             }
         }
     }
