@@ -1,6 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using SimpleAuth.Client.InternalExtensions;
 using SimpleAuth.Client.Utils;
+using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Models;
 
@@ -11,6 +13,8 @@ namespace SimpleAuth.Client.Services
         Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel);
         Task<Shared.Domains.RoleGroup> GetRoleGroupAsync(string roleGroupName);
         Task AddRoleToGroupAsync(string roleGroupName, UpdateRolesModel updateRolesModel);
+        Task DeleteRolesAsync(string roleGroupName, DeleteRolesModel deleteRolesModel);
+        Task DeleteAllRolesAsync(string roleGroupName);
     }
 
     public class DefaultRoleGroupManagementService : ClientService, IRoleGroupManagementService
@@ -57,6 +61,32 @@ namespace SimpleAuth.Client.Services
                     .Append(EndpointBuilder.RoleGroupManagement.AddRoleToGroup(roleGroupName))
                     .Method(Constants.HttpMethods.PUT),
                 updateRolesModel.JsonSerialize()
+            );
+        }
+
+        public Task DeleteRolesAsync(string roleGroupName, DeleteRolesModel deleteRolesModel)
+        {
+            if (deleteRolesModel.Roles.IsEmpty())
+                throw new ArgumentNullException(nameof(deleteRolesModel.Roles));
+            return SubmitDeleteRolesAsync(roleGroupName, deleteRolesModel);
+        }
+
+        public Task DeleteAllRolesAsync(string roleGroupName)
+        {
+            return SubmitDeleteRolesAsync(roleGroupName, new DeleteRolesModel
+            {
+                Roles = new RoleModel[0]
+            });
+        }
+
+        private Task SubmitDeleteRolesAsync(string roleGroupName, DeleteRolesModel deleteRolesModel)
+        {
+            return _httpService.DoHttpRequestWithoutResponseAsync(
+                true,
+                NewRequest()
+                    .Append(EndpointBuilder.RoleGroupManagement.DeleteRoles(roleGroupName))
+                    .Method(Constants.HttpMethods.DELETE),
+                deleteRolesModel.JsonSerialize()
             );
         }
     }

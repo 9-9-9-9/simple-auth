@@ -87,13 +87,13 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
                 if (expectedError)
                     Assert.Fail("Expect error");
             }
-            catch (Exception e)
+            catch
             {
                 if (expectedError)
-                {
                     // pass
                     return;
-                }
+
+                throw;
             }
 
             var actResult = actionExecutingContext.Result;
