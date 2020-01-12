@@ -128,7 +128,12 @@ namespace SimpleAuth.Server.Controllers
 
             return await ProcedureDefaultResponse(async () =>
             {
-                var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
+                var group = new Shared.Domains.RoleGroup
+                {
+                    Name = groupName,
+                    Corp = RequestAppHeaders.Corp,
+                    App = RequestAppHeaders.App
+                };
                 if (model.Roles.IsAny())
                     await Service.DeleteRolesFromGroupAsync(group, model.Roles);
                 else
