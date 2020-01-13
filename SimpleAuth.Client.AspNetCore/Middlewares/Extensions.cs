@@ -1,9 +1,11 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Middlewares;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.DependencyInjection;
+
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMethodReturnValue.Global
 
@@ -11,7 +13,8 @@ namespace Microsoft.AspNetCore.Builder
 {
     public static class Extensions
     {
-        public static IServiceCollection UseCustomTenantProvider<TTenantProvider>(this IServiceCollection serviceCollection)
+        public static IServiceCollection UseCustomTenantProvider<TTenantProvider>(
+            this IServiceCollection serviceCollection)
             where TTenantProvider : class, ITenantProvider
         {
             serviceCollection.AddTransient<ITenantProvider, TTenantProvider>();
@@ -30,9 +33,12 @@ namespace Microsoft.AspNetCore.Builder
         }
 
         public static IServiceCollection UseSimpleAuthDefaultServices(this IServiceCollection services,
-            SimpleAuthSettings simpleAuthSettings)
+            IConfiguration simpleAuthSettingsConfiguration = null)
         {
-            services.AddSingleton(simpleAuthSettings);
+            if (simpleAuthSettingsConfiguration != null)
+                services
+                    .Configure<SimpleAuthSettings>(simpleAuthSettingsConfiguration);
+            
             services
                 .RegisterModules<BasicServiceModules>()
                 .RegisterModules<ServiceModules>()
