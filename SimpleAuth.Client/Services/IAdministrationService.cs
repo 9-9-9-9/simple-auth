@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SimpleAuth.Client.Utils;
 using SimpleAuth.Shared;
 
@@ -68,10 +67,7 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.EncryptPlainText())
-                    .WithQuery(new Dictionary<string, string>
-                    {
-                        {"data", data}
-                    })
+                    .WithQuery("data", data)
                     .Method(Constants.HttpMethods.GET)
             );
         }
@@ -81,10 +77,7 @@ namespace SimpleAuth.Client.Services
             return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
                 NewRequest()
                     .Append(EndpointBuilder.Administration.DecryptData())
-                    .WithQuery(new Dictionary<string, string>
-                    {
-                        {"data", data}
-                    })
+                    .WithQuery("data", data)
                     .Method(Constants.HttpMethods.GET)
             );
         }

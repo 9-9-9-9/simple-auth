@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using SimpleAuth.Client.Models;
+using SimpleAuth.Shared;
 
 namespace SimpleAuth.Client.AspNetCore.Services
 {
@@ -53,7 +54,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
         {
             var randomValue = Guid.NewGuid().ToString();
             await _claimCachingService.SaveClaimsAsync(randomValue, claims);
-            return new Claim(SimpleAuthDefaults.ClaimType, randomValue);
+            return new Claim(SimpleAuthDefaults.ClaimType, randomValue, nameof(SimpleAuthorizationClaim), Constants.Identity.Issuer);
         }
 
         public async Task<IEnumerable<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim)

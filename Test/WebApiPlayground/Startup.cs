@@ -24,26 +24,11 @@ namespace WebApiPlayground
         {
             services.AddControllers();
 
-            services.UseSimpleAuthDefaultServices(new SimpleAuthSettings
-            {
-                SimpleAuthServerUrl = "http://standingtrust.com",
-                TokenSettings = new SimpleAuthTokenSettings
-                {
-                    CorpToken = "",
-                    AppToken = ""
-                },
-                Corp = "c",
-                App = "a",
-                Env = "e",
-                Tenant = "t"
-            });
+            services.UseSimpleAuthDefaultServices(Configuration.GetSection(nameof(SimpleAuthSettings)));
             
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
-            
-            // dummy
-            services.AddSingleton<IUserAuthService, DummyUserAuthService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

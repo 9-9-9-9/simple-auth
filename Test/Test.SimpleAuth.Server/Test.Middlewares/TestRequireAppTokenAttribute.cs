@@ -23,17 +23,24 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
     public class TestRequireAppTokenAttribute : BaseTestAttribute
     {
         [TestCase("{\"Corp\": \"c\", \"App\": \"a\", \"Version\": 1, \"Header\": \"x-app-token\"}", true, 0)]
-        [TestCase("{\"Corp\": \"c\", \"App\": \"a\", \"Version\": 1, \"Header\": \"x-App-token\"}", false, StatusCodes.Status403Forbidden)]
-        [TestCase("{\"Corp\": \"c\", \"App\": \"a\", \"Version\": 0, \"Header\": \"x-app-token\"}", false, StatusCodes.Status426UpgradeRequired)]
-        [TestCase("{\"Corp\": \"c\", \"App\": \"a\", \"Version\": 2, \"Header\": \"x-app-token\"}", false, StatusCodes.Status426UpgradeRequired)]
-        [TestCase("{'Corp': 'c', 'App': 'a', 'Version': 1, 'Header': 'x-app-token'}", false, StatusCodes.Status403Forbidden)]
-        [TestCase("{\"corp\": \"c\", \"App\": \"a\", \"Version\": 1, \"Header\": \"x-app-token\"}", false, StatusCodes.Status412PreconditionFailed)]
-        [TestCase("{\"Corp\": \"c\", \"App\": \"\", \"Version\": 1, \"Header\": \"x-app-token\"}", false, StatusCodes.Status412PreconditionFailed)]
-        [TestCase("{\"Corp\": \"\", \"App\": \"a\", \"Version\": 1, \"Header\": \"x-app-token\"}", false, StatusCodes.Status412PreconditionFailed)]
-        [TestCase("{\"Corp\": \"\", \"App\": \"\", \"Version\": 1, \"Header\": \"x-app-token\"}", false, StatusCodes.Status412PreconditionFailed)]
+        [TestCase("{\"Corp\": \"c\", \"App\": \"a\", \"Version\": 1, \"Header\": \"x-App-token\"}", false,
+            StatusCodes.Status403Forbidden)]
+        [TestCase("{\"Corp\": \"c\", \"App\": \"a\", \"Version\": 0, \"Header\": \"x-app-token\"}", false,
+            StatusCodes.Status426UpgradeRequired)]
+        [TestCase("{\"Corp\": \"c\", \"App\": \"a\", \"Version\": 2, \"Header\": \"x-app-token\"}", false,
+            StatusCodes.Status426UpgradeRequired)]
+        [TestCase("{'Corp': 'c', 'App': 'a', 'Version': 1, 'Header': 'x-app-token'}", false, 0, true)]
+        [TestCase("{\"corp\": \"c\", \"App\": \"a\", \"Version\": 1, \"Header\": \"x-app-token\"}", false,
+            StatusCodes.Status412PreconditionFailed)]
+        [TestCase("{\"Corp\": \"c\", \"App\": \"\", \"Version\": 1, \"Header\": \"x-app-token\"}", false,
+            StatusCodes.Status412PreconditionFailed)]
+        [TestCase("{\"Corp\": \"\", \"App\": \"a\", \"Version\": 1, \"Header\": \"x-app-token\"}", false,
+            StatusCodes.Status412PreconditionFailed)]
+        [TestCase("{\"Corp\": \"\", \"App\": \"\", \"Version\": 1, \"Header\": \"x-app-token\"}", false,
+            StatusCodes.Status412PreconditionFailed)]
         [TestCase("", false, StatusCodes.Status403Forbidden)]
         [TestCase(null, false, StatusCodes.Status403Forbidden)]
-        public void RequireAppToken(string input, bool valid, int expectedStatusCde)
+        public void RequireAppToken(string input, bool valid, int expectedStatusCde, bool expectedError = false)
         {
             var ctx = M<HttpContext>();
             var req = M<HttpRequest>();
@@ -74,7 +81,20 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
                 Mock.Of<Controller>()
             );
 
-            attr.OnActionExecuting(actionExecutingContext);
+            try
+            {
+                attr.OnActionExecuting(actionExecutingContext);
+                if (expectedError)
+                    Assert.Fail("Expect error");
+            }
+            catch
+            {
+                if (expectedError)
+                    // pass
+                    return;
+
+                throw;
+            }
 
             var actResult = actionExecutingContext.Result;
             var items = actionExecutingContext.HttpContext.Items;

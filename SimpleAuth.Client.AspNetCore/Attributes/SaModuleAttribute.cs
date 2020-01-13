@@ -1,7 +1,7 @@
 using System;
 using SimpleAuth.Shared;
 
-namespace SimpleAuth.Client.AspNetCore.Middlewares
+namespace SimpleAuth.Client.AspNetCore.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false)]
     public class SaModuleAttribute : Attribute

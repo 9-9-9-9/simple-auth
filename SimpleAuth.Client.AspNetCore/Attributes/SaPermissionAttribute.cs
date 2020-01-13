@@ -3,7 +3,7 @@ using System.Linq;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
 
-namespace SimpleAuth.Client.AspNetCore.Middlewares
+namespace SimpleAuth.Client.AspNetCore.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class SaPermissionAttribute : Attribute

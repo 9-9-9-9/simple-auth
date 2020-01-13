@@ -1,15 +1,16 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
+using SimpleAuth.Shared.Utils;
 using SimpleAuth.Shared.Validation;
 
 namespace SimpleAuth.Server.Controllers
@@ -73,19 +74,33 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpPost, HttpPut, Route("{name}/lock")]
-        public async Task<IActionResult> UpdateLock(string name)
+        [HttpPost("{groupName}/lock")]
+        public async Task<IActionResult> LockRoleGroup(string groupName)
         {
-            var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
-
             return await ProcedureDefaultResponse(async () =>
                 {
                     await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
                     {
-                        Name = name,
+                        Name = groupName,
                         Corp = RequestAppHeaders.Corp,
                         App = RequestAppHeaders.App,
-                        Locked = @lock
+                        Locked = true
+                    });
+                }
+            );
+        }
+
+        [HttpDelete("{groupName}/lock")]
+        public async Task<IActionResult> UnlockRoleGroup(string groupName)
+        {
+            return await ProcedureDefaultResponse(async () =>
+                {
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
+                    {
+                        Name = groupName,
+                        Corp = RequestAppHeaders.Corp,
+                        App = RequestAppHeaders.App,
+                        Locked = false
                     });
                 }
             );
@@ -121,18 +136,33 @@ namespace SimpleAuth.Server.Controllers
         [HttpDelete, Route("{groupName}/roles")]
         public async Task<IActionResult> DeleteRoles(
             string groupName,
-            [FromBody] DeleteRolesModel model)
+            [FromQuery] string[] roles,
+            [FromQuery] bool all)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(nameof(ModelState));
+            if (all && roles.IsAny())
+                return BadRequest();
+
+            if (!all && !roles.IsAny())
+                return BadRequest();
 
             return await ProcedureDefaultResponse(async () =>
             {
-                var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
-                if (model.Roles.IsAny())
-                    await Service.DeleteRolesFromGroupAsync(group, model.Roles);
-                else
+                var group = new Shared.Domains.RoleGroup
+                {
+                    Name = groupName,
+                    Corp = RequestAppHeaders.Corp,
+                    App = RequestAppHeaders.App
+                };
+                if (all)
                     await Service.DeleteAllRolesFromGroupAsync(group);
+                else
+                    await Service.DeleteRolesFromGroupAsync(group, roles.Select(RoleUtils.UnMerge)
+                        .Select(tp => new RoleModel
+                        {
+                            Role = tp.Item1,
+                            Permission = tp.Item2.Serialize()
+                        })
+                        .ToArray());
             });
         }
 

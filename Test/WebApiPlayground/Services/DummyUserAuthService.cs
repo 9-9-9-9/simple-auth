@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Shared.Enums;
@@ -45,10 +44,10 @@ namespace WebApiPlayground.Services
             //
             IEnumerable<RoleModel> YieldResults()
             {
-                yield return Rm("c.a.e.t.weatherforecast", Permission.View);
-                yield return Rm("c.a.e.t.weatherforecast.*", Permission.View);
-                yield return Rm("c.a.e.t.best", Permission.View);
-                yield return Rm("c.a.e.t.best.a", Permission.View);
+                yield return Rm("test.a.e.t.weatherforecast", Permission.View);
+                yield return Rm("test.a.e.t.weatherforecast.*", Permission.View);
+                yield return Rm("test.a.e.t.best", Permission.View);
+                yield return Rm("test.a.e.t.best.a", Permission.View);
             }
 
             //

@@ -7,6 +7,7 @@ namespace SimpleAuth.Shared
         public const string WildCard = "*";
         public const string SplitterRoleParts = ".";
         public const char ChSplitterRoleParts = '.';
+        public const char ChSplitterMergedRoleIdWithPermission = '#';
 
         public static class Length
         {
@@ -57,5 +58,53 @@ namespace SimpleAuth.Shared
             public const string DELETE = nameof(DELETE);
             // ReSharper restore InconsistentNaming
         }
+
+        // ReSharper disable UnusedMember.Global
+        // ReSharper disable MemberHidesStaticFromOuterClass
+        // ReSharper disable InconsistentNaming
+        public static class PreDefinedRoleParts
+        {
+            public static class Corp
+            {
+                public const string Test = "test";
+                public const string GoQuo = "gq";
+                public const string Google = "gg";
+                public const string Microsoft = "ms";
+                public const string IBM = "ibm";
+                public const string FBI = "fbi";
+                public const string Twitter = "twtr";
+                public const string Facebook = "fb";
+            }
+
+            public static class App
+            {
+                public const string Test = "a";
+            }
+
+            public static class Env
+            {
+                public const string Test = "e";
+                public const string AllEnvs = WildCard;
+                public const string Live = "l";
+                public const string PreProd = "pp";
+                public const string Staging = "s";
+                public const string Dev = "d";
+            }
+
+            public static class Tenant
+            {
+                public const string Test = "t";
+                public const string AllTenants = WildCard;
+            }
+
+            public static class Module
+            {
+                public const string Test = "m";
+                public const string AllModules = WildCard;
+            }
+        }
+        // ReSharper restore InconsistentNaming
+        // ReSharper restore MemberHidesStaticFromOuterClass
+        // ReSharper restore UnusedMember.Global
     }
 }

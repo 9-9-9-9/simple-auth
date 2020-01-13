@@ -22,8 +22,13 @@ namespace AppManagementConsole.Commands
             var userId = args[0];
             return Print(_userAuthService.GetUserAsync(userId).ContinueWith(x =>
             {
-                var sb = new StringBuilder();
                 var model = x.Result;
+
+                if (model == null)
+                    return "No user content";
+                
+                var sb = new StringBuilder();
+                
 
                 sb.AppendLine($"Email: {model.Email}");
                 sb.AppendLine($"Token expire: {model.TokenExpireAfterSeconds?.ToString() ?? "None"} secs");

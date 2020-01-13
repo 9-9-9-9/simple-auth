@@ -156,18 +156,23 @@ namespace SimpleAuth.Services
 
         public async Task DeleteRolesFromGroupAsync(RoleGroup roleGroup, RoleModel[] roleModels)
         {
-            if (roleGroup.Roles.IsEmpty())
+            var domain = await GetRoleGroupByName(roleGroup.Name, roleGroup.Corp, roleGroup.App);
+            
+            if (domain == default)
+                throw new EntityNotExistsException($"{roleGroup.Name}");
+            
+            if (domain.Roles.IsEmpty())
                 return;
 
             foreach (var roleModel in roleModels)
             {
-                var matchingRole = roleGroup.Roles.FirstOrDefault(x => x.RoleId == roleModel.Role);
+                var matchingRole = domain.Roles.FirstOrDefault(x => x.RoleId == roleModel.Role);
                 if (matchingRole == default)
                     continue;
                 matchingRole.Permission = matchingRole.Permission.Revoke(roleModel.Permission.Deserialize());
             }
 
-            await UpdateRolesAsync(roleGroup, roleGroup.Roles
+            await UpdateRolesAsync(domain, domain.Roles
                 .Select(r => r.ToEntityObject().WithRandomId())
                 .ToList()
             );
@@ -175,10 +180,15 @@ namespace SimpleAuth.Services
 
         public async Task DeleteAllRolesFromGroupAsync(RoleGroup roleGroup)
         {
-            if (roleGroup.Roles.IsEmpty())
+            var domain = await GetRoleGroupByName(roleGroup.Name, roleGroup.Corp, roleGroup.App);
+            
+            if (domain == default)
+                throw new EntityNotExistsException($"{roleGroup.Name}");
+            
+            if (domain.Roles.IsEmpty())
                 return;
 
-            await UpdateRolesAsync(roleGroup, null);
+            await UpdateRolesAsync(domain, null);
         }
 
         public async Task DeleteRoleGroupAsync(RoleGroup roleGroup)

@@ -173,5 +173,42 @@ namespace SimpleAuth.Shared.Utils
             FromApp = App | FromEnv,
             All = Corp | FromApp
         }
+
+        public static string Merge(string roleId, string permission)
+        {
+            if (roleId.IsBlank())
+                throw new ArgumentNullException(nameof(roleId));
+            
+            if (permission.IsBlank())
+                throw new ArgumentNullException(nameof(permission));
+            
+            if (permission == "0")
+                throw new ArgumentException(nameof(permission));
+            
+            return $"{roleId}{Constants.ChSplitterMergedRoleIdWithPermission}{permission}";
+        }
+
+        public static string Merge(string roleId, Permission permission)
+        {
+            if (roleId.IsBlank())
+                throw new ArgumentNullException(nameof(roleId));
+            
+            if (permission == Permission.None)
+                throw new ArgumentException(nameof(permission));
+            
+            return $"{roleId}{Constants.ChSplitterMergedRoleIdWithPermission}{permission.Serialize()}";
+        }
+
+        public static (string, Permission) UnMerge(string merged)
+        {
+            if (merged.IsBlank())
+                throw new ArgumentNullException(nameof(merged));
+
+            var spl = merged.Split(Constants.ChSplitterMergedRoleIdWithPermission);
+            if (spl.Length != 2 || spl.Any(x => x.IsBlank()))
+                throw new ArgumentException(nameof(merged));
+
+            return (spl[0], spl[1].Deserialize());
+        }
     }
 }
