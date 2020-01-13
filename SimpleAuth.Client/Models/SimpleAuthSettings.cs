@@ -17,5 +17,6 @@ namespace SimpleAuth.Client.Models
         public string CorpToken { get; set; }
         public string AppToken { get; set; }
         public string[] OtherAppsTokens { get; set; }
+        public string OtherAppsSecretTokens { get; set; }
     }
 }
