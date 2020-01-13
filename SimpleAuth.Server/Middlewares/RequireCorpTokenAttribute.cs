@@ -19,8 +19,7 @@ namespace SimpleAuth.Server.Middlewares
 
             var encryptionService = actionExecutingContext.ResolveService<IEncryptionService>();
 
-            var decryptedToken = encryptionService.Decrypt(token);
-            if (decryptedToken.IsBlank())
+            if (!encryptionService.TryDecrypt(token, out var decryptedToken) || decryptedToken.IsBlank())
             {
                 actionExecutingContext.Result = StatusCodes.Status403Forbidden.WithEmpty();
             }

@@ -127,5 +127,17 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
         {
             return encryptedData;
         }
+
+        public bool TryEncrypt(string plainTextData, out string encryptedData)
+        {
+            encryptedData = plainTextData;
+            return true;
+        }
+
+        public bool TryDecrypt(string encryptedData, out string decryptedData)
+        {
+            decryptedData = encryptedData;
+            return true;
+        }
     }
 }
