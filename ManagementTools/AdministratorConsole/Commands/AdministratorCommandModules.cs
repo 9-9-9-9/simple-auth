@@ -9,6 +9,7 @@ namespace AdministratorConsole.Commands
         public override void RegisterModules(IServiceCollection serviceCollection)
         {
             serviceCollection.RegisterCommand<GenerateSecretKeyPairCommand>();
+            serviceCollection.RegisterCommand<EncryptUsingPublicKeyCommand>();
             serviceCollection.RegisterCommand<GenerateCorpPermissionTokenCommand>();
             serviceCollection.RegisterCommand<GenerateAppPermissionTokenCommand>();
             serviceCollection.RegisterCommand<EncryptCommand>();
