@@ -29,9 +29,6 @@ namespace WebApiPlayground
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
-            
-            // dummy
-            services.AddSingleton<IUserAuthService, DummyUserAuthService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -13,6 +13,8 @@ namespace WebApiPlayground.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
+        public const string UserId = "theone";
+        
         private readonly IServiceProvider _serviceProvider;
         private readonly IUserAuthService _userAuthService;
 
@@ -26,7 +28,7 @@ namespace WebApiPlayground.Controllers
         [HttpGet, HttpPost, Route("si")]
         public async Task<IActionResult> SignIn()
         {
-            var roleModels = (await _userAuthService.GetUserAsync(string.Empty)).ActiveRoles;
+            var roleModels = (await _userAuthService.GetUserAsync(UserId)).ActiveRoles;
 
             var claim = await roleModels.ToSimpleAuthorizationClaims().GenerateSimpleAuthClaimAsync(_serviceProvider);
             var claimsIdentity = new ClaimsIdentity(
