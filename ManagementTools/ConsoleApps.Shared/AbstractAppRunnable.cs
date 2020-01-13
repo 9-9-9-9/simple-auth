@@ -16,7 +16,9 @@ namespace ConsoleApps.Shared
         public virtual async Task RunAsync()
         {
             var builder = new ConfigurationBuilder();
-            builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            builder
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("/configmaps/management-tools/appsettings.json", optional: false, reloadOnChange: true);
             builder.AddUserSecrets(GetType().Assembly, false);
             var configuration = builder.Build();
 
