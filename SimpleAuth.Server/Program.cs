@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace SimpleAuthServer
 {
@@ -13,6 +14,7 @@ namespace SimpleAuthServer
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureAppConfiguration((hostBuilder, builder) =>
                     {
                         builder.AddJsonFile("appsettings.json", optional: true);
