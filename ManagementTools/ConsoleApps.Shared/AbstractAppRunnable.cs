@@ -17,6 +17,7 @@ namespace ConsoleApps.Shared
         {
             var builder = new ConfigurationBuilder();
             builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            builder.AddUserSecrets(GetType().Assembly, false);
             var configuration = builder.Build();
 
             IServiceCollection services = new ServiceCollection();
