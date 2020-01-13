@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
@@ -48,31 +49,31 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                 {
                     var claims = await authenticationInfoProvider.GetClaims(httpContext);
 
-                    var configurationProvider = httpContext.RequestServices.GetService<ISimpleAuthConfigurationProvider>();
+                    var configurationProvider =
+                        httpContext.RequestServices.GetService<ISimpleAuthConfigurationProvider>();
                     var tenantProvider = httpContext.RequestServices.GetService<ITenantProvider>();
-                    var requireCorp = configurationProvider.Corp;
-                    var requireApp = configurationProvider.App;
-                    var requireEnv = configurationProvider.Env;
                     var requireTenant = await tenantProvider.GetTenantAsync(httpContext);
-                    
+
                     var requireClaims = saP.Select(x => new SimpleAuthorizationClaim(new ClientRoleModel
                     {
-                        Corp = requireCorp,
-                        App = requireApp,
-                        Env = requireEnv,
+                        Corp = configurationProvider.Corp,
+                        App = configurationProvider.App,
+                        Env = configurationProvider.Env,
                         Tenant = requireTenant,
                         Module = saM.Module,
                         SubModules = x.SubModules,
                         Permission = x.Permission
                     })).ToArray();
 
-                    var missingClaims = (await claims.GetMissingClaimsAsync(requireClaims, httpContext.RequestServices)).OrEmpty().ToArray();
+                    var missingClaims = (await claims.GetMissingClaimsAsync(requireClaims, httpContext.RequestServices))
+                        .OrEmpty().ToArray();
                     if (missingClaims.Any())
                     {
                         await httpContext.Response
                             .WithStatus(StatusCodes.Status403Forbidden)
                             .WithBody(
-                                $"Require {missingClaims[0].ClientRoleModel}");
+                                $"Require {missingClaims[0].ClientRoleModel}"
+                            );
                         return;
                     }
                 }
