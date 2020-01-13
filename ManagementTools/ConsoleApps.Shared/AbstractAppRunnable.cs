@@ -79,13 +79,14 @@ namespace ConsoleApps.Shared
                     arguments.Add(GetInputString());
                 });
 
-                await ProcessCommand(selectedCommand, arguments.ToArray());
+                await ProcessCommand(selectedCommand, arguments.ToArray(), configuration, serviceProvider);
                 "Execution of command was finished successfully".Write();
                 Console.ReadLine();
             }
         }
 
-        protected virtual Task ProcessCommand(ICommand command, string[] args)
+        protected virtual Task ProcessCommand(ICommand command, string[] args, IConfigurationRoot configurationRoot,
+            IServiceProvider serviceProvider)
         {
             return command.Process(args);
         }
