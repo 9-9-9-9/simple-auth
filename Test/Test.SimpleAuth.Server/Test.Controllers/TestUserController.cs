@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SimpleAuth.Repositories;
@@ -55,6 +56,9 @@ namespace Test.SimpleAuth.Server.Test.Controllers
             isp.Setup(x => x.GetService(typeof(IUserService)))
                 .Returns(userService);
 
+            isp.Setup(x => x.GetService(typeof(ILogger<UserController>)))
+                .Returns(MLog<UserController>().Object);
+            
             var uRepo = MRepo();
             isp.Setup(x => x.GetService(typeof(IUserRepository)))
                 .Returns(uRepo.Object);

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server.Extensions;
@@ -16,6 +17,7 @@ using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Validation;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
+using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
 
 namespace SimpleAuth.Server.Controllers
 {
@@ -26,6 +28,7 @@ namespace SimpleAuth.Server.Controllers
         private readonly IEncryptionService _encryptionService;
         private readonly IGoogleService _googleService;
         private readonly IUserValidationService _userValidationService;
+        private readonly ILogger<UserController> _logger;
 
         public UserController(IServiceProvider serviceProvider, IEncryptionService encryptionService,
             IGoogleService googleService, IUserValidationService userValidationService) : base(
@@ -34,12 +37,15 @@ namespace SimpleAuth.Server.Controllers
             _encryptionService = encryptionService;
             _googleService = googleService;
             _userValidationService = userValidationService;
+            _logger = serviceProvider.ResolveLogger<UserController>();
         }
 
         [HttpPost, HttpPut, Route("{userId}/lock")]
         public async Task<IActionResult> LockUser(string userId)
         {
             var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
+
+            _logger.LogInformation($"Update LOCK status of UserId {userId} to {@lock}");
 
             return await ProcedureDefaultResponse(async () =>
                 {
@@ -67,15 +73,21 @@ namespace SimpleAuth.Server.Controllers
                 var usr = Repository.Find(userId);
                 var localUserInfo = usr?.UserInfos?.FirstOrDefault(x => x.Corp == RequestAppHeaders.Corp);
                 if (localUserInfo == null)
+                {
+                    _logger.LogInformation($"User id {userId} is not exists in {RequestAppHeaders.Corp}");
                     throw new EntityNotExistsException(userId);
+                }
 
                 if (localUserInfo.EncryptedPassword.IsBlank())
-                    return StatusCodes.Status412PreconditionFailed.WithEmpty();
+                    return StatusCodes.Status412PreconditionFailed.WithMessage($"User has no password defined");
 
                 var pwdMatch = _encryptionService.Decrypt(localUserInfo.EncryptedPassword).Equals(password);
 
                 if (!pwdMatch)
+                {
+                    _logger.LogInformation($"Password miss-match for user {userId}");
                     return Unauthorized();
+                }
 
                 return await GetUser(userId);
             });
@@ -106,13 +118,17 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost("{emailAsUserId}/google")]
+        //TODO FIX THIS, EMAIL CAN NOT BE A PART OF URL THUS THIS METHOD CAN NEVER BE CALLED
         public async Task<IActionResult> CheckGoogleToken(string emailAsUserId, [FromBody] LoginByGoogleRequest form)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             if (emailAsUserId != form.Email)
+            {
+                _logger.LogWarning($"UserId {emailAsUserId} is different than email provided in payload {form.Email}");
                 return BadRequest();
+            }
 
             return await ProcedureDefaultResponseIfError(async () =>
             {
@@ -120,6 +136,7 @@ namespace SimpleAuth.Server.Controllers
                 var localUserInfo = user?.LocalUserInfos?.FirstOrDefault(x => x.Corp == RequestAppHeaders.Corp);
                 if (localUserInfo == null)
                     throw new EntityNotExistsException($"{emailAsUserId} at {RequestAppHeaders.Corp}");
+
                 if (localUserInfo.Locked)
                     throw new AccessLockedEntityException($"{user.Id} at {localUserInfo.Corp}");
 
@@ -129,9 +146,10 @@ namespace SimpleAuth.Server.Controllers
                 {
                     ggToken = await _googleService.GetInfoAsync(form.GoogleToken);
                 }
-                catch (SimpleAuthException e)
+                catch (SimpleAuthException ex)
                 {
-                    return StatusCodes.Status412PreconditionFailed.WithMessage(e.Message);
+                    _logger.LogWarning(ex, $"Google token verification issue");
+                    return StatusCodes.Status412PreconditionFailed.WithMessage(ex.Message);
                 }
 
                 if (!emailAsUserId.EqualsIgnoreCase(ggToken.Email))
@@ -155,14 +173,18 @@ namespace SimpleAuth.Server.Controllers
                 expiryDate = expiryDate.AddSeconds(ggToken.Exp);
 
                 if (DateTime.UtcNow > expiryDate)
+                {
+                    _logger.LogWarning($"User {emailAsUserId} provided an expired google token");
                     return StatusCodes.Status406NotAcceptable.WithMessage(
                         "Token already expired"
                     );
+                }
 
                 var model = await GetBaseResponseUserModelAsync(emailAsUserId);
                 model.GoogleToken = ggToken;
                 model.ExpireAt(expiryDate);
 
+                _logger.LogInformation($"Access granted for {emailAsUserId} via Google Token");
                 return ReturnResponseUserModel(model);
             });
         }
@@ -185,15 +207,20 @@ namespace SimpleAuth.Server.Controllers
         public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
         {
             return await ProcedureDefaultResponseIfError(() =>
-                Service.IsHaveActivePermissionAsync(
-                    userId,
-                    roleId,
-                    permission.Deserialize(),
-                    RequestAppHeaders.Corp, RequestAppHeaders.App
-                ).ContinueWith(
-                    x => (x.Result ? StatusCodes.Status200OK : StatusCodes.Status406NotAcceptable)
-                        .WithEmpty()
-                )
+                {
+                    var ePermission = permission.Deserialize();
+                    _logger.LogInformation($"Checking permission [{roleId}, {ePermission}] for user {userId}");
+
+                    return Service.IsHaveActivePermissionAsync(
+                        userId,
+                        roleId,
+                        ePermission,
+                        RequestAppHeaders.Corp, RequestAppHeaders.App
+                    ).ContinueWith(
+                        x => (x.Result ? StatusCodes.Status200OK : StatusCodes.Status406NotAcceptable)
+                            .WithEmpty()
+                    );
+                }
             );
         }
 
@@ -229,6 +256,7 @@ namespace SimpleAuth.Server.Controllers
                         PlainPassword = model.Password
                     });
 
+                _logger.LogInformation($"User {model.UserId} had been created at {RequestAppHeaders.Corp}");
                 return StatusCodes.Status201Created.WithEmpty();
             });
         }
@@ -249,12 +277,15 @@ namespace SimpleAuth.Server.Controllers
                     await Service.AssignUserToGroupsAsync(new Shared.Domains.User
                     {
                         Id = userId
-                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new Shared.Domains.RoleGroup
+                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new RoleGroup
                     {
                         Name = x,
                         Corp = RequestAppHeaders.Corp,
                         App = RequestAppHeaders.App
                     }).ToArray());
+                    _logger.LogInformation(
+                        $"Assigned user {userId} to groups {string.Join(',', modifyUserRoleGroupsModel.RoleGroups)} ({RequestAppHeaders.Corp}.{RequestAppHeaders.App})"
+                    );
                 }
             );
         }
