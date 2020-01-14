@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server.Controllers;
@@ -18,6 +19,19 @@ namespace Test.SimpleAuth.Server
         }
 
         protected Mock<IServiceProvider> Isp(MockBehavior mockBehavior = MockBehavior.Strict) => M<IServiceProvider>(mockBehavior);
+
+        protected Mock<ILogger<T>> MLog<T>(MockBehavior mockBehavior = MockBehavior.Strict)
+        {
+            var logger = M<ILogger<T>>(mockBehavior);
+            logger.Setup(x => x.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>) It.IsAny<object>())
+            );
+            return logger;
+        }
     }
 
     public abstract class BaseTestAttribute : BaseTestServer

@@ -29,17 +29,7 @@ namespace SimpleAuth.Server.Middlewares
             }
             else
             {
-                RequestAppHeaders requestAppHeaders;
-                try
-                {
-                    requestAppHeaders = decryptedToken.FromJson<RequestAppHeaders>();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError($"Deserialize {nameof(RequestAppHeaders)} failure", ex);
-                    actionExecutingContext.Result = StatusCodes.Status500InternalServerError.WithEmpty();
-                    return;
-                }
+                var requestAppHeaders = decryptedToken.FromJson<RequestAppHeaders>();
 
                 if (requestAppHeaders == null || requestAppHeaders.Corp.IsBlank() || requestAppHeaders.App.IsBlank())
                 {

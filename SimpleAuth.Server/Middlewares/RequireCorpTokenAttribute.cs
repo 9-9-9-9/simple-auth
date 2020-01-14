@@ -16,7 +16,7 @@ namespace SimpleAuth.Server.Middlewares
     {
         protected override void ComputeAndModifyIfNeeded(ActionExecutingContext actionExecutingContext)
         {
-            var logger = actionExecutingContext.ResolveLogger<RequireAppTokenAttribute>();
+            var logger = actionExecutingContext.ResolveLogger<RequireCorpTokenAttribute>();
 
             var token = actionExecutingContext.HttpContext.Request.Headers[Constants.Headers.CorpPermission];
 
@@ -29,17 +29,7 @@ namespace SimpleAuth.Server.Middlewares
             }
             else
             {
-                RequireCorpToken requireCorpToken;
-                try
-                {
-                    requireCorpToken = decryptedToken.FromJson<RequireCorpToken>();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError($"Deserialize {nameof(RequireCorpToken)} failure", ex);
-                    actionExecutingContext.Result = StatusCodes.Status500InternalServerError.WithEmpty();
-                    return;
-                }
+                var requireCorpToken = decryptedToken.FromJson<RequireCorpToken>();
 
                 if (requireCorpToken == null || requireCorpToken.Corp.IsBlank() || requireCorpToken.Version == 0)
                 {

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
@@ -29,7 +30,7 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
         [TestCase("{\"Corp\": \"c\", \"Version\": 2, \"Header\": \"x-corp-token\"}", false, StatusCodes.Status426UpgradeRequired)]
         [TestCase("", false, StatusCodes.Status403Forbidden)]
         [TestCase(null, false, StatusCodes.Status403Forbidden)]
-        public void RequireAppToken(string input, bool valid, int expectedStatusCde)
+        public void RequireCorpToken(string input, bool valid, int expectedStatusCde)
         {
             var ctx = M<HttpContext>();
             var req = M<HttpRequest>();
@@ -38,7 +39,9 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
             var scp = M<IServiceScope>();
             var fac = M<IServiceScopeFactory>();
             var tkn = M<ITokenInfoService>();
+            var log = MLog<RequireCorpTokenAttribute>();
 
+            svc.Setup(x => x.GetService(typeof(ILogger<RequireCorpTokenAttribute>))).Returns(log.Object);
             svc.Setup(x => x.GetService(typeof(IEncryptionService))).Returns(new DummyEncryptionService());
             tkn.Setup(x => x.GetCurrentVersionAsync(It.IsAny<TokenInfo>())).ReturnsAsync(1);
             svc.Setup(x => x.GetService(typeof(ITokenInfoService))).Returns(tkn.Object);
