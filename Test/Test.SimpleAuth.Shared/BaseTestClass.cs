@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using SimpleAuth.Core.DependencyInjection;
 using SimpleAuth.Repositories;
@@ -120,6 +122,26 @@ namespace Test.SimpleAuth.Shared
             serviceCollection.AddTransient<SimpleAuthDbContext, DbContext>();
             serviceCollection.RegisterModules<MockServiceModules>();
             serviceCollection.RegisterModules<MockRepositoryModules>();
+
+            serviceCollection.AddSingleton(MLog<DefaultEncryptionService>().Object);
+        }
+        
+        protected Mock<T> M<T>(MockBehavior mockBehavior = MockBehavior.Strict) where T : class
+        {
+            return new Mock<T>(mockBehavior);
+        }
+        
+        protected Mock<ILogger<T>> MLog<T>(MockBehavior mockBehavior = MockBehavior.Strict)
+        {
+            var logger = M<ILogger<T>>(mockBehavior);
+            logger.Setup(x => x.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>) It.IsAny<object>())
+            );
+            return logger;
         }
 
         protected TService Svc<TService>()

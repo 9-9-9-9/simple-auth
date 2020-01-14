@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SimpleAuth.Repositories;
@@ -113,11 +114,14 @@ namespace Test.SimpleAuth.Server.Test.Controllers
                 isp.Setup(x => x.GetService(typeof(IUserService)))
                     .Returns(userService);
 
+                isp.Setup(x => x.GetService(typeof(ILogger<UserController>)))
+                    .Returns(MLog<UserController>().Object);
+
                 var uRepo = M<IUserRepository>();
                 isp.Setup(x => x.GetService(typeof(IUserRepository)))
                     .Returns(uRepo.Object);
 
-                var controller = new UserController(isp.Object, null, null, null).WithHttpCtx();
+                var controller = new UserController(isp.Object, null, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
                 {
                     Corp = "c",

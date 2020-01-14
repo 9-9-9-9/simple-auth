@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Models;
@@ -15,25 +16,31 @@ namespace SimpleAuth.Server.Middlewares
     {
         protected override void ComputeAndModifyIfNeeded(ActionExecutingContext actionExecutingContext)
         {
+            var logger = actionExecutingContext.ResolveLogger<RequireAppTokenAttribute>();
+
             var token = actionExecutingContext.HttpContext.Request.Headers[Constants.Headers.AppPermission];
 
             var encryptionService = actionExecutingContext.ResolveService<IEncryptionService>();
 
             if (!encryptionService.TryDecrypt(token, out var decryptedToken) || decryptedToken.IsBlank())
             {
+                logger.LogInformation("Decrypt failure");
                 actionExecutingContext.Result = StatusCodes.Status403Forbidden.WithEmpty();
             }
             else
             {
-                var obj = decryptedToken.FromJson<RequestAppHeaders>();
-                if (obj == null || obj.Corp.IsBlank() || obj.App.IsBlank())
+                var requestAppHeaders = decryptedToken.FromJson<RequestAppHeaders>();
+
+                if (requestAppHeaders == null || requestAppHeaders.Corp.IsBlank() || requestAppHeaders.App.IsBlank())
                 {
+                    logger.LogInformation($"{nameof(RequestAppHeaders)} has invalid content");
                     actionExecutingContext.Result = StatusCodes.Status412PreconditionFailed.WithEmpty();
                     return;
                 }
 
-                if (obj.Header.IsBlank() || obj.Header != Constants.Headers.AppPermission)
+                if (requestAppHeaders.Header.IsBlank() || requestAppHeaders.Header != Constants.Headers.AppPermission)
                 {
+                    logger.LogInformation($"{nameof(RequestAppHeaders)} has invalid content");
                     actionExecutingContext.Result =
                         StatusCodes.Status403Forbidden.WithMessage(nameof(RequestAppHeaders.Header));
                     return;
@@ -42,18 +49,21 @@ namespace SimpleAuth.Server.Middlewares
                 var tokenInfoService = actionExecutingContext.ResolveService<ITokenInfoService>();
                 var currentTokenVersion = tokenInfoService.GetCurrentVersionAsync(new TokenInfo
                 {
-                    Corp = obj.Corp,
-                    App = obj.App
+                    Corp = requestAppHeaders.Corp,
+                    App = requestAppHeaders.App
                 }).Result;
-                if (obj.Version != currentTokenVersion)
+                if (requestAppHeaders.Version != currentTokenVersion)
                 {
+                    logger.LogError(
+                        $"Client using an out dated token version {requestAppHeaders.Version}, current version is {currentTokenVersion}");
                     actionExecutingContext.Result =
                         StatusCodes.Status426UpgradeRequired.WithMessage(
-                            $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {obj.Version}");
+                            $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {requestAppHeaders.Version}");
                     return;
                 }
 
-                actionExecutingContext.HttpContext.Items[Constants.Headers.AppPermission] = obj;
+                actionExecutingContext.HttpContext.Items[Constants.Headers.AppPermission] = requestAppHeaders;
+                logger.LogInformation($"Access granted for {nameof(RequestAppHeaders)}");
             }
         }
     }
