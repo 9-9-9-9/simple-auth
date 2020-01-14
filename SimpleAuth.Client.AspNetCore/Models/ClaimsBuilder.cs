@@ -20,6 +20,9 @@ namespace SimpleAuth.Client.AspNetCore.Models
         {
             if (module.IsBlank())
                 throw new ArgumentNullException(nameof(module));
+            if (!Module.IsBlank())
+                throw new ArgumentException($"Overriding property {nameof(Module)} is not allowed when already has value");
+            
             Module = module;
             Restricted = restricted;
             return this;
@@ -58,6 +61,24 @@ namespace SimpleAuth.Client.AspNetCore.Models
 
         public IEnumerable<SimpleAuthorizationClaim> Build(string corp, string app, string env, string tenant)
         {
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+            if (app.IsBlank())
+                throw new ArgumentNullException(nameof(app));
+            if (env.IsBlank())
+                throw new ArgumentNullException(nameof(env));
+            if (tenant.IsBlank())
+                throw new ArgumentNullException(nameof(tenant));
+            if (Module.IsBlank())
+                throw new ArgumentNullException(
+                    $"{nameof(Module)}, perhaps you missed calling method {nameof(WithModule)}");
+            if (PermissionBatches.IsEmpty())
+                throw new ArgumentNullException(
+                    $"No permission provided, perhaps you missed calling method {nameof(WithPermission)} or {nameof(WithPermissions)}");
+
+            if (PermissionBatches.Any(x => x.Permission == Permission.None))
+                throw new ArgumentException($"Non-allowed permission value {nameof(Permission.None)} is existing");
+
             foreach (var permissionBatch in PermissionBatches)
             {
                 yield return new SimpleAuthorizationClaim(
