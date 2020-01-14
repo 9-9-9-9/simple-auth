@@ -12,7 +12,9 @@ using SimpleAuth.Server.Models;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared;
+using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
+using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Server.Controllers
 {
@@ -224,6 +226,38 @@ namespace SimpleAuth.Server.Controllers
                         : StatusCodes.Status204NoContent
                 ).WithJson(response);
             });
+        }
+
+        protected async Task<ResponseUserModel> GetBaseResponseUserModelAsync(string userId, IUserService userService)
+        {
+            var user = userService.GetUser(userId, RequestAppHeaders.Corp);
+            if (user == default)
+                throw new EntityNotExistsException(userId);
+
+            var filterRoleEnv = GetHeader(Constants.Headers.FilterByEnv);
+            var filterRoleTenant = GetHeader(Constants.Headers.FilterByTenant);
+
+            var activeRoles = await userService.GetActiveRolesAsync(userId, RequestAppHeaders.Corp, RequestAppHeaders.App,
+                filterRoleEnv, filterRoleTenant);
+            return new ResponseUserModel
+            {
+                Id = userId,
+                Corp = RequestAppHeaders.Corp,
+                ActiveRoles = activeRoles.OrEmpty().Select(x => new RoleModel
+                {
+                    Role = x.RoleId,
+                    Permission = x.Permission.Serialize()
+                }).ToArray()
+            };
+        }
+
+        protected IActionResult ReturnResponseUserModel(ResponseUserModel model)
+        {
+            return (
+                model.ActiveRoles.IsAny()
+                    ? StatusCodes.Status200OK
+                    : StatusCodes.Status204NoContent
+            ).WithJson(model);
         }
     }
 

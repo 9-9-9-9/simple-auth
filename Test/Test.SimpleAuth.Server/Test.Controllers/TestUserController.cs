@@ -63,7 +63,7 @@ namespace Test.SimpleAuth.Server.Test.Controllers
             isp.Setup(x => x.GetService(typeof(IUserRepository)))
                 .Returns(uRepo.Object);
 
-            var controller = new UserController(isp.Object, null, null, null).WithHttpCtx();
+            var controller = new UserController(isp.Object, null, null).WithHttpCtx();
             controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
             {
                 Corp = "c",
