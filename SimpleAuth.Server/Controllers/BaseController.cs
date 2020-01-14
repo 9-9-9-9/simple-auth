@@ -237,7 +237,8 @@ namespace SimpleAuth.Server.Controllers
             var filterRoleEnv = GetHeader(Constants.Headers.FilterByEnv);
             var filterRoleTenant = GetHeader(Constants.Headers.FilterByTenant);
 
-            var activeRoles = await userService.GetActiveRolesAsync(userId, RequestAppHeaders.Corp, RequestAppHeaders.App,
+            var activeRoles = await userService.GetActiveRolesAsync(userId, RequestAppHeaders.Corp,
+                RequestAppHeaders.App,
                 filterRoleEnv, filterRoleTenant);
             return new ResponseUserModel
             {
@@ -253,11 +254,9 @@ namespace SimpleAuth.Server.Controllers
 
         protected IActionResult ReturnResponseUserModel(ResponseUserModel model)
         {
-            return (
-                model.ActiveRoles.IsAny()
-                    ? StatusCodes.Status200OK
-                    : StatusCodes.Status204NoContent
-            ).WithJson(model);
+            if (!model.ActiveRoles.IsAny())
+                return NoContent();
+            return StatusCodes.Status200OK.WithJson(model);
         }
     }
 
