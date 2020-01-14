@@ -8,6 +8,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
     [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     public interface ITenantProvider
     {
+        string GetTenant(HttpContext httpContext);
         Task<string> GetTenantAsync(HttpContext httpContext);
     }
 
@@ -20,9 +21,14 @@ namespace SimpleAuth.Client.AspNetCore.Services
             _simpleAuthConfigurationProvider = simpleAuthConfigurationProvider;
         }
 
+        public string GetTenant(HttpContext httpContext)
+        {
+            return _simpleAuthConfigurationProvider.Tenant;
+        }
+
         public Task<string> GetTenantAsync(HttpContext httpContext)
         {
-            return Task.FromResult(_simpleAuthConfigurationProvider.Tenant);
+            return Task.FromResult(GetTenant(httpContext));
         }
     }
 }

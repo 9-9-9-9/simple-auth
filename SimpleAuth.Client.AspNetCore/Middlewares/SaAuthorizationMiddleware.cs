@@ -46,8 +46,6 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             {
                 if (saM != null)
                 {
-                    var claims = await authenticationInfoProvider.GetClaims(httpContext);
-
                     var configurationProvider =
                         httpContext.RequestServices.GetService<ISimpleAuthConfigurationProvider>();
                     var tenantProvider = httpContext.RequestServices.GetService<ITenantProvider>();
@@ -59,8 +57,9 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         .Build(configurationProvider, requireTenant)
                         .ToArray();
 
-                    var missingClaims = (await claims.GetMissingClaimsAsync(requireClaims, httpContext.RequestServices))
-                        .OrEmpty().ToArray();
+                    var missingClaims = (await httpContext.GetMissingClaimsAsync(requireClaims))
+                        .OrEmpty()
+                        .ToArray();
                     if (missingClaims.Any())
                     {
                         await httpContext.Response

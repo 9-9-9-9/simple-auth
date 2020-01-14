@@ -7,10 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Models;
-using SimpleAuth.Client.AspNetCore.Services;
-using SimpleAuth.Client.Models;
-using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Enums;
 
 namespace WebApiPlayground.Controllers
@@ -24,18 +20,6 @@ namespace WebApiPlayground.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
-
-        private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
-        private readonly ITenantProvider _tenantProvider;
-        private readonly IAuthenticationInfoProvider _authenticationInfoProvider;
-
-        public WeatherForecastController(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
-            ITenantProvider tenantProvider, IAuthenticationInfoProvider authenticationInfoProvider)
-        {
-            _simpleAuthConfigurationProvider = simpleAuthConfigurationProvider;
-            _tenantProvider = tenantProvider;
-            _authenticationInfoProvider = authenticationInfoProvider;
-        }
 
         [HttpGet("0")]
         public IEnumerable<WeatherForecast> GetWithoutPermission()
@@ -71,7 +55,7 @@ namespace WebApiPlayground.Controllers
         public async Task<IActionResult> GetWithControllerModule_With_Declared_and_Extra_Addition_At_Runtime()
         {
             return await ResponseAsync(
-                    ClaimsBuilder.FromMetaData(
+                ClaimsBuilder.FromMetaData(
                         GetType().GetMethod(
                             nameof(GetWithControllerModule_With_Declared_and_Extra_Addition_At_Runtime)
                         )
@@ -82,28 +66,14 @@ namespace WebApiPlayground.Controllers
 
         private async Task<IActionResult> ResponseAsync(ClaimsBuilder claimsBuilder)
         {
-            var claims = await _authenticationInfoProvider.GetClaims(HttpContext);
-            var requireClaims = claimsBuilder.Build(_simpleAuthConfigurationProvider,
-                await _tenantProvider.GetTenantAsync(HttpContext)).ToArray();
-
-            var missingClaims = (
-                    await claims.GetMissingClaimsAsync(requireClaims, HttpContext.RequestServices)
-                )
-                .OrEmpty()
-                .ToArray();
-
-            string Join(IEnumerable<SimpleAuthorizationClaim> col) =>
-                string.Join(',', col.SelectMany(x => x.ClientRoleModel.SubModules));
-
-            Console.WriteLine($"{nameof(requireClaims)}: {requireClaims.Length}. {Join(requireClaims)}");
-            Console.WriteLine($"{nameof(missingClaims)}: {missingClaims.Length}. {Join(missingClaims)}");
+            var missingClaims = await HttpContext.GetMissingClaimsAsync(claimsBuilder);
 
             if (missingClaims.Any())
             {
                 return new ContentResult
                 {
                     StatusCode = StatusCodes.Status403Forbidden,
-                    Content = $"Require {missingClaims[0].ClientRoleModel}"
+                    Content = $"Require {missingClaims.First().ClientRoleModel}"
                 };
             }
 

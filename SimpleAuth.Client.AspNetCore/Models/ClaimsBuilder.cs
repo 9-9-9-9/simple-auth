@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Attributes;
+using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
@@ -174,11 +177,22 @@ namespace SimpleAuth.Client.AspNetCore.Models
             return Build(simpleAuthConfigurationProvider, simpleAuthConfigurationProvider.Tenant);
         }
 
+        public IEnumerable<SimpleAuthorizationClaim> Build(HttpContext httpContext)
+        {
+            return Build(
+                httpContext.RequestServices.GetService<ISimpleAuthConfigurationProvider>(),
+                httpContext.RequestServices.GetService<ITenantProvider>().GetTenant(httpContext)
+            );
+        }
+
         public IEnumerable<SimpleAuthorizationClaim> Build(
             ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider, string tenant)
         {
-            return Build(simpleAuthConfigurationProvider.Corp, simpleAuthConfigurationProvider.App,
-                simpleAuthConfigurationProvider.Env, tenant);
+            return Build(simpleAuthConfigurationProvider.Corp,
+                simpleAuthConfigurationProvider.App,
+                simpleAuthConfigurationProvider.Env,
+                tenant
+            );
         }
 
         public static ClaimsBuilder FromMetaData(MethodInfo methodInfo)
