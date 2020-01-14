@@ -1,10 +1,13 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using SimpleAuth.Core.Utils;
 
 namespace SimpleAuth.Services
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public interface IEncryptionService
     {
         string Encrypt(string plainTextData);
@@ -17,29 +20,54 @@ namespace SimpleAuth.Services
     {
         private readonly RSAParameters _publicKey;
         private readonly RSAParameters _privateKey;
+        private readonly ILogger<DefaultEncryptionService> _logger;
 
-        public DefaultEncryptionService(EncryptionUtils.EncryptionKeyPair encryptionKeyPair)
+        public DefaultEncryptionService(EncryptionUtils.EncryptionKeyPair encryptionKeyPair,
+            ILogger<DefaultEncryptionService> logger)
         {
+            _logger = logger;
             _publicKey = EncryptionUtils.DeserializeKey(encryptionKeyPair.PublicKey);
             _privateKey = EncryptionUtils.DeserializeKey(encryptionKeyPair.PrivateKey);
         }
 
         public string Encrypt(string plainTextData)
         {
-            var csp = new RSACryptoServiceProvider();
-            csp.ImportParameters(_publicKey);
-            var bytesPlainTextData = Encoding.UTF8.GetBytes(plainTextData);
-            var bytesCypherText = csp.Encrypt(bytesPlainTextData, false);
-            return Convert.ToBase64String(bytesCypherText);
+            try
+            {
+                _logger.LogWarning("Received an encryption request");
+                var csp = new RSACryptoServiceProvider();
+                csp.ImportParameters(_publicKey);
+                var bytesPlainTextData = Encoding.UTF8.GetBytes(plainTextData);
+                var bytesCypherText = csp.Encrypt(bytesPlainTextData, false);
+                var result = Convert.ToBase64String(bytesCypherText);
+                _logger.LogInformation("Encrypted successfully");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Encryption failure");
+                throw;
+            }
         }
 
         public string Decrypt(string encryptedData)
         {
-            var csp = new RSACryptoServiceProvider();
-            csp.ImportParameters(_privateKey);
-            var bytesCypherText = Convert.FromBase64String(encryptedData);
-            var bytesPlainTextData = csp.Decrypt(bytesCypherText, false);
-            return Encoding.UTF8.GetString(bytesPlainTextData);
+            try
+            {
+                _logger.LogWarning("Received an decryption request");
+                var csp = new RSACryptoServiceProvider();
+                csp.ImportParameters(_privateKey);
+                var bytesCypherText = Convert.FromBase64String(encryptedData);
+                var bytesPlainTextData = csp.Decrypt(bytesCypherText, false);
+                var result = Encoding.UTF8.GetString(bytesPlainTextData);
+                _logger.LogInformation("Decrypted successfully");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Decryption failure");
+                throw;
+            }
         }
 
         public bool TryEncrypt(string plainTextData, out string encryptedData)
