@@ -45,8 +45,9 @@ namespace SimpleAuthServer
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostBuilder, builder) =>
                     {
-                        builder.AddJsonFiles();
-                        builder.AddEnvironmentVariables();
+                        builder
+                            .AddJsonFiles()
+                            .AddEnvironmentVariables();
                     }
                 )
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
