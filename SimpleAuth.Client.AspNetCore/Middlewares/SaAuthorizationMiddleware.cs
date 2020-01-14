@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Attributes;
+using SimpleAuth.Client.AspNetCore.Models;
 using SimpleAuth.Client.AspNetCore.Services;
-using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
-using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
 {
@@ -54,16 +53,11 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                     var tenantProvider = httpContext.RequestServices.GetService<ITenantProvider>();
                     var requireTenant = await tenantProvider.GetTenantAsync(httpContext);
 
-                    var requireClaims = saP.Select(x => new SimpleAuthorizationClaim(new ClientRoleModel
-                    {
-                        Corp = configurationProvider.Corp,
-                        App = configurationProvider.App,
-                        Env = configurationProvider.Env,
-                        Tenant = requireTenant,
-                        Module = saM.Module,
-                        SubModules = x.SubModules,
-                        Permission = x.Permission
-                    })).ToArray();
+                    var requireClaims = new ClaimsBuilder()
+                        .WithModule(saM)
+                        .WithPermissions(saP)
+                        .Build(configurationProvider, requireTenant)
+                        .ToArray();
 
                     var missingClaims = (await claims.GetMissingClaimsAsync(requireClaims, httpContext.RequestServices))
                         .OrEmpty().ToArray();
