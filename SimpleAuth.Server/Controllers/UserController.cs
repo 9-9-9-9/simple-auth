@@ -117,25 +117,18 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        [HttpPost("{emailAsUserId}/google")]
-        //TODO FIX THIS, EMAIL CAN NOT BE A PART OF URL THUS THIS METHOD CAN NEVER BE CALLED
-        public async Task<IActionResult> CheckGoogleToken(string emailAsUserId, [FromBody] LoginByGoogleRequest form)
+        [HttpPost("_google")]
+        public async Task<IActionResult> CheckGoogleToken([FromBody] LoginByGoogleRequest form)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            if (emailAsUserId != form.Email)
-            {
-                _logger.LogWarning($"UserId {emailAsUserId} is different than email provided in payload {form.Email}");
-                return BadRequest();
-            }
-
             return await ProcedureDefaultResponseIfError(async () =>
             {
-                var user = Service.GetUser(emailAsUserId, RequestAppHeaders.Corp);
+                var user = Service.GetUser(form.Email, RequestAppHeaders.Corp);
                 var localUserInfo = user?.LocalUserInfos?.FirstOrDefault(x => x.Corp == RequestAppHeaders.Corp);
                 if (localUserInfo == null)
-                    throw new EntityNotExistsException($"{emailAsUserId} at {RequestAppHeaders.Corp}");
+                    throw new EntityNotExistsException($"{form.Email} at {RequestAppHeaders.Corp}");
 
                 if (localUserInfo.Locked)
                     throw new AccessLockedEntityException($"{user.Id} at {localUserInfo.Corp}");
@@ -152,9 +145,9 @@ namespace SimpleAuth.Server.Controllers
                     return StatusCodes.Status412PreconditionFailed.WithMessage(ex.Message);
                 }
 
-                if (!emailAsUserId.EqualsIgnoreCase(ggToken.Email))
+                if (!form.Email.EqualsIgnoreCase(ggToken.Email))
                     throw new DataVerificationMismatchException(
-                        $"This token belong to {ggToken.Email} which is different than yours user id {emailAsUserId}"
+                        $"This token belong to {ggToken.Email} which is different than email provided in payload {form.Email}"
                     );
 
                 if (!form.VerifyWithClientId.IsBlank())
@@ -174,17 +167,17 @@ namespace SimpleAuth.Server.Controllers
 
                 if (DateTime.UtcNow > expiryDate)
                 {
-                    _logger.LogWarning($"User {emailAsUserId} provided an expired google token");
+                    _logger.LogWarning($"User {form.Email} provided an expired google token");
                     return StatusCodes.Status406NotAcceptable.WithMessage(
                         "Token already expired"
                     );
                 }
 
-                var model = await GetBaseResponseUserModelAsync(emailAsUserId);
+                var model = await GetBaseResponseUserModelAsync(form.Email);
                 model.GoogleToken = ggToken;
                 model.ExpireAt(expiryDate);
 
-                _logger.LogInformation($"Access granted for {emailAsUserId} via Google Token");
+                _logger.LogInformation($"Access granted for {form.Email} via Google Token");
                 return ReturnResponseUserModel(model);
             });
         }
