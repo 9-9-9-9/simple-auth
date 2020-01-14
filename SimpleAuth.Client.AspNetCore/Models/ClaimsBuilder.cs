@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
@@ -16,13 +17,31 @@ namespace SimpleAuth.Client.AspNetCore.Models
         public bool Restricted { get; set; } = true;
         public readonly HashSet<PermissionBatch> PermissionBatches = new HashSet<PermissionBatch>();
 
+        public ClaimsBuilder()
+        {
+        }
+
+        public ClaimsBuilder(string module, Permission permission, params string[] subModules)
+        {
+            WithModule(module);
+            WithPermission(permission, subModules);
+        }
+
+        public ClaimsBuilder(string module, params (Permission, string[])[] permissions)
+        {
+            WithModule(module);
+            foreach (var permission in permissions)
+                WithPermission(permission.Item1, permission.Item2);
+        }
+
         public ClaimsBuilder WithModule(string module, bool restricted = true)
         {
             if (module.IsBlank())
                 throw new ArgumentNullException(nameof(module));
             if (!Module.IsBlank())
-                throw new ArgumentException($"Overriding property {nameof(Module)} is not allowed when already has value");
-            
+                throw new ArgumentException(
+                    $"Overriding property {nameof(Module)} is not allowed when already has value");
+
             Module = module;
             Restricted = restricted;
             return this;
@@ -31,6 +50,31 @@ namespace SimpleAuth.Client.AspNetCore.Models
         public ClaimsBuilder WithModule(SaModuleAttribute module)
         {
             return WithModule(module.Module, module.Restricted);
+        }
+
+        public ClaimsBuilder WithModule(MethodInfo methodInfo)
+        {
+            if (methodInfo == null)
+                throw new ArgumentNullException(nameof(methodInfo));
+
+            var saModuleAttribute = methodInfo.GetCustomAttribute<SaModuleAttribute>();
+            if (saModuleAttribute != null)
+                return WithModule(saModuleAttribute);
+
+            var classType = methodInfo.DeclaringType;
+            return WithModule(classType);
+        }
+
+        public ClaimsBuilder WithModule(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            var saModuleAttribute = type.GetCustomAttribute<SaModuleAttribute>();
+            if (saModuleAttribute != null)
+                WithModule(saModuleAttribute);
+
+            return this;
         }
 
         public ClaimsBuilder WithPermission(Permission permission, params string[] subModules)
@@ -56,6 +100,34 @@ namespace SimpleAuth.Client.AspNetCore.Models
         {
             foreach (var permission in permissions)
                 WithPermission(permission.Permission, permission.SubModules);
+            return this;
+        }
+
+        public ClaimsBuilder WithPermissions(MethodInfo methodInfo)
+        {
+            if (methodInfo == null)
+                throw new ArgumentNullException(nameof(methodInfo));
+
+            var saPermissionAttributes = methodInfo.GetCustomAttributes<SaPermissionAttribute>();
+            return WithPermissions(saPermissionAttributes);
+        }
+
+        public ClaimsBuilder LoadFromMeta(MethodInfo methodInfo)
+        {
+            return
+                WithModule(methodInfo)
+                    .WithPermissions(methodInfo);
+        }
+
+        public ClaimsBuilder ClearModule()
+        {
+            Module = null;
+            return this;
+        }
+
+        public ClaimsBuilder ClearAllPermissions()
+        {
+            PermissionBatches.Clear();
             return this;
         }
 
@@ -107,6 +179,12 @@ namespace SimpleAuth.Client.AspNetCore.Models
         {
             return Build(simpleAuthConfigurationProvider.Corp, simpleAuthConfigurationProvider.App,
                 simpleAuthConfigurationProvider.Env, tenant);
+        }
+
+        public static ClaimsBuilder FromMetaData(MethodInfo methodInfo)
+        {
+            return new ClaimsBuilder()
+                .LoadFromMeta(methodInfo);
         }
     }
 
