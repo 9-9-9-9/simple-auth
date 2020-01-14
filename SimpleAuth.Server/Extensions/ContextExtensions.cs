@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Server.Extensions
@@ -11,6 +12,11 @@ namespace SimpleAuth.Server.Extensions
         public static T ResolveService<T>(this ActionExecutingContext actionExecutingContext)
         {
             return actionExecutingContext.HttpContext.ResolveService<T>();
+        }
+        
+        public static ILogger<T> ResolveLogger<T>(this ActionExecutingContext actionExecutingContext)
+        {
+            return actionExecutingContext.HttpContext.ResolveService<ILogger<T>>();
         }
 
         public static T ResolveService<T>(this HttpContext httpContext)
