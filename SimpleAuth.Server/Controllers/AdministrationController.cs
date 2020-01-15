@@ -38,7 +38,7 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("token/{corp}")]
         public async Task<IActionResult> GenerateCorpPermissionToken(string corp)
         {
-            _logger.LogWarning($"{nameof(GenerateCorpPermissionToken)} for corp {RequireCorpToken.Corp}");
+            _logger.LogWarning($"{nameof(GenerateCorpPermissionToken)} for corp {corp}");
             
             if (!_rolePartsValidationService.IsValidCorp(corp).IsValid)
                 return StatusCodes.Status400BadRequest.WithMessage(nameof(corp));
@@ -56,7 +56,7 @@ namespace SimpleAuth.Server.Controllers
                 Version = nextTokenVersion
             }.ToJson()));
 
-            _logger.LogWarning($"Generated token for {RequireCorpToken.Corp} version {nextTokenVersion}");
+            _logger.LogWarning($"Generated token for {corp} version {nextTokenVersion}");
             
             return actionResult;
         }
@@ -85,7 +85,7 @@ namespace SimpleAuth.Server.Controllers
                 Version = nextTokenVersion
             }.ToJson()));
             
-            _logger.LogWarning($"Generated token for {RequireCorpToken.Corp}.{app} version {nextTokenVersion}");
+            _logger.LogWarning($"Generated token for {corp}.{app} version {nextTokenVersion}");
 
             return actionResult;
         }
