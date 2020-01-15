@@ -64,7 +64,7 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("token/{corp}/{app}")]
         public async Task<IActionResult> GenerateAppPermissionToken(string corp, string app)
         {
-            _logger.LogWarning($"{nameof(GenerateAppPermissionToken)} for application {RequireCorpToken.Corp}.{app}");
+            _logger.LogWarning($"{nameof(GenerateAppPermissionToken)} for application {corp}.{app}");
             
             if (!_rolePartsValidationService.IsValidCorp(corp).IsValid)
                 return StatusCodes.Status400BadRequest.WithMessage(nameof(corp));
