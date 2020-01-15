@@ -1,4 +1,6 @@
-Code coverage: 71%
+Code coverage: 50%
+
+#### I know 50% is too little, but the core part, the service one, is tested
 
 # SimpleAuth
 ## A lightweighted Authorization server, integrated with external Authentication providers
