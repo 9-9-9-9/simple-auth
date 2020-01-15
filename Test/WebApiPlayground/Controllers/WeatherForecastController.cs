@@ -39,12 +39,7 @@ namespace WebApiPlayground.Controllers
         public async Task<IActionResult> GetWithControllerModule_WithoutDeclared_But_DeclareAtRuntime()
         {
             return await ResponseAsync(
-                new ClaimsBuilder()
-                    .WithModule(
-                        GetType().GetMethod(
-                            nameof(GetWithControllerModule_WithoutDeclared_But_DeclareAtRuntime)
-                        )
-                    )
+                ClaimsBuilder.FromMetaData<WeatherForecastController>()
                     .WithPermission(Permission.View, "a")
                     .WithPermission(Permission.View, "b")
             );
@@ -55,11 +50,7 @@ namespace WebApiPlayground.Controllers
         public async Task<IActionResult> GetWithControllerModule_With_Declared_and_Extra_Addition_At_Runtime()
         {
             return await ResponseAsync(
-                ClaimsBuilder.FromMetaData(
-                        GetType().GetMethod(
-                            nameof(GetWithControllerModule_With_Declared_and_Extra_Addition_At_Runtime)
-                        )
-                    )
+                ClaimsBuilder.FromMetaData<WeatherForecastController>()
                     .WithPermission(Permission.View, "b")
             );
         }
@@ -97,12 +88,7 @@ namespace WebApiPlayground.Controllers
         public async Task<IActionResult> GetWithOverridenModule_WithoutDeclared_But_DeclareAtRuntime()
         {
             return await ResponseAsync(
-                new ClaimsBuilder()
-                    .LoadFromMeta(
-                        GetType().GetMethod(
-                            nameof(GetWithOverridenModule_WithoutDeclared_But_DeclareAtRuntime)
-                        )
-                    )
+                ClaimsBuilder.FromMetaData<WeatherForecastController>()
                     .WithPermission(Permission.View)
             );
         }
@@ -112,12 +98,7 @@ namespace WebApiPlayground.Controllers
         public async Task<IActionResult> GetWithOverridenModule_CannotDoThis_Because_Module_Is_Restricted()
         {
             return await ResponseAsync(
-                new ClaimsBuilder()
-                    .WithModule(
-                        GetType().GetMethod(
-                            nameof(GetWithOverridenModule_CannotDoThis_Because_Module_Is_Restricted)
-                        )
-                    )
+                ClaimsBuilder.FromMetaData<WeatherForecastController>()
                     .WithPermission(Permission.View)
             );
             // The attribute SaModule has to be removed in order to process this method

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Attributes;
@@ -199,6 +200,44 @@ namespace SimpleAuth.Client.AspNetCore.Models
         {
             return new ClaimsBuilder()
                 .LoadFromMeta(methodInfo);
+        }
+
+        public static ClaimsBuilder FromMetaData(Type classType, [CallerMemberName] string callerMethodName = "")
+        {
+            return FromReflection(classType, callerMethodName);
+        }
+
+        public static ClaimsBuilder FromMetaData<T>([CallerMemberName] string callerMethodName = "")
+        {
+            return FromReflection(typeof(T), callerMethodName);
+        }
+
+        public static ClaimsBuilder FromMetaData(object instance, [CallerMemberName] string callerMethodName = "")
+        {
+            if (instance == null)
+                throw new ArgumentNullException(nameof(instance));
+            return FromReflection(instance.GetType(), callerMethodName);
+        }
+
+        private static ClaimsBuilder FromReflection(Type classType, string callerMethodName)
+        {
+            if (classType == null)
+                throw new ArgumentNullException(nameof(classType));
+            if (callerMethodName == null)
+                throw new ArgumentNullException(nameof(callerMethodName));
+
+            var methodInfos = classType.GetMethods()
+                .Where(x => x.Name == callerMethodName)
+                .ToArray();
+            
+            if (methodInfos.Length == 0)
+                throw new ArgumentException($"Method {callerMethodName} could not be found in class {classType.FullName}");
+            
+            if (methodInfos.Length > 1)
+                throw new ArgumentException($"Method name '{callerMethodName}' must be unique in order to use this function");
+
+            var methodInfo = methodInfos.First();
+            return FromMetaData(methodInfo);
         }
     }
 
