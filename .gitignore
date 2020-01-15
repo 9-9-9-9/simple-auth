@@ -9,3 +9,5 @@ bin/
 *.db-*
 coverage*
 logs/
+Nuget*.sh
+*.nupkg
