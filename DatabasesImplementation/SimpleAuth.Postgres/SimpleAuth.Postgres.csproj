@@ -5,11 +5,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SimpleAuth.Services\SimpleAuth.Services.csproj" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.1" />
+      <ProjectReference Include="..\..\SimpleAuth.Services\SimpleAuth.Services.csproj" />
     </ItemGroup>
 
 </Project>
