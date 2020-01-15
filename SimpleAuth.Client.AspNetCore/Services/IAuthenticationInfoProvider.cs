@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
@@ -61,8 +62,12 @@ namespace SimpleAuth.Client.AspNetCore.Services
 
         public async Task<ICollection<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim)
         {
+            if (claim == null)
+                return Enumerable.Empty<SimpleAuthorizationClaim>().ToList();
+            
             if (claim?.Type != SimpleAuthDefaults.ClaimType)
                 throw new ArgumentException($"{nameof(claim)}: is not type '{SimpleAuthDefaults.ClaimType}'");
+            
             return (await _claimCachingService.GetClaimsAsync(claim.Value)).OrEmpty().ToList();
         }
     }
