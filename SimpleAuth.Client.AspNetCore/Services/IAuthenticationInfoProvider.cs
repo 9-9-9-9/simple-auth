@@ -61,8 +61,12 @@ namespace SimpleAuth.Client.AspNetCore.Services
 
         public async Task<ICollection<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim)
         {
+            if (claim == null)
+                return Enumerable.Empty<SimpleAuthorizationClaim>().ToList();
+            
             if (claim?.Type != SimpleAuthDefaults.ClaimType)
                 throw new ArgumentException($"{nameof(claim)}: is not type '{SimpleAuthDefaults.ClaimType}'");
+            
             return (await _claimCachingService.GetClaimsAsync(claim.Value)).OrEmpty().ToList();
         }
     }
