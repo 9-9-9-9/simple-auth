@@ -28,14 +28,14 @@ namespace WebApiPlayground.Controllers
         [HttpGet, HttpPost, Route("si")]
         public async Task<IActionResult> SignIn()
         {
-            var roleModels = (await _userAuthService.GetUserAsync(UserId)).ActiveRoles;
+            var saUserModel = await _userAuthService.GetUserAsync(UserId);
 
-            var claim = await roleModels.ToSimpleAuthorizationClaims().GenerateSimpleAuthClaimAsync(_serviceProvider);
+            var claim = await saUserModel.GenerateSimpleAuthClaimAsync(_serviceProvider);
+            if (claim == default)
+                return NotFound();
+            
             var claimsIdentity = new ClaimsIdentity(
-                new[]
-                {
-                    claim
-                },
+                new[] { claim },
                 CookieAuthenticationDefaults.AuthenticationScheme);
 
             var authProperties = new AuthenticationProperties

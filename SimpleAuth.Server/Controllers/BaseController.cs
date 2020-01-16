@@ -254,8 +254,6 @@ namespace SimpleAuth.Server.Controllers
 
         protected IActionResult ReturnResponseUserModel(ResponseUserModel model)
         {
-            if (!model.ActiveRoles.IsAny())
-                return NoContent();
             return StatusCodes.Status200OK.WithJson(model);
         }
     }
