@@ -57,9 +57,22 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         .Build(configurationProvider, requireTenant)
                         .ToArray();
 
-                    var missingClaims = (await httpContext.GetMissingClaimsAsync(requireClaims))
+                    var userClaims = httpContext.GetUserSimpleAuthorizationClaimsFromContext();
+
+                    if (!userClaims.IsAny())
+                    {
+                        await httpContext.Response
+                            .WithStatus(StatusCodes.Status403Forbidden)
+                            .WithBody(
+                                "User doesn't have any permission'"
+                            );
+                        return;
+                    }
+
+                    var missingClaims = userClaims.GetMissingClaims(requireClaims)
                         .OrEmpty()
                         .ToArray();
+
                     if (missingClaims.Any())
                     {
                         await httpContext.Response
