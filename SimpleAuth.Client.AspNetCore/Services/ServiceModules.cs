@@ -9,7 +9,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
         public override void RegisterModules(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IAuthenticationInfoProvider, DefaultAuthenticationInfoProvider>();
-            serviceCollection.AddSingleton<IClaimCachingService, ClaimLocalCachingService>();
+            serviceCollection.AddSingleton<IClaimTransformingService, LocalCachingClaimService>();
             serviceCollection.AddSingleton<IJsonService, JsonNetService>();
         }
     }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Core.Extensions;
-using SimpleAuth.Shared;
 
 namespace SimpleAuth.Client.AspNetCore.Services
 {
@@ -17,18 +15,18 @@ namespace SimpleAuth.Client.AspNetCore.Services
         Task<bool> IsAuthenticated(HttpContext httpContext);
         Task<ICollection<Claim>> GetClaimsAsync(HttpContext httpContext);
         Task<Claim> GetSimpleAuthClaimAsync(HttpContext httpContext);
-        Claim GetSimpleAuthClaim(IEnumerable<Claim> claims);
-        Task<Claim> GenerateSimpleAuthClaimAsync(IEnumerable<SimpleAuthorizationClaim> claims);
+        Claim GetSimpleAuthClaim(ICollection<Claim> claims);
+        Task<Claim> GenerateSimpleAuthClaimAsync(ICollection<SimpleAuthorizationClaim> claims);
         Task<ICollection<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim);
     }
 
     public class DefaultAuthenticationInfoProvider : IAuthenticationInfoProvider
     {
-        private readonly IClaimCachingService _claimCachingService;
+        private readonly IClaimTransformingService _claimTransformingService;
 
-        public DefaultAuthenticationInfoProvider(IClaimCachingService claimCachingService)
+        public DefaultAuthenticationInfoProvider(IClaimTransformingService claimTransformingService)
         {
-            _claimCachingService = claimCachingService;
+            _claimTransformingService = claimTransformingService;
         }
 
         public Task<bool> IsAuthenticated(HttpContext httpContext)
@@ -42,7 +40,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
             return httpContext.User.Claims.OrEmpty().ToList();
         }
 
-        public Claim GetSimpleAuthClaim(IEnumerable<Claim> claims)
+        public Claim GetSimpleAuthClaim(ICollection<Claim> claims)
         {
             return claims.GetDefaultSimpleAuthClaim();
         }
@@ -52,22 +50,17 @@ namespace SimpleAuth.Client.AspNetCore.Services
             return GetSimpleAuthClaim(await GetClaimsAsync(httpContext));
         }
 
-        public async Task<Claim> GenerateSimpleAuthClaimAsync(IEnumerable<SimpleAuthorizationClaim> claims)
+        public Task<Claim> GenerateSimpleAuthClaimAsync(ICollection<SimpleAuthorizationClaim> claims)
         {
-            var randomValue = Guid.NewGuid().ToString();
-            await _claimCachingService.SaveClaimsAsync(randomValue, claims);
-            return new Claim(SimpleAuthDefaults.ClaimType, randomValue, nameof(SimpleAuthorizationClaim), Constants.Identity.Issuer);
+            return _claimTransformingService.PackAsync(claims);
         }
 
         public async Task<ICollection<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim)
         {
             if (claim == null)
                 return Enumerable.Empty<SimpleAuthorizationClaim>().ToList();
-            
-            if (claim?.Type != SimpleAuthDefaults.ClaimType)
-                throw new ArgumentException($"{nameof(claim)}: is not type '{SimpleAuthDefaults.ClaimType}'");
-            
-            return (await _claimCachingService.GetClaimsAsync(claim.Value)).OrEmpty().ToList();
+
+            return await _claimTransformingService.UnpackAsync(claim);
         }
     }
 }
