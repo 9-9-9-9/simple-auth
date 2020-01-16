@@ -40,10 +40,10 @@ namespace SimpleAuth.Client.Models
 
     public static class SimpleAuthorizationClaimExtensions
     {
-        public static IEnumerable<SimpleAuthorizationClaim> ToSimpleAuthorizationClaims(
-            this IEnumerable<RoleModel> roleModels)
+        public static ICollection<SimpleAuthorizationClaim> ToSimpleAuthorizationClaims(
+            this ICollection<RoleModel> roleModels)
         {
-            return roleModels.Select(x => new SimpleAuthorizationClaim(x));
+            return roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList();
         }
     }
 }

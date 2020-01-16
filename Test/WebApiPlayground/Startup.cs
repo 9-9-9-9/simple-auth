@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleAuth.Client.Models;
-using SimpleAuth.Client.Services;
-using WebApiPlayground.Services;
 
 namespace WebApiPlayground
 {
@@ -25,6 +23,8 @@ namespace WebApiPlayground
             services.AddControllers();
 
             services.UseSimpleAuthDefaultServices(Configuration.GetSection(nameof(SimpleAuthSettings)));
+
+            services.StorePermissionInClaim();
             
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -44,7 +44,7 @@ namespace WebApiPlayground
             app.UseAuthorization();
             
             app.UseRouting();
-            
+
             app.UseSimpleAuth();
             
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

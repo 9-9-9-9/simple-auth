@@ -10,14 +10,14 @@ namespace SimpleAuth.Client.Models
 {
     public static class SimpleAuthorizationClaimAdditionalExtensions
     {
-        public static async Task<Claim> GenerateSimpleAuthClaimAsync(this IEnumerable<SimpleAuthorizationClaim> claims,
+        public static async Task<Claim> GenerateSimpleAuthClaimAsync(this ICollection<SimpleAuthorizationClaim> claims,
             IServiceProvider serviceProvider)
         {
             var authenticationInfoProvider = serviceProvider.GetService<IAuthenticationInfoProvider>();
             return await authenticationInfoProvider.GenerateSimpleAuthClaimAsync(claims);
         }
         
-        public static Task<Claim> GenerateSimpleAuthClaimAsync(this IEnumerable<RoleModel> roleModels,
+        public static Task<Claim> GenerateSimpleAuthClaimAsync(this ICollection<RoleModel> roleModels,
             IServiceProvider serviceProvider)
         {
             return roleModels.ToSimpleAuthorizationClaims().GenerateSimpleAuthClaimAsync(serviceProvider);

@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.Builder
             if (simpleAuthSettingsConfiguration != null)
                 services
                     .Configure<SimpleAuthSettings>(simpleAuthSettingsConfiguration);
-            
+
             services
                 .RegisterModules<BasicServiceModules>()
                 .RegisterModules<ServiceModules>()
@@ -53,6 +53,16 @@ namespace Microsoft.AspNetCore.Builder
         {
             services.UseSimpleAuthDefaultServices(configuration?.GetSection(nameof(SimpleAuthSettings)));
             return services;
+        }
+
+        public static IServiceCollection StorePermissionInClaim(this IServiceCollection services)
+        {
+            return services.AddSingleton<IClaimTransformingService, SelfContainedClaimService>();
+        }
+
+        public static IServiceCollection StorePermissionInMemoryReferClaimByKey(this IServiceCollection services)
+        {
+            return services.AddSingleton<IClaimTransformingService, LocalCachingClaimService>();
         }
     }
 }
