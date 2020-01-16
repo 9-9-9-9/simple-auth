@@ -29,7 +29,9 @@ namespace Microsoft.AspNetCore.Builder
 
         public static IApplicationBuilder UseSimpleAuth(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<SaAuthorizationMiddleware>();
+            return app
+                .UseMiddleware<SaPushClaimsToContextMiddleware>()
+                .UseMiddleware<SaAuthorizationMiddleware>();
         }
 
         public static IServiceCollection UseSimpleAuthDefaultServices(this IServiceCollection services,
