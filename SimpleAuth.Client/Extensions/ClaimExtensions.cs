@@ -8,7 +8,9 @@ namespace System.Security.Claims
     {
         public static Claim GetDefaultSimpleAuthClaim(this IEnumerable<Claim> claims)
         {
-            return claims.FirstOrDefault(x => x.Type == SimpleAuthDefaults.ClaimType);
+            return claims.FirstOrDefault(x =>
+                x.Type == SimpleAuthDefaults.ClaimType
+            );
         }
     }
 }

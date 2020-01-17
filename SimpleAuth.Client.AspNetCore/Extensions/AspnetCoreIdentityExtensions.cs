@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Shared.Models;
@@ -50,6 +51,10 @@ namespace Microsoft.AspNetCore.Identity
             var simpleAuthClaim = await responseUserModel.GenerateSimpleAuthClaimAsync(serviceProvider);
             if (simpleAuthClaim == default)
                 return IdentityResult.Failed();
+            var existingClaims = await userManager.GetClaimsAsync(user);
+            var existingSimpleAuthClaims = existingClaims.Where(x => x.Type == simpleAuthClaim.Type).ToList();
+            if (existingSimpleAuthClaims.Any())
+                await userManager.RemoveClaimsAsync(user, existingSimpleAuthClaims);
             return await userManager.AddClaimAsync(user, simpleAuthClaim);
         }
     }
