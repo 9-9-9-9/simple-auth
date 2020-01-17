@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SimpleAuth.Client.Models;
-using SimpleAuth.Shared;
 
 namespace SimpleAuth.Client.AspNetCore.Services
 {
@@ -31,13 +30,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
                 throw new ArgumentNullException(nameof(claim));
 
             if (claim.Type != SimpleAuthDefaults.ClaimType)
-                throw new ArgumentException(nameof(claim));
-
-            if (claim.ValueType != nameof(SimpleAuthorizationClaim))
-                throw new ArgumentException(nameof(claim));
-
-            if (claim.Issuer != Constants.Identity.Issuer)
-                throw new ArgumentException(nameof(claim));
+                throw new ArgumentException($"{nameof(claim)}: {nameof(claim.Type)}");
 
             return await TransformBackAsync(claim.Value);
         }
@@ -47,8 +40,8 @@ namespace SimpleAuth.Client.AspNetCore.Services
             var transformedData = await TransformAsync(simpleAuthorizationClaims);
             return new Claim(SimpleAuthDefaults.ClaimType,
                 transformedData,
-                nameof(SimpleAuthorizationClaim),
-                Constants.Identity.Issuer);
+                SimpleAuthDefaults.ClaimValueType,
+                SimpleAuthDefaults.ClaimIssuer);
         }
     }
 

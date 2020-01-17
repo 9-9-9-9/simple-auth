@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Services;
+using SimpleAuth.Core.Extensions;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
 {
@@ -23,7 +24,8 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             if (await authenticationInfoProvider.IsAuthenticated(httpContext))
             {
                 var userSimpleAuthorizationClaims = await httpContext.GetUserSimpleAuthorizationClaimsAsync();
-                httpContext.AddUserSimpleAuthorizationClaimsIntoContext(userSimpleAuthorizationClaims);
+                if (userSimpleAuthorizationClaims.IsAny())
+                    httpContext.AddUserSimpleAuthorizationClaimsIntoContext(userSimpleAuthorizationClaims);
             }
 
             await _next(httpContext);

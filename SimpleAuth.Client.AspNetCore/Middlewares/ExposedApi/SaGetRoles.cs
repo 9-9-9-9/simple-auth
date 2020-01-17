@@ -9,6 +9,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
     // ReSharper disable once ClassNeverInstantiated.Global
     public class SaGetRoles
     {
+        // ReSharper disable once NotAccessedField.Local
         private readonly RequestDelegate _next;
 
         public SaGetRoles(RequestDelegate next)
