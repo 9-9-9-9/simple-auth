@@ -64,6 +64,9 @@ namespace SimpleAuth.Server.Middlewares
 
                 actionExecutingContext.HttpContext.Items[Constants.Headers.AppPermission] = requestAppHeaders;
                 logger.LogInformation($"Access granted for {nameof(RequestAppHeaders)}");
+                
+                actionExecutingContext.HttpContext.Response.Headers.Add(Constants.Headers.SourceCorp, requestAppHeaders.Corp);
+                actionExecutingContext.HttpContext.Response.Headers.Add(Constants.Headers.SourceApp, requestAppHeaders.App);
             }
         }
     }
