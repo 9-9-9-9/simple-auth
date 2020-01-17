@@ -27,6 +27,8 @@ namespace AppManagementConsole
 
     internal class AppManagementApp : AbstractAppRunnable
     {
+        protected override bool AllowSwitchingDefaultApp => true;
+
         protected override IServiceCollection RegisterServiceCollections(IServiceCollection serviceCollection)
         {
             return serviceCollection

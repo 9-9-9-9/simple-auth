@@ -22,6 +22,9 @@ namespace SimpleAuth.Shared
             public const string AppPermission = "x-app-token";
             public const string CorpPermission = "x-corp-token";
             public const string MasterToken = "x-master-token";
+
+            public const string SourceCorp = "src-corp";
+            public const string SourceApp = "src-app";
         }
 
         public static class Encryption

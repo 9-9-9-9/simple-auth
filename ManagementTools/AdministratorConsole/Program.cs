@@ -27,6 +27,8 @@ namespace AdministratorConsole
 
     internal class AdminApp : AbstractAppRunnable
     {
+        protected override bool AllowSwitchingDefaultApp => false;
+
         protected override IServiceCollection RegisterServiceCollections(IServiceCollection serviceCollection)
         {
             return serviceCollection

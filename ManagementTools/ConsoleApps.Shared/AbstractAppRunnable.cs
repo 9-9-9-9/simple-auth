@@ -13,6 +13,8 @@ namespace ConsoleApps.Shared
 {
     public abstract class AbstractAppRunnable
     {
+        protected abstract bool AllowSwitchingDefaultApp { get; }
+        
         public virtual async Task RunAsync()
         {
             var builder = new ConfigurationBuilder();
@@ -29,24 +31,27 @@ namespace ConsoleApps.Shared
             var serviceProvider = services.BuildServiceProvider();
 
             var simpleAuthConfigurationProvider = serviceProvider.GetService<ISimpleAuthConfigurationProvider>();
-            var othersAppsTokens = simpleAuthConfigurationProvider.OthersAppsTokens;
-            if (othersAppsTokens.Any())
+            if (AllowSwitchingDefaultApp)
             {
-                $"Default app is: {simpleAuthConfigurationProvider.App}".Write();
-                "You can change to another app by typing another app name (leave empty to continue with default):"
-                    .Write();
-                var switchToApp = Console.ReadLine()?.Trim() ?? string.Empty;
-                if (!switchToApp.IsBlank())
+                var othersAppsTokens = simpleAuthConfigurationProvider.OthersAppsTokens;
+                if (othersAppsTokens.Any())
                 {
-                    if (!othersAppsTokens.ContainsKey(switchToApp))
+                    $"Default app is: {simpleAuthConfigurationProvider.App}".Write();
+                    "You can change to another app by typing another app name (leave empty to continue with default):"
+                        .Write();
+                    var switchToApp = Console.ReadLine()?.Trim() ?? string.Empty;
+                    if (!switchToApp.IsBlank())
                     {
-                        var validApps = othersAppsTokens.ToArray().Select(x => x.Key);
-                        throw new ArgumentException(
-                            $"Token of app '{switchToApp}' could not be found, please correct/insert into appsettings.json, key {nameof(SimpleAuthSettings.TokenSettings)}.{nameof(SimpleAuthTokenSettings.OtherAppsTokens)}. Valid values are '{string.Join(",", validApps)}'");
-                    }
+                        if (!othersAppsTokens.ContainsKey(switchToApp))
+                        {
+                            var validApps = othersAppsTokens.ToArray().Select(x => x.Key);
+                            throw new ArgumentException(
+                                $"Token of app '{switchToApp}' could not be found, please correct/insert into appsettings.json, key {nameof(SimpleAuthSettings.TokenSettings)}.{nameof(SimpleAuthTokenSettings.OtherAppsTokens)}. Valid values are '{string.Join(",", validApps)}'");
+                        }
 
-                    simpleAuthConfigurationProvider.App = switchToApp;
-                    simpleAuthConfigurationProvider.AppToken = othersAppsTokens[switchToApp];
+                        simpleAuthConfigurationProvider.App = switchToApp;
+                        simpleAuthConfigurationProvider.AppToken = othersAppsTokens[switchToApp];
+                    }
                 }
             }
 
@@ -61,7 +66,8 @@ namespace ConsoleApps.Shared
                 "Commands".Write();
                 commandDict.ToList().ForEach(kvp => $"{kvp.Key}. {kvp.Value.GetType().Name}".Write());
                 "0. Exit".Write();
-                $"Working application is '{simpleAuthConfigurationProvider.App}'".Write();
+                if (AllowSwitchingDefaultApp)
+                    $"Working application is '{simpleAuthConfigurationProvider.App}'".Write();
                 "Select your option".Write();
 
                 var opt = ReadInputInt();

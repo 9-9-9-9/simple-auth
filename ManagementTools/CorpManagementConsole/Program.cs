@@ -27,6 +27,8 @@ namespace CorpManagementConsole
 
     internal class CorpManagementApp : AbstractAppRunnable
     {
+        protected override bool AllowSwitchingDefaultApp => false;
+
         protected override IServiceCollection RegisterServiceCollections(IServiceCollection serviceCollection)
         {
             return serviceCollection

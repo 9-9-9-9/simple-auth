@@ -64,6 +64,8 @@ namespace SimpleAuth.Server.Middlewares
 
                 actionExecutingContext.HttpContext.Items[Constants.Headers.CorpPermission] = requireCorpToken;
                 logger.LogInformation($"Access granted for {nameof(RequireCorpToken)}");
+                
+                actionExecutingContext.HttpContext.Response.Headers.Add(Constants.Headers.SourceCorp, requireCorpToken.Corp);
             }
         }
     }
