@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SimpleAuth.Client.AspNetCore.Middlewares;
 using SimpleAuth.Client.Models;
 
 namespace WebApiPlayground
@@ -46,7 +47,8 @@ namespace WebApiPlayground
             app.UseRouting();
 
             app.UseSimpleAuth();
-            
+
+            app.Map("/api/simple-auth/roles", builder => { builder.UseMiddleware<SaGetRoles>(); });
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
