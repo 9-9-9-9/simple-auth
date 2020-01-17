@@ -2,9 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using SimpleAuth.Client.AspNetCore.Models;
+using SimpleAuth.Client.AspNetCore.Services;
+using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
@@ -97,7 +100,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                     .Select(x => x.Trim())
                     .Where(x => !string.IsNullOrWhiteSpace(x))
                     .Distinct()
-                    .Select(x => (Permission) Enum.Parse(typeof(Permission), x))
+                    .Select(x => (Permission) Enum.Parse(typeof(Permission), x, true))
                     .ToList();
 
                 if (ePermissions.IsEmpty())
@@ -116,14 +119,20 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
 
             var claimsBuilder = new ClaimsBuilder().WithModule(module).WithPermission(permission, strSubPermissions);
 
-            var missingClaims = await httpContext.GetMissingClaimsAsync(claimsBuilder);
+            var simpleAuthConfigurationProvider = httpContext.RequestServices.GetService<ISimpleAuthConfigurationProvider>();
+            var tenantProvider = httpContext.RequestServices.GetService<ITenantProvider>();
+            var requiredClaims = claimsBuilder.Build(simpleAuthConfigurationProvider.Corp,
+                simpleAuthConfigurationProvider.App, env ?? simpleAuthConfigurationProvider.Env,
+                tenant ?? tenantProvider.GetTenant(httpContext));
+
+            var missingClaims = await httpContext.GetMissingClaimsAsync(requiredClaims);
 
             if (missingClaims.IsAny())
             {
                 await httpContext.Response
                     .WithStatus(StatusCodes.Status406NotAcceptable)
                     .WithBody(
-                        JsonConvert.SerializeObject(userClaims.Select(c =>
+                        JsonConvert.SerializeObject(missingClaims.Select(c =>
                             RoleUtils.ComputeRoleId(c.ClientRoleModel.Corp, c.ClientRoleModel.App,
                                 c.ClientRoleModel.Env, c.ClientRoleModel.Tenant, c.ClientRoleModel.Module,
                                 c.ClientRoleModel.SubModules) + $":{c.ClientRoleModel.Permission}").ToArray())

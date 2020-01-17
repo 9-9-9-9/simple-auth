@@ -48,7 +48,8 @@ namespace WebApiPlayground
 
             app.UseSimpleAuth();
 
-            app.Map("/api/simple-auth/roles", builder => { builder.UseMiddleware<SaGetRoles>(); });
+            app.UseSimpleAuthEndPoints();
+
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
