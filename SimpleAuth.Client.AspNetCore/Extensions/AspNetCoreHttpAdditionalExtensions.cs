@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,8 @@ namespace Microsoft.AspNetCore.Http
             var authenticationInfoProvider = httpContext.RequestServices.GetService<IAuthenticationInfoProvider>();
             var claims = await authenticationInfoProvider.GetClaimsAsync(httpContext);
             var simpleAuthClaim = authenticationInfoProvider.GetSimpleAuthClaim(claims);
+            if (simpleAuthClaim == default)
+                return Enumerable.Empty<SimpleAuthorizationClaim>().ToList();
             return await authenticationInfoProvider.GetSimpleAuthClaimsAsync(simpleAuthClaim);
         }
 
