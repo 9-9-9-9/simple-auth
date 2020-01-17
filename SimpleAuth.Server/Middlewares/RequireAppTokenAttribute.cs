@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -65,8 +66,8 @@ namespace SimpleAuth.Server.Middlewares
                 actionExecutingContext.HttpContext.Items[Constants.Headers.AppPermission] = requestAppHeaders;
                 logger.LogInformation($"Access granted for {nameof(RequestAppHeaders)}");
                 
-                actionExecutingContext.HttpContext.Response.Headers.Add(Constants.Headers.SourceCorp, requestAppHeaders.Corp);
-                actionExecutingContext.HttpContext.Response.Headers.Add(Constants.Headers.SourceApp, requestAppHeaders.App);
+                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceCorp, requestAppHeaders.Corp);
+                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceApp, requestAppHeaders.App);
             }
         }
     }
