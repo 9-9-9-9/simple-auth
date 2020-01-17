@@ -1,5 +1,3 @@
-using System.Net;
-
 namespace SimpleAuth.Client.Utils
 {
     public static class EndpointBuilder

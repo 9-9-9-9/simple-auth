@@ -24,6 +24,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
         private const string ParamSubModules = "subModules";
         private const string ParamPermission = "permission";
 
+        // ReSharper disable once NotAccessedField.Local
         private readonly RequestDelegate _next;
 
         public SaCheckRole(RequestDelegate next)

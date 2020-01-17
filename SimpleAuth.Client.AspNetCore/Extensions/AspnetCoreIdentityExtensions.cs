@@ -42,8 +42,7 @@ namespace Microsoft.AspNetCore.Identity
         }
 
         public static async Task<IdentityResult> RefreshClaimByUserAsync<T>(this UserManager<T> userManager,
-            T user,
-            ResponseUserModel responseUserModel, IServiceProvider serviceProvider)
+            T user, ResponseUserModel responseUserModel, IServiceProvider serviceProvider)
             where T : class
         {
             if (user == default)
