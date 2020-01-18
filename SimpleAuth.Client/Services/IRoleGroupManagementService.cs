@@ -62,7 +62,7 @@ namespace SimpleAuth.Client.Services
                 true,
                 NewRequest()
                     .Append(EndpointBuilder.RoleGroupManagement.AddRoleToGroup(roleGroupName))
-                    .Method(Constants.HttpMethods.PUT),
+                    .Method(Constants.HttpMethods.POST),
                 updateRolesModel.JsonSerialize()
             );
         }

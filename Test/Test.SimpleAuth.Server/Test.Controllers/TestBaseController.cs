@@ -145,7 +145,7 @@ namespace Test.SimpleAuth.Server.Test.Controllers
             {
                 new Role {RoleId = "x"}, new Role {RoleId = "x"}, new Role {RoleId = "x"}
             }), StatusCodes.Status200OK, 3);
-            await AssertResponse(Returns(new List<Role>()), StatusCodes.Status204NoContent, 0);
+            await AssertResponse(Returns(new List<Role>()), StatusCodes.Status404NotFound, 0);
 
             MockExtensions.FutureSetup<IRoleService> Returns(IEnumerable<Role> result)
             {
@@ -170,10 +170,14 @@ namespace Test.SimpleAuth.Server.Test.Controllers
                 var response = await controller.FindRoles("term", 0, 0);
                 var sr = AssertE.IsAssignableFrom<ContentResult>(response);
                 Assert.AreEqual(expectHttpStatus, sr.StatusCode);
-                Assert.IsTrue(sr.ContentType.Contains("application/json"));
-                Assert.NotNull(sr.Content);
-                var arr = JsonSerializer.Deserialize<string[]>(sr.Content);
-                Assert.AreEqual(expectedResponseSize, arr.Length);
+
+                if (expectHttpStatus != StatusCodes.Status404NotFound)
+                {
+                    Assert.IsTrue(sr.ContentType.Contains("application/json"));
+                    Assert.NotNull(sr.Content);
+                    var arr = JsonSerializer.Deserialize<string[]>(sr.Content);
+                    Assert.AreEqual(expectedResponseSize, arr.Length);
+                }
 
                 var sizeInHeader = controller.Response.Headers["CSize1"].First();
                 Assert.AreEqual(expectedResponseSize.ToString(), sizeInHeader);
