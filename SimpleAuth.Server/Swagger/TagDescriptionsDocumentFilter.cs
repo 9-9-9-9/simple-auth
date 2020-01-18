@@ -18,11 +18,11 @@ namespace SimpleAuth.Server.Swagger
             swaggerDoc.Tags = new List<OpenApiTag>
             {
                 new OpenApiTag {Name = "User"},
-                new OpenApiTag {Name = "Google"},
+                new OpenApiTag {Name = "Google", Description = "Reserved Endpoint for serving requests relate to Google, such as sign-in using OAuth token"},
                 new OpenApiTag {Name = "RoleGroups"},
                 new OpenApiTag {Name = "Roles"},
-                new OpenApiTag {Name = "Administration"},
-                new OpenApiTag {Name = "Corp"},
+                new OpenApiTag {Name = "Administration", Description = "Master controller for administration. By providing a master token as `x-master-token` header, requester can access ultimate features"},
+                new OpenApiTag {Name = "Corp", Description = "Controller for managing Corp. By providing a corp-level token as `x-corp-token` header, requester can access features"},
             };
         }
     }
