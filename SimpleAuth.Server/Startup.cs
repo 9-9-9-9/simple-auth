@@ -49,9 +49,15 @@ namespace SimpleAuthServer
             //
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Values Api", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo {
+                    Title = "Values Api", 
+                    Version = "v1", 
+                    Description = "<a href='https://github.com/9-9-9-9/simple-auth'>Watch me on GitHub</a>"
+                });
                 
                 c.OperationFilter<AddRequiredHeaderParameter>();
+                
+                c.DocumentFilter<TagDescriptionsDocumentFilter>();
             });
         }
 
