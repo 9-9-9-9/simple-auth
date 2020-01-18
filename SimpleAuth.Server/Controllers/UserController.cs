@@ -36,28 +36,131 @@ namespace SimpleAuth.Server.Controllers
             _logger = serviceProvider.ResolveLogger<UserController>();
         }
 
-        [HttpPost, Route("{userId}/lock")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> LockUser(string userId)
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
         {
-            var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-            _logger.LogInformation($"Update LOCK status of UserId {userId} to {@lock}");
+            var user = Service.GetUser(model.UserId, RequestAppHeaders.Corp);
+            if (user != default)
+                return Conflict();
+
+            var vr = new Func<ValidationResult>[]
+            {
+                () => _userValidationService.IsValidUserId(model.UserId),
+                () => _userValidationService.IsValidPassword(model.Password),
+                () => _userValidationService.IsValidEmail(model.Email),
+            }.IsValid();
+
+            if (!vr.IsValid)
+                return BadRequest(vr.Message);
+
+            return await ProcedureDefaultResponseIfError(async () =>
+            {
+                await Service.CreateUserAsync(new Shared.Domains.User
+                    {
+                        Id = model.UserId
+                    },
+                    new LocalUserInfo
+                    {
+                        Corp = RequestAppHeaders.Corp,
+                        PlainPassword = model.Password
+                    });
+
+                _logger.LogInformation($"User {model.UserId} had been created at {RequestAppHeaders.Corp}");
+                return StatusCodes.Status201Created.WithEmpty();
+            });
+        }
+
+        [HttpGet("{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUser(string userId)
+        {
+            return await ProcedureDefaultResponseIfError(() =>
+                GetBaseResponseUserModelAsync(userId, Service)
+                    .ContinueWith(x =>
+                        StatusCodes.Status200OK.WithJson(x.Result)
+                    )
+            );
+        }
+
+        [HttpPost, Route("{userId}/role-groups")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AssignUserToGroupsAsync(string userId,
+            [FromBody] ModifyUserRoleGroupsModel modifyUserRoleGroupsModel)
+        {
+            if ((modifyUserRoleGroupsModel?.RoleGroups?.Length ?? 0) == 0)
+                return BadRequest();
 
             return await ProcedureDefaultResponse(async () =>
                 {
-                    await Service.UpdateLockStatusAsync(new Shared.Domains.User
+                    var user = Service.GetUser(userId, RequestAppHeaders.Corp);
+                    if (user == default)
+                        throw new EntityNotExistsException(
+                            $"{userId} at {RequestAppHeaders.App} of {RequestAppHeaders.Corp}");
+                    await Service.AssignUserToGroupsAsync(new Shared.Domains.User
                     {
-                        Id = userId,
-                        LocalUserInfos = new[]
-                        {
-                            new LocalUserInfo
-                            {
-                                Corp = RequestAppHeaders.Corp,
-                                Locked = @lock
-                            }
-                        }
-                    });
+                        Id = userId
+                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new RoleGroup
+                    {
+                        Name = x,
+                        Corp = RequestAppHeaders.Corp,
+                        App = RequestAppHeaders.App
+                    }).ToArray());
+                    _logger.LogInformation(
+                        $"Assigned user {userId} to groups {string.Join(',', modifyUserRoleGroupsModel.RoleGroups)} ({RequestAppHeaders.Corp}.{RequestAppHeaders.App})"
+                    );
+                }
+            );
+        }
+
+        [HttpGet("{userId}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetActiveRoles(string userId)
+        {
+            return await ProcedureDefaultResponseIfError(() =>
+                GetBaseResponseUserModelAsync(userId, Service)
+                    .ContinueWith(x =>
+                        StatusCodes.Status200OK.WithJson(
+                            x.Result
+                                .ActiveRoles
+                                .OrEmpty()
+                                .ToArray()
+                        )
+                    )
+            );
+        }
+
+        [HttpGet, Route("{userId}/roles/{roleId}/{permission}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
+        {
+            return await ProcedureDefaultResponseIfError(() =>
+                {
+                    var ePermission = permission.Deserialize();
+                    _logger.LogInformation($"Checking permission [{roleId}, {ePermission}] for user {userId}");
+
+                    return Service.IsHaveActivePermissionAsync(
+                        userId,
+                        roleId,
+                        ePermission,
+                        RequestAppHeaders.Corp, RequestAppHeaders.App
+                    ).ContinueWith(
+                        x => (x.Result
+                                ? StatusCodes.Status200OK
+                                : StatusCodes.Status406NotAcceptable
+                            ).WithEmpty()
+                    );
                 }
             );
         }
@@ -120,131 +223,28 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        [HttpGet("{userId}/roles")]
+        [HttpPost, Route("{userId}/lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetActiveRoles(string userId)
+        public async Task<IActionResult> LockUser(string userId)
         {
-            return await ProcedureDefaultResponseIfError(() =>
-                GetBaseResponseUserModelAsync(userId, Service)
-                    .ContinueWith(x =>
-                        StatusCodes.Status200OK.WithJson(
-                            x.Result
-                                .ActiveRoles
-                                .OrEmpty()
-                                .ToArray()
-                        )
-                    )
-            );
-        }
+            var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
 
-        [HttpGet("{userId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUser(string userId)
-        {
-            return await ProcedureDefaultResponseIfError(() =>
-                GetBaseResponseUserModelAsync(userId, Service)
-                    .ContinueWith(x =>
-                        StatusCodes.Status200OK.WithJson(x.Result)
-                    )
-            );
-        }
-
-        [HttpGet, Route("{userId}/roles/{roleId}/{permission}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
-        {
-            return await ProcedureDefaultResponseIfError(() =>
-                {
-                    var ePermission = permission.Deserialize();
-                    _logger.LogInformation($"Checking permission [{roleId}, {ePermission}] for user {userId}");
-
-                    return Service.IsHaveActivePermissionAsync(
-                        userId,
-                        roleId,
-                        ePermission,
-                        RequestAppHeaders.Corp, RequestAppHeaders.App
-                    ).ContinueWith(
-                        x => (x.Result
-                                ? StatusCodes.Status200OK
-                                : StatusCodes.Status406NotAcceptable
-                            ).WithEmpty()
-                    );
-                }
-            );
-        }
-
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            var user = Service.GetUser(model.UserId, RequestAppHeaders.Corp);
-            if (user != default)
-                return Conflict();
-
-            var vr = new Func<ValidationResult>[]
-            {
-                () => _userValidationService.IsValidUserId(model.UserId),
-                () => _userValidationService.IsValidPassword(model.Password),
-                () => _userValidationService.IsValidEmail(model.Email),
-            }.IsValid();
-
-            if (!vr.IsValid)
-                return BadRequest(vr.Message);
-
-            return await ProcedureDefaultResponseIfError(async () =>
-            {
-                await Service.CreateUserAsync(new Shared.Domains.User
-                    {
-                        Id = model.UserId
-                    },
-                    new LocalUserInfo
-                    {
-                        Corp = RequestAppHeaders.Corp,
-                        PlainPassword = model.Password
-                    });
-
-                _logger.LogInformation($"User {model.UserId} had been created at {RequestAppHeaders.Corp}");
-                return StatusCodes.Status201Created.WithEmpty();
-            });
-        }
-
-        [HttpPost, Route("{userId}/role-groups")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> AssignUserToGroupsAsync(string userId,
-            [FromBody] ModifyUserRoleGroupsModel modifyUserRoleGroupsModel)
-        {
-            if ((modifyUserRoleGroupsModel?.RoleGroups?.Length ?? 0) == 0)
-                return BadRequest();
+            _logger.LogInformation($"Update LOCK status of UserId {userId} to {@lock}");
 
             return await ProcedureDefaultResponse(async () =>
                 {
-                    var user = Service.GetUser(userId, RequestAppHeaders.Corp);
-                    if (user == default)
-                        throw new EntityNotExistsException(
-                            $"{userId} at {RequestAppHeaders.App} of {RequestAppHeaders.Corp}");
-                    await Service.AssignUserToGroupsAsync(new Shared.Domains.User
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.User
                     {
-                        Id = userId
-                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new RoleGroup
-                    {
-                        Name = x,
-                        Corp = RequestAppHeaders.Corp,
-                        App = RequestAppHeaders.App
-                    }).ToArray());
-                    _logger.LogInformation(
-                        $"Assigned user {userId} to groups {string.Join(',', modifyUserRoleGroupsModel.RoleGroups)} ({RequestAppHeaders.Corp}.{RequestAppHeaders.App})"
-                    );
+                        Id = userId,
+                        LocalUserInfos = new[]
+                        {
+                            new LocalUserInfo
+                            {
+                                Corp = RequestAppHeaders.Corp,
+                                Locked = @lock
+                            }
+                        }
+                    });
                 }
             );
         }

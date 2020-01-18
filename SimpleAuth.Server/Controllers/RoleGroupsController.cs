@@ -64,61 +64,6 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> FindRoleGroups(
-            [FromQuery] string term,
-            [FromQuery] int? skip,
-            [FromQuery] int? take)
-        {
-            return await ProcedureResponseForLookUpArrayUsingTerm(term, skip, take,
-                findOptions =>
-                    Task.FromResult(
-                        Service
-                            .SearchRoleGroups(term, RequestAppHeaders.Corp, RequestAppHeaders.App, findOptions)
-                            .Select(x => x.Name)
-                    )
-            );
-        }
-
-        [HttpPost("{groupName}/lock")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> LockRoleGroup(string groupName)
-        {
-            return await ProcedureDefaultResponse(async () =>
-                {
-                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
-                    {
-                        Name = groupName,
-                        Corp = RequestAppHeaders.Corp,
-                        App = RequestAppHeaders.App,
-                        Locked = true
-                    });
-                }
-            );
-        }
-
-        [HttpDelete("{groupName}/lock")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UnlockRoleGroup(string groupName)
-        {
-            return await ProcedureDefaultResponse(async () =>
-                {
-                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
-                    {
-                        Name = groupName,
-                        Corp = RequestAppHeaders.Corp,
-                        App = RequestAppHeaders.App,
-                        Locked = false
-                    });
-                }
-            );
-        }
-
-
         [HttpGet("{groupName}/roles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -184,6 +129,60 @@ namespace SimpleAuth.Server.Controllers
                         })
                         .ToArray());
             });
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> FindRoleGroups(
+            [FromQuery] string term,
+            [FromQuery] int? skip,
+            [FromQuery] int? take)
+        {
+            return await ProcedureResponseForLookUpArrayUsingTerm(term, skip, take,
+                findOptions =>
+                    Task.FromResult(
+                        Service
+                            .SearchRoleGroups(term, RequestAppHeaders.Corp, RequestAppHeaders.App, findOptions)
+                            .Select(x => x.Name)
+                    )
+            );
+        }
+
+        [HttpPost("{groupName}/lock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> LockRoleGroup(string groupName)
+        {
+            return await ProcedureDefaultResponse(async () =>
+                {
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
+                    {
+                        Name = groupName,
+                        Corp = RequestAppHeaders.Corp,
+                        App = RequestAppHeaders.App,
+                        Locked = true
+                    });
+                }
+            );
+        }
+
+        [HttpDelete("{groupName}/lock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UnlockRoleGroup(string groupName)
+        {
+            return await ProcedureDefaultResponse(async () =>
+                {
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
+                    {
+                        Name = groupName,
+                        Corp = RequestAppHeaders.Corp,
+                        App = RequestAppHeaders.App,
+                        Locked = false
+                    });
+                }
+            );
         }
 
         private async Task<Shared.Domains.RoleGroup> FindRoleGroupAsync(string name, string corp, string app)
