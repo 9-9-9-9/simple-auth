@@ -13,6 +13,7 @@ namespace SimpleAuth.Client.Services
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public interface IUserAuthService : IClientService
     {
+        Task<RoleModel[]> GetActiveRolesAsync(string userId);
         Task<ResponseUserModel> GetUserAsync(string userId);
         Task<ResponseUserModel> GetUserAsync(string userId, string password);
         Task<ResponseUserModel> GetUserAsync(LoginByGoogleRequest loginByGoogleRequest);
@@ -37,18 +38,27 @@ namespace SimpleAuth.Client.Services
                 .WithFilterTenant();
         }
 
-        public async Task<ResponseUserModel> GetUserAsync(string userId)
+        public Task<RoleModel[]> GetActiveRolesAsync(string userId)
         {
-            return await _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
+            return _httpService.DoHttpRequestWithResponseContentAsync<RoleModel[]>(
                 NewRequest()
-                .Append(EndpointBuilder.User.GetActiveRoles(userId))
+                    .Append(EndpointBuilder.User.GetActiveRoles(userId))
+                    .Method(Constants.HttpMethods.GET)
+            );
+        }
+
+        public Task<ResponseUserModel> GetUserAsync(string userId)
+        {
+            return _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
+                NewRequest()
+                .Append(EndpointBuilder.User.GetUser(userId))
                 .Method(Constants.HttpMethods.GET)
             );
         }
 
-        public async Task<ResponseUserModel> GetUserAsync(string userId, string password)
+        public Task<ResponseUserModel> GetUserAsync(string userId, string password)
         {
-            return await _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
+            return _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
                 NewRequest()
                 .Append(EndpointBuilder.User.CheckPass(userId))
                 .Method(Constants.HttpMethods.POST),
@@ -56,9 +66,9 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public async Task<ResponseUserModel> GetUserAsync(LoginByGoogleRequest loginByGoogleRequest)
+        public Task<ResponseUserModel> GetUserAsync(LoginByGoogleRequest loginByGoogleRequest)
         {
-            return await _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
+            return _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
                 NewRequest()
                     .Append(EndpointBuilder.User.CheckGoogleToken(loginByGoogleRequest.Email))
                     .Method(Constants.HttpMethods.POST),

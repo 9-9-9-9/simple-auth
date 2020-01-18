@@ -92,7 +92,8 @@ namespace SimpleAuth.Server.Controllers
                 model.ExpireAt(expiryDate);
 
                 _logger.LogInformation($"Access granted for {form.Email} via Google Token");
-                return ReturnResponseUserModel(model);
+
+                return StatusCodes.Status200OK.WithJson(model);
             });
         }
     }

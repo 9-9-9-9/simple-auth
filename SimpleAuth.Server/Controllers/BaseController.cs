@@ -240,6 +240,7 @@ namespace SimpleAuth.Server.Controllers
             var activeRoles = await userService.GetActiveRolesAsync(userId, RequestAppHeaders.Corp,
                 RequestAppHeaders.App,
                 filterRoleEnv, filterRoleTenant);
+            
             return new ResponseUserModel
             {
                 Id = userId,
@@ -250,11 +251,6 @@ namespace SimpleAuth.Server.Controllers
                     Permission = x.Permission.Serialize()
                 }).ToArray()
             };
-        }
-
-        protected IActionResult ReturnResponseUserModel(ResponseUserModel model)
-        {
-            return StatusCodes.Status200OK.WithJson(model);
         }
     }
 
