@@ -27,7 +27,8 @@ namespace SimpleAuth.Server.Controllers
         private readonly IUserValidationService _userValidationService;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IServiceProvider serviceProvider, IEncryptionService encryptionService, IUserValidationService userValidationService) : base(
+        public UserController(IServiceProvider serviceProvider, IEncryptionService encryptionService,
+            IUserValidationService userValidationService) : base(
             serviceProvider)
         {
             _encryptionService = encryptionService;
@@ -115,14 +116,27 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("{userId}/roles")]
         public async Task<IActionResult> GetActiveRoles(string userId)
         {
-            return await GetUser(userId);
+            return await ProcedureDefaultResponseIfError(() =>
+                GetBaseResponseUserModelAsync(userId, Service)
+                    .ContinueWith(x =>
+                        StatusCodes.Status200OK.WithJson(
+                            x.Result
+                                .ActiveRoles
+                                .OrEmpty()
+                                .ToArray()
+                        )
+                    )
+            );
         }
 
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUser(string userId)
         {
             return await ProcedureDefaultResponseIfError(() =>
-                GetBaseResponseUserModelAsync(userId, Service).ContinueWith(x => ReturnResponseUserModel(x.Result))
+                GetBaseResponseUserModelAsync(userId, Service)
+                    .ContinueWith(x =>
+                        StatusCodes.Status200OK.WithJson(x.Result)
+                    )
             );
         }
 
@@ -140,8 +154,10 @@ namespace SimpleAuth.Server.Controllers
                         ePermission,
                         RequestAppHeaders.Corp, RequestAppHeaders.App
                     ).ContinueWith(
-                        x => (x.Result ? StatusCodes.Status200OK : StatusCodes.Status406NotAcceptable)
-                            .WithEmpty()
+                        x => (x.Result
+                                ? StatusCodes.Status200OK
+                                : StatusCodes.Status406NotAcceptable
+                            ).WithEmpty()
                     );
                 }
             );

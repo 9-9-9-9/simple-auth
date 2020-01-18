@@ -9,6 +9,11 @@ namespace WebApiPlayground.Services
 {
     public class DummyUserAuthService : IUserAuthService
     {
+        public Task<RoleModel[]> GetActiveRolesAsync(string userId)
+        {
+            return Task.FromResult(GetDummyUser(userId).ActiveRoles);
+        }
+
         public Task<ResponseUserModel> GetUserAsync(string userId)
         {
             return Task.FromResult(GetDummyUser(userId));
