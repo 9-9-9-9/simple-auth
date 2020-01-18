@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -58,6 +61,10 @@ namespace SimpleAuthServer
                 c.OperationFilter<AddRequiredHeaderParameter>();
                 
                 c.DocumentFilter<TagDescriptionsDocumentFilter>();
+                
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

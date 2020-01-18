@@ -35,6 +35,11 @@ namespace SimpleAuth.Server.Controllers
             _logger = serviceProvider.ResolveLogger<AdministrationController>();
         }
 
+        /// <summary>
+        /// Generate a token, which has to be provided in 'x-corp-token' header for some restricted actions
+        /// </summary>
+        /// <param name="corp">Target corp to generate token, if app does not exists, a newly one with version 1 will be generated</param>
+        /// <returns>A newly created token, with version increased</returns>
         [HttpGet("token/{corp}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -63,6 +68,12 @@ namespace SimpleAuth.Server.Controllers
             return actionResult;
         }
 
+        /// <summary>
+        /// Generate a token, which has to be provided in 'x-app-token' header for some restricted actions
+        /// </summary>
+        /// <param name="corp">Target corp to generate token</param>
+        /// <param name="app">Target app to generate token, if app does not exists, a newly one with version 1 will be generated</param>
+        /// <returns>A newly created token, with version increased</returns>
         [HttpGet("token/{corp}/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

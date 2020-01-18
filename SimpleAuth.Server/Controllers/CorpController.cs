@@ -31,7 +31,12 @@ namespace SimpleAuth.Server.Controllers
             _rolePartsValidationService = rolePartsValidationService;
             _logger = serviceProvider.ResolveLogger<CorpController>();
         }
-
+        
+        /// <summary>
+        /// Generate a token, which has to be provided in 'x-app-token' header for some restricted actions
+        /// </summary>
+        /// <param name="app">Target app to generate token, if app does not exists, a newly one with version 1 will be generated</param>
+        /// <returns>A newly created token, with version increased</returns>
         [HttpGet("token/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
