@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using SimpleAuth.Core.DependencyInjection;
 using SimpleAuth.Core.Utils;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server;
 using SimpleAuth.Server.Models;
 using SimpleAuth.Server.Services;
+using SimpleAuth.Server.Swagger;
 using Constants = SimpleAuth.Shared.Constants;
 
 namespace SimpleAuthServer
@@ -27,7 +29,7 @@ namespace SimpleAuthServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
+
             var secretSection = Configuration.GetSection(Constants.Encryption.Section);
             services.AddSingleton(new EncryptionUtils.EncryptionKeyPair
             {
@@ -43,6 +45,14 @@ namespace SimpleAuthServer
             services.AddTransient<SimpleAuthDbContext, DbContext>();
 
             services.AddSingleton<IGoogleService, DefaultGoogleService>();
+
+            //
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Values Api", Version = "v1"});
+                
+                c.OperationFilter<AddRequiredHeaderParameter>();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +67,7 @@ namespace SimpleAuthServer
             //app.UseHttpsRedirection();
 
             app.UseRouting();
-            
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -66,6 +76,12 @@ namespace SimpleAuthServer
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Values Api V1");
+            });
         }
     }
 }
