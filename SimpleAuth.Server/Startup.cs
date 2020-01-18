@@ -65,6 +65,13 @@ namespace SimpleAuthServer
 
             //TODO HTTPS
             //app.UseHttpsRedirection();
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Values Api V1");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseRouting();
 
@@ -76,12 +83,6 @@ namespace SimpleAuthServer
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-            
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Values Api V1");
-            });
         }
     }
 }

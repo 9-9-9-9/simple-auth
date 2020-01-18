@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
@@ -29,6 +30,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> AddRoleGroup([FromBody] CreateRoleGroupModel model)
         {
             if (model.Name.IsBlank())
@@ -51,6 +55,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("{name}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRoleGroup(string name)
         {
             return await ProcedureResponseForLookUp(() =>
@@ -59,6 +65,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> FindRoleGroups(
             [FromQuery] string term,
             [FromQuery] int? skip,
@@ -75,6 +83,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost("{groupName}/lock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> LockRoleGroup(string groupName)
         {
             return await ProcedureDefaultResponse(async () =>
@@ -91,6 +101,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpDelete("{groupName}/lock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UnlockRoleGroup(string groupName)
         {
             return await ProcedureDefaultResponse(async () =>
@@ -108,6 +120,8 @@ namespace SimpleAuth.Server.Controllers
 
 
         [HttpGet("{groupName}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRoles(string groupName)
         {
             return await ProcedureResponseForArrayLookUp(() =>
@@ -119,6 +133,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost, HttpPut, Route("{groupName}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateRoles(
             string groupName,
             [FromBody] UpdateRolesModel model)
@@ -134,6 +151,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpDelete, Route("{groupName}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteRoles(
             string groupName,
             [FromQuery] string[] roles,

@@ -36,6 +36,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("token/{corp}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GenerateCorpPermissionToken(string corp)
         {
             _logger.LogWarning($"{nameof(GenerateCorpPermissionToken)} for corp {corp}");
@@ -62,6 +64,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("token/{corp}/{app}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GenerateAppPermissionToken(string corp, string app)
         {
             _logger.LogWarning($"{nameof(GenerateAppPermissionToken)} for application {corp}.{app}");
@@ -91,6 +95,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("encrypt")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult EncryptPlainText([FromQuery, Required] string data)
         {
             _logger.LogWarning("Received an encryption request");
@@ -101,6 +107,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("decrypt")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status417ExpectationFailed)]
         public IActionResult DecryptData([FromQuery, Required] string data)
         {
             _logger.LogWarning("Received an decryption request");

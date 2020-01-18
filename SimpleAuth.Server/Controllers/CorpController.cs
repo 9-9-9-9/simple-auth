@@ -33,6 +33,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("token/{app}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GenerateAppPermissionToken(string app)
         {
             _logger.LogWarning($"{nameof(GenerateAppPermissionToken)} for application {RequireCorpToken.Corp}.{app}");

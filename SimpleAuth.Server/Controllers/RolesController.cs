@@ -28,6 +28,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddRole([FromBody] CreateRoleModel model)
         {
             if (!ModelState.IsValid)
@@ -46,6 +48,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> FindRoles(
             [FromQuery, Required] string term,
             [FromQuery] int skip,
@@ -64,6 +68,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost, HttpPut, HttpDelete, Route("{roleId}/lock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateLock(string roleId)
         {
             var spl = roleId.Split(Constants.SplitterRoleParts, 3);
