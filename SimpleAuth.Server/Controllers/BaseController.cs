@@ -220,11 +220,10 @@ namespace SimpleAuth.Server.Controllers
 
                 PushHeaderSize(response.Length);
 
-                return (
-                    response.Any()
-                        ? StatusCodes.Status200OK
-                        : StatusCodes.Status204NoContent
-                ).WithJson(response);
+                if (!response.Any())
+                    return NotFound();
+
+                return StatusCodes.Status200OK.WithJson(response);
             });
         }
 

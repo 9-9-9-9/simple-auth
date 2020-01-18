@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server.Middlewares;
@@ -7,6 +8,7 @@ namespace SimpleAuth.Server.Controllers
 {
     [Route("cache")]
     [RequireAppToken]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CacheController : BaseController
     {
         private readonly ICachedTokenInfoRepository _cachedTokenInfoRepository;
@@ -19,6 +21,7 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet, HttpPost, HttpDelete, Route("clear/token-info")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public void ClearCacheTokenInfo()
         {
             _cachedTokenInfoRepository.Clear(RequestAppHeaders.Corp, RequestAppHeaders.App); // App token

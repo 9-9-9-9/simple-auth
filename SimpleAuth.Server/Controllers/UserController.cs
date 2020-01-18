@@ -37,6 +37,7 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost, HttpPut, Route("{userId}/lock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LockUser(string userId)
         {
             var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
@@ -62,6 +63,10 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost("{userId}/password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CheckPass(string userId, [FromBody] string password)
         {
             return await ProcedureDefaultResponseIfError(async () =>
@@ -90,6 +95,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPut("{userId}/password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ChangePass(string userId, [FromBody] string newPassword)
         {
             var vr = _userValidationService.IsValidPassword(newPassword);
@@ -114,6 +121,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("{userId}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetActiveRoles(string userId)
         {
             return await ProcedureDefaultResponseIfError(() =>
@@ -130,6 +139,8 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet("{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUser(string userId)
         {
             return await ProcedureDefaultResponseIfError(() =>
@@ -141,6 +152,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpGet, HttpPost, Route("{userId}/roles/{roleId}/{permission}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
         {
             return await ProcedureDefaultResponseIfError(() =>
@@ -164,6 +178,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserModel model)
         {
             if (!ModelState.IsValid)
@@ -201,6 +218,9 @@ namespace SimpleAuth.Server.Controllers
         }
 
         [HttpPost, HttpPut, Route("{userId}/role-groups")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> AssignUserToGroupsAsync(string userId,
             [FromBody] ModifyUserRoleGroupsModel modifyUserRoleGroupsModel)
         {
