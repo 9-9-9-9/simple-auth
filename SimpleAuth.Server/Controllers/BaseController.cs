@@ -188,7 +188,7 @@ namespace SimpleAuth.Server.Controllers
                 var response = await lookupActionFactory();
 
                 if (response == null)
-                    return NotFound();
+                    return StatusCodes.Status404NotFound.WithEmpty();
 
                 return StatusCodes.Status200OK.WithJson(response);
             });
@@ -221,7 +221,7 @@ namespace SimpleAuth.Server.Controllers
                 PushHeaderSize(response.Length);
 
                 if (!response.Any())
-                    return NotFound();
+                    return StatusCodes.Status404NotFound.WithEmpty();
 
                 return StatusCodes.Status200OK.WithJson(response);
             });

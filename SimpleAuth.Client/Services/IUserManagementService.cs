@@ -34,7 +34,7 @@ namespace SimpleAuth.Client.Services
                 true,
                 NewRequest()
                     .Append(EndpointBuilder.User.AssignUserToRoleGroups(userId))
-                    .Method(Constants.HttpMethods.PUT),
+                    .Method(Constants.HttpMethods.POST),
                 modifyUserRoleGroupsModel.JsonSerialize()
             );
         }

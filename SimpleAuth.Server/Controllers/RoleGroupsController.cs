@@ -64,6 +64,73 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
+        [HttpGet("{groupName}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetRoles(string groupName)
+        {
+            return await ProcedureResponseForArrayLookUp(() =>
+                FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
+                    .ContinueWith(x =>
+                        x.Result.Roles.OrEmpty().Select(RoleModel.Cast)
+                    )
+            );
+        }
+
+        [HttpPost, Route("{groupName}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateRoles(
+            string groupName,
+            [FromBody] UpdateRolesModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(nameof(ModelState));
+
+            return await ProcedureDefaultResponse(async () =>
+            {
+                var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
+                await Service.AddRolesToGroupAsync(group, model.Roles);
+            });
+        }
+
+        [HttpDelete, Route("{groupName}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteRoles(
+            string groupName,
+            [FromQuery] string[] roles,
+            [FromQuery] bool all)
+        {
+            if (all && roles.IsAny())
+                return BadRequest();
+
+            if (!all && !roles.IsAny())
+                return BadRequest();
+
+            return await ProcedureDefaultResponse(async () =>
+            {
+                var group = new Shared.Domains.RoleGroup
+                {
+                    Name = groupName,
+                    Corp = RequestAppHeaders.Corp,
+                    App = RequestAppHeaders.App
+                };
+                if (all)
+                    await Service.DeleteAllRolesFromGroupAsync(group);
+                else
+                    await Service.DeleteRolesFromGroupAsync(group, roles.Select(RoleUtils.UnMerge)
+                        .Select(tp => new RoleModel
+                        {
+                            Role = tp.Item1,
+                            Permission = tp.Item2.Serialize()
+                        })
+                        .ToArray());
+            });
+        }
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -116,74 +183,6 @@ namespace SimpleAuth.Server.Controllers
                     });
                 }
             );
-        }
-
-
-        [HttpGet("{groupName}/roles")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetRoles(string groupName)
-        {
-            return await ProcedureResponseForArrayLookUp(() =>
-                FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
-                    .ContinueWith(x =>
-                        x.Result.Roles.OrEmpty().Select(RoleModel.Cast)
-                    )
-            );
-        }
-
-        [HttpPost, HttpPut, Route("{groupName}/roles")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateRoles(
-            string groupName,
-            [FromBody] UpdateRolesModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(nameof(ModelState));
-
-            return await ProcedureDefaultResponse(async () =>
-            {
-                var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
-                await Service.AddRolesToGroupAsync(group, model.Roles);
-            });
-        }
-
-        [HttpDelete, Route("{groupName}/roles")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> DeleteRoles(
-            string groupName,
-            [FromQuery] string[] roles,
-            [FromQuery] bool all)
-        {
-            if (all && roles.IsAny())
-                return BadRequest();
-
-            if (!all && !roles.IsAny())
-                return BadRequest();
-
-            return await ProcedureDefaultResponse(async () =>
-            {
-                var group = new Shared.Domains.RoleGroup
-                {
-                    Name = groupName,
-                    Corp = RequestAppHeaders.Corp,
-                    App = RequestAppHeaders.App
-                };
-                if (all)
-                    await Service.DeleteAllRolesFromGroupAsync(group);
-                else
-                    await Service.DeleteRolesFromGroupAsync(group, roles.Select(RoleUtils.UnMerge)
-                        .Select(tp => new RoleModel
-                        {
-                            Role = tp.Item1,
-                            Permission = tp.Item2.Serialize()
-                        })
-                        .ToArray());
-            });
         }
 
         private async Task<Shared.Domains.RoleGroup> FindRoleGroupAsync(string name, string corp, string app)
