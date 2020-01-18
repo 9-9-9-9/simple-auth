@@ -20,7 +20,7 @@ namespace SimpleAuth.Server.Controllers
             _cachedTokenInfoRepository = cachedTokenInfoRepository;
         }
 
-        [HttpGet, HttpPost, HttpDelete, Route("clear/token-info")]
+        [HttpGet, Route("clear/token-info")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public void ClearCacheTokenInfo()
         {

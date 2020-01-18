@@ -57,6 +57,11 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
                     {Constants.Headers.CorpPermission, new StringValues(input)}
                 })
             );
+            res.SetupGet(x => x.Headers).Returns(
+                new HeaderDictionary(new Dictionary<string, StringValues>()
+                {
+                })
+            );
             ctx.SetupGet(x => x.Items).Returns(new Dictionary<object, object>());
 
             var attr = new RequireCorpTokenAttribute();

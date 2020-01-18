@@ -67,7 +67,7 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpPost, HttpPut, HttpDelete, Route("{roleId}/lock")]
+        [HttpPost, HttpDelete, Route("{roleId}/lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateLock(string roleId)

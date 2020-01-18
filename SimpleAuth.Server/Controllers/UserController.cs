@@ -36,7 +36,7 @@ namespace SimpleAuth.Server.Controllers
             _logger = serviceProvider.ResolveLogger<UserController>();
         }
 
-        [HttpPost, HttpPut, Route("{userId}/lock")]
+        [HttpPost, Route("{userId}/lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LockUser(string userId)
         {
@@ -151,7 +151,7 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpGet, HttpPost, Route("{userId}/roles/{roleId}/{permission}")]
+        [HttpGet, Route("{userId}/roles/{roleId}/{permission}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -217,7 +217,7 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
-        [HttpPost, HttpPut, Route("{userId}/role-groups")]
+        [HttpPost, Route("{userId}/role-groups")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

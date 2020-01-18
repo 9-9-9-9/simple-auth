@@ -132,7 +132,7 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        [HttpPost, HttpPut, Route("{groupName}/roles")]
+        [HttpPost, Route("{groupName}/roles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

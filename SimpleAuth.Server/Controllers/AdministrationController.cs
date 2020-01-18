@@ -35,34 +35,6 @@ namespace SimpleAuth.Server.Controllers
             _logger = serviceProvider.ResolveLogger<AdministrationController>();
         }
 
-        [HttpGet("token/{corp}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GenerateCorpPermissionToken(string corp)
-        {
-            _logger.LogWarning($"{nameof(GenerateCorpPermissionToken)} for corp {corp}");
-            
-            if (!_rolePartsValidationService.IsValidCorp(corp).IsValid)
-                return StatusCodes.Status400BadRequest.WithMessage(nameof(corp));
-            
-            var nextTokenVersion = await _tokenInfoService.IncreaseVersionAsync(new TokenInfo
-            {
-                Corp = corp,
-                App = string.Empty
-            });
-
-            var actionResult = StatusCodes.Status201Created.WithMessage(_encryption.Encrypt(new RequireCorpToken
-            {
-                Header = Constants.Headers.CorpPermission,
-                Corp = corp,
-                Version = nextTokenVersion
-            }.ToJson()));
-
-            _logger.LogWarning($"Generated token for {corp} version {nextTokenVersion}");
-            
-            return actionResult;
-        }
-
         [HttpGet("token/{corp}/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -91,6 +63,34 @@ namespace SimpleAuth.Server.Controllers
             
             _logger.LogWarning($"Generated token for {corp}.{app} version {nextTokenVersion}");
 
+            return actionResult;
+        }
+
+        [HttpGet("token/{corp}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GenerateCorpPermissionToken(string corp)
+        {
+            _logger.LogWarning($"{nameof(GenerateCorpPermissionToken)} for corp {corp}");
+            
+            if (!_rolePartsValidationService.IsValidCorp(corp).IsValid)
+                return StatusCodes.Status400BadRequest.WithMessage(nameof(corp));
+            
+            var nextTokenVersion = await _tokenInfoService.IncreaseVersionAsync(new TokenInfo
+            {
+                Corp = corp,
+                App = string.Empty
+            });
+
+            var actionResult = StatusCodes.Status201Created.WithMessage(_encryption.Encrypt(new RequireCorpToken
+            {
+                Header = Constants.Headers.CorpPermission,
+                Corp = corp,
+                Version = nextTokenVersion
+            }.ToJson()));
+
+            _logger.LogWarning($"Generated token for {corp} version {nextTokenVersion}");
+            
             return actionResult;
         }
 
