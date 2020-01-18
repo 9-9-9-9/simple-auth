@@ -15,6 +15,9 @@ using SimpleAuth.Shared.Validation;
 
 namespace SimpleAuth.Server.Controllers
 {
+    /// <summary>
+    /// Master controller for administration. By providing a master token as `x-master-token` header, requester can access ultimate features
+    /// </summary>
     [Route("admin")]
     [RequireMasterToken]
     public class AdministrationController : BaseController
@@ -24,6 +27,9 @@ namespace SimpleAuth.Server.Controllers
         private readonly IRolePartsValidationService _rolePartsValidationService;
         private readonly ILogger<AdministrationController> _logger;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public AdministrationController(IServiceProvider serviceProvider,
             IEncryptionService encryption,
             ITokenInfoService tokenInfoService,
@@ -40,6 +46,8 @@ namespace SimpleAuth.Server.Controllers
         /// </summary>
         /// <param name="corp">Target corp to generate token, if app does not exists, a newly one with version 1 will be generated</param>
         /// <returns>A newly created token, with version increased</returns>
+        /// <response code="200">Token generated successfully</response>
+        /// <response code="400">Specified corp is malformed</response>
         [HttpGet("token/{corp}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,6 +82,8 @@ namespace SimpleAuth.Server.Controllers
         /// <param name="corp">Target corp to generate token</param>
         /// <param name="app">Target app to generate token, if app does not exists, a newly one with version 1 will be generated</param>
         /// <returns>A newly created token, with version increased</returns>
+        /// <response code="200">Token generated successfully</response>
+        /// <response code="400">Specified corp/app is malformed</response>
         [HttpGet("token/{corp}/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -105,6 +115,13 @@ namespace SimpleAuth.Server.Controllers
             return actionResult;
         }
 
+        /// <summary>
+        /// Encrypt text using the master public key, use at your own risk
+        /// </summary>
+        /// <param name="data">Data to be encrypted</param>
+        /// <returns>Data which were encrypted by public key, default encryption method using RSA 2048</returns>
+        /// <response code="200">Encrypted text from input data</response>
+        /// <response code="400">Input data was blank</response>
         [HttpGet("encrypt")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,6 +134,15 @@ namespace SimpleAuth.Server.Controllers
             return StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(data));
         }
 
+        
+        /// <summary>
+        /// Decrypt data using the master private key, use at your own risk
+        /// </summary>
+        /// <param name="data">Data to be decrypted</param>
+        /// <returns>Data which were decrypted using master private key, default encryption method using RSA 2048</returns>
+        /// <response code="200">Decrypted value from input data</response>
+        /// <response code="400">Input data was blank</response>
+        /// <response code="417">Error occured during decryption. Perhaps input data was incorrect, something which was not encrypted using master public/private key pair</response>
         [HttpGet("decrypt")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -16,6 +16,9 @@ using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Server.Controllers
 {
+    /// <summary>
+    /// Reserved Endpoint for serving requests relate to Google, such as sign-in using OAuth token
+    /// </summary>
     [Microsoft.AspNetCore.Components.Route("api/external/google")]
     [RequireAppToken]
     public class GoogleController : BaseController<IUserService, IUserRepository, User>
@@ -23,6 +26,9 @@ namespace SimpleAuth.Server.Controllers
         private readonly IGoogleService _googleService;
         private readonly ILogger<UserController> _logger;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public GoogleController(IServiceProvider serviceProvider,
             IGoogleService googleService) : base(
             serviceProvider)
@@ -31,7 +37,21 @@ namespace SimpleAuth.Server.Controllers
             _logger = serviceProvider.ResolveLogger<UserController>();
         }
 
+        /// <summary>
+        /// User can get roles and permissions via Google OAuth, just by sending token and request some additional checking
+        /// </summary>
+        /// <returns>User information, include active roles</returns>
+        /// <response code="200">Checked everything with a good result</response>
+        /// <response code="404">User had not been registered in the specified Corp</response>
+        /// <response code="423">User had been locked in the specified Corp</response>
+        /// <response code="412">Cannot Google for verifying token</response>
+        /// <response code="406">There are some mis-match/invalidated information from token info that does not fit requirement</response>
         [HttpPost("token")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status423Locked)]
+        [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         public async Task<IActionResult> GetUserByGoogleToken([FromBody] LoginByGoogleRequest form)
         {
             if (!ModelState.IsValid)
@@ -82,7 +102,7 @@ namespace SimpleAuth.Server.Controllers
                 if (DateTime.UtcNow > expiryDate)
                 {
                     _logger.LogWarning($"User {form.Email} provided an expired google token");
-                    return StatusCodes.Status406NotAcceptable.WithMessage(
+                    throw new DataVerificationMismatchException(
                         "Token already expired"
                     );
                 }

@@ -13,6 +13,9 @@ using SimpleAuth.Shared.Validation;
 
 namespace SimpleAuth.Server.Controllers
 {
+    /// <summary>
+    /// Controller for managing Corp. By providing a corp-level token as `x-corp-token` header, requester can access features
+    /// </summary>
     [Route("corp")]
     [RequireCorpToken]
     public class CorpController : BaseController
@@ -22,6 +25,9 @@ namespace SimpleAuth.Server.Controllers
         private readonly IRolePartsValidationService _rolePartsValidationService;
         private readonly ILogger<CorpController> _logger;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public CorpController(IServiceProvider serviceProvider, IEncryptionService encryption,
             ITokenInfoService tokenInfoService, IRolePartsValidationService rolePartsValidationService) 
             : base(serviceProvider)
@@ -37,6 +43,8 @@ namespace SimpleAuth.Server.Controllers
         /// </summary>
         /// <param name="app">Target app to generate token, if app does not exists, a newly one with version 1 will be generated</param>
         /// <returns>A newly created token, with version increased</returns>
+        /// <response code="200">Token generated successfully</response>
+        /// <response code="400">Specified app is malformed</response>
         [HttpGet("token/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

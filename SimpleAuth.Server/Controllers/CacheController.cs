@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server.Middlewares;
+#pragma warning disable 1591
 
 namespace SimpleAuth.Server.Controllers
 {
