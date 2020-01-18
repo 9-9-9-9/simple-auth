@@ -18,12 +18,12 @@ namespace SimpleAuth.Server.Swagger
             if (context.MethodInfo.DeclaringType?.GetCustomAttribute<RequireAppTokenAttribute>() != null)
                 operation.Parameters.AddHeaderRequirement(
                     Constants.Headers.AppPermission,
-                    "Token contains Corp and App information, indicate target of requesting"
+                    $"Token contains Corp and App information, indicate target of requesting. Response contains headers '{Constants.Headers.SourceCorp}' and '{Constants.Headers.SourceApp}' are values by this token"
                 );
             else if (context.MethodInfo.DeclaringType?.GetCustomAttribute<RequireCorpTokenAttribute>() != null)
                 operation.Parameters.AddHeaderRequirement(
                     Constants.Headers.CorpPermission,
-                    "Token contains Corp information, indicate target of requesting"
+                    $"Token contains Corp information, indicate target of requesting. Response contains header '{Constants.Headers.SourceCorp}' is value by this token"
                 );
             else if (context.MethodInfo.DeclaringType?.GetCustomAttribute<RequireMasterTokenAttribute>() != null)
                 operation.Parameters.AddHeaderRequirement(
