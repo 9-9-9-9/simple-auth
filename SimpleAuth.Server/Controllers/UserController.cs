@@ -19,6 +19,9 @@ using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
 
 namespace SimpleAuth.Server.Controllers
 {
+    /// <summary>
+    /// Serves requests relate to user management, user authentication/authorization
+    /// </summary>
     [Route("api/users")]
     [RequireAppToken]
     public class UserController : BaseController<IUserService, IUserRepository, User>
@@ -27,6 +30,9 @@ namespace SimpleAuth.Server.Controllers
         private readonly IUserValidationService _userValidationService;
         private readonly ILogger<UserController> _logger;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public UserController(IServiceProvider serviceProvider, IEncryptionService encryptionService,
             IUserValidationService userValidationService) : base(
             serviceProvider)
@@ -36,6 +42,15 @@ namespace SimpleAuth.Server.Controllers
             _logger = serviceProvider.ResolveLogger<UserController>();
         }
 
+        /// <summary>
+        /// Create user in the specific Corp, the target Corp will be retrieved from 'x-app-token'.
+        /// Based on specification of SimpleAuth, user is at Corp's level,
+        /// therefore need to register user at Corp in order to use features
+        /// </summary>
+        /// <param name="model">User information</param>
+        /// <response code="201">User created successfully</response>
+        /// <response code="400">Request model is invalid</response>
+        /// <response code="409">Corp already has that user id</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -76,6 +91,11 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Get user's information.
+        /// </summary>
+        /// <param name="userId">Selected user id</param>
+        /// <returns><see cref="SimpleAuth.Shared.Models.ResponseUserModel"/></returns>
         [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -89,6 +109,15 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
+        /// <summary>
+        /// Assign user to specific Role Group of the same Corp, same App.
+        /// In order to grant permission for user, manager has to set permissions for role group and then assign user to that group if user is not belong to it.
+        /// </summary>
+        /// <param name="userId">The target user which should be granted permission</param>
+        /// <param name="modifyUserRoleGroupsModel">The target role groups which should take the user</param>
+        /// <response code="200">Assign user to the specific role groups completed</response>
+        /// <response code="400">Request model is invalid</response>
+        /// <response code="404">Target user id or role group not found</response>
         [HttpPost, Route("{userId}/role-groups")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -121,6 +150,13 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
+        /// <summary>
+        /// Get the current active roles of an user, but for the current corp and app only, another corp/app are excluded
+        /// </summary>
+        /// <param name="userId">The target user which should be checked</param>
+        /// <returns>Array of <see cref="SimpleAuth.Shared.Models.RoleModel"/></returns>
+        /// <response code="200">Retrieve information without any problem</response>
+        /// <response code="404">User id could not be found</response>
         [HttpGet("{userId}/roles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -139,6 +175,16 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
+        /// <summary>
+        /// Check if user has specific permission
+        /// </summary>
+        /// <param name="userId">User to be checked</param>
+        /// <param name="roleId">Role to be checked, with full parts, example: corp.app.env.tenant.module.subModules</param>
+        /// <param name="permission">Serialized permission (byte value)</param>
+        /// <returns>No content but status code is 200 if user has permission, 406 if user doesn't have that permission</returns>
+        /// <response code="200">User HAS the required permission</response>
+        /// <response code="406">User DOES NOT HAVE the required permission</response>
+        /// <response code="404">User is not exists</response>
         [HttpGet, Route("{userId}/roles/{roleId}/{permission}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
@@ -165,6 +211,16 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
+        /// <summary>
+        /// Get user's information, if the specified user and password are correct
+        /// </summary>
+        /// <param name="userId">User id to check</param>
+        /// <param name="password">Plain-text password of the user</param>
+        /// <returns>If password of user is correct, then user's information will be responded to client</returns>
+        /// <response code="200">Password is match and response information</response>
+        /// <response code="404">User not found</response>
+        /// <response code="412">User does not has password, thus can not be checked</response>
+        /// <response code="401">Password mis-match</response>
         [HttpPost("{userId}/password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -189,7 +245,7 @@ namespace SimpleAuth.Server.Controllers
 
                 if (!pwdMatch)
                 {
-                    _logger.LogInformation($"Password miss-match for user {userId}");
+                    _logger.LogInformation($"Password mis-match for user {userId}");
                     return Unauthorized();
                 }
 
@@ -197,6 +253,13 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Change password of user within Corp
+        /// </summary>
+        /// <param name="userId">User to change pass</param>
+        /// <param name="newPassword">Plain text of the new password</param>
+        /// <response code="200">Password updated successfully</response>
+        /// <response code="400">Password is malformed</response>
         [HttpPut("{userId}/password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -223,13 +286,16 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Lock a specific user
+        /// </summary>
+        /// <param name="userId">User to be locked</param>
+        /// <response code="200">Operation completed successfully</response>
         [HttpPost, Route("{userId}/lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LockUser(string userId)
         {
-            var @lock = !Request.Method.EqualsIgnoreCase(HttpMethods.Delete);
-
-            _logger.LogInformation($"Update LOCK status of UserId {userId} to {@lock}");
+            _logger.LogInformation($"LOCK User {userId}");
 
             return await ProcedureDefaultResponse(async () =>
                 {
@@ -241,7 +307,36 @@ namespace SimpleAuth.Server.Controllers
                             new LocalUserInfo
                             {
                                 Corp = RequestAppHeaders.Corp,
-                                Locked = @lock
+                                Locked = true
+                            }
+                        }
+                    });
+                }
+            );
+        }
+
+        /// <summary>
+        /// Un-Lock a specific user
+        /// </summary>
+        /// <param name="userId">User to be unlocked</param>
+        /// <response code="200">Operation completed successfully</response>
+        [HttpDelete, Route("{userId}/lock")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> UnLockUser(string userId)
+        {
+            _logger.LogInformation($"UnLock User {userId}");
+
+            return await ProcedureDefaultResponse(async () =>
+                {
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.User
+                    {
+                        Id = userId,
+                        LocalUserInfos = new[]
+                        {
+                            new LocalUserInfo
+                            {
+                                Corp = RequestAppHeaders.Corp,
+                                Locked = false
                             }
                         }
                     });
