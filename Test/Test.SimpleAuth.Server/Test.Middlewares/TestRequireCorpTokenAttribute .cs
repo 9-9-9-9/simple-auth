@@ -50,7 +50,7 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
                 .WithLogger<RequireCorpTokenAttribute>()
                 .WithIn<IEncryptionService>(new DummyEncryptionService())
                 .With<ITokenInfoService>(out var tkn);
-            tkn.Setup(x => x.GetCurrentVersionAsync(It.IsAny<TokenInfo>())).ReturnsAsync(1);
+            tkn.Setup(x => x.GetCurrentVersionAsync(It.IsAny<TokenInfo>(), It.IsAny<bool>())).ReturnsAsync(1);
 
             ctx.SetupGet(x => x.Items).Returns(new Dictionary<object, object>());
 
