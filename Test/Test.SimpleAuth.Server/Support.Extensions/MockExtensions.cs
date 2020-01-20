@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Language.Flow;
+using SimpleAuth.Server.Controllers;
 
 namespace Test.SimpleAuth.Server.Support.Extensions
 {
@@ -28,6 +30,12 @@ namespace Test.SimpleAuth.Server.Support.Extensions
             where T : class
         {
             return setup.Returns(Task.FromResult(result));
+        }
+
+        public static Mock<IServiceProvider> SetupLogger<T>(this Mock<IServiceProvider> isp, Mock<ILogger<T>> mockLogger)
+        {
+            isp.Setup(x => x.GetService(typeof(ILogger<T>))).Returns(mockLogger.Object);
+            return isp;
         }
 
         public class FutureSetup<T> where T : class

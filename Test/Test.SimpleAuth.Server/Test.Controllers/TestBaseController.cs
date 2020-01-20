@@ -192,6 +192,8 @@ namespace Test.SimpleAuth.Server.Test.Controllers
                 var uRepo = M<IRoleRepository>();
                 isp.Setup(x => x.GetService(typeof(IRoleRepository)))
                     .Returns(uRepo.Object);
+                
+                isp.SetupLogger(MLog<RolesController>());
 
                 var controller = new RolesController(isp.Object, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
@@ -246,6 +248,8 @@ namespace Test.SimpleAuth.Server.Test.Controllers
                 var uRepo = M<IRoleGroupRepository>();
                 isp.Setup(x => x.GetService(typeof(IRoleGroupRepository)))
                     .Returns(uRepo.Object);
+
+                isp.SetupLogger(MLog<RoleGroupsController>());
 
                 var controller = new RoleGroupsController(isp.Object, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
