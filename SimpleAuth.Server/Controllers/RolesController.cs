@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleAuth.Repositories;
+using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;

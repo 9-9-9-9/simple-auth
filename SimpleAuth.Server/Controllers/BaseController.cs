@@ -124,8 +124,17 @@ namespace SimpleAuth.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Procedure an action result based on Exception
+        /// </summary>
+        /// <param name="ex">Exception occured</param>
+        /// <returns>Response with default HTTP status code and response body</returns>
+        /// <exception cref="Exception">Rethrow exception if input exception not belong to any pre-defined</exception>
         protected IActionResult DefaultExceptionHandler(Exception ex)
         {
+            if (ex == null)
+                throw new ArgumentNullException(nameof(ex));
+            
             if (ex is EntityAlreadyExistsException || ex is ConstraintViolationException)
             {
                 return StatusCodes.Status409Conflict.WithMessage(ex.Message);
@@ -169,6 +178,10 @@ namespace SimpleAuth.Server.Controllers
             throw ex;
         }
 
+        /// <summary>
+        /// Response status code 201 Created if action executed successfully, or others status code if error 
+        /// </summary>
+        /// <param name="actionFactory">Action to be executed</param>
         protected async Task<IActionResult> ProcedureResponseForPersistAction(Func<Task> actionFactory)
         {
             return await ProcedureDefaultResponseIfError(async () =>
@@ -178,6 +191,10 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Response status code 200 OK if action executed successfully, or others status code if error 
+        /// </summary>
+        /// <param name="actionFactory">Action to be executed</param>
         protected async Task<IActionResult> ProcedureDefaultResponse(Func<Task> actionFactory)
         {
             return await ProcedureDefaultResponseIfError(async () =>
@@ -187,6 +204,11 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Response status 200 OK with serialized array of result as application/json, 404 NotFound if no element, a header contains size of result will be added
+        /// </summary>
+        /// <param name="lookupActionFactory">Lookup action to be executed</param>
+        /// <returns>Json serialized array of results</returns>
         protected async Task<IActionResult> ProcedureResponseForArrayLookUp<T>(
             Func<Task<IEnumerable<T>>> lookupActionFactory)
         {
@@ -202,6 +224,11 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Response status 200 OK with result as application/json, 404 NotFound if no result found
+        /// </summary>
+        /// <param name="lookupActionFactory">Lookup action to be executed</param>
+        /// <returns>Json serialized result</returns>
         protected async Task<IActionResult> ProcedureResponseForLookUp<T>(Func<Task<T>> lookupActionFactory)
         {
             return await ProcedureDefaultResponseIfError(async () =>
@@ -215,6 +242,14 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Response status 200 OK with serialized array of result as application/json, 404 NotFound if no element, a header contains size of result will be added
+        /// </summary>
+        /// <param name="lookupActionFactory">Lookup action to be executed</param>
+        /// <param name="term">Term of searching</param>
+        /// <param name="skip">Used for paging</param>
+        /// <param name="take">Used for paging</param>
+        /// <returns>Json serialized array of results</returns>
         protected async Task<IActionResult> ProcedureResponseForLookUpArrayUsingTerm<T>(
             string term, int? skip, int? take,
             Func<FindOptions, Task<IEnumerable<T>>> lookupActionFactory)
@@ -248,6 +283,13 @@ namespace SimpleAuth.Server.Controllers
             });
         }
 
+        /// <summary>
+        /// Find a user and response it
+        /// </summary>
+        /// <param name="userId">ID of user to lookup</param>
+        /// <param name="userService">User domain service, to be used for lookup by user id</param>
+        /// <returns>Model of user</returns>
+        /// <exception cref="EntityNotExistsException">When user not found, using this method should be wrapped in a safe context</exception>
         protected async Task<ResponseUserModel> GetBaseResponseUserModelAsync(string userId, IUserService userService)
         {
             var user = userService.GetUser(userId, RequestAppHeaders.Corp);
@@ -274,14 +316,23 @@ namespace SimpleAuth.Server.Controllers
         }
     }
 
+    /// <inheritdoc />
     public abstract class BaseController<TService, TRepo, TEntity> : BaseController
         where TService : IDomainService
         where TRepo : IRepository<TEntity>
         where TEntity : BaseEntity
     {
+        /// <summary>
+        /// Domain service
+        /// </summary>
         protected readonly TService Service;
+        
+        /// <summary>
+        /// Entity repository
+        /// </summary>
         protected readonly TRepo Repository;
 
+        /// <inheritdoc />
         protected BaseController(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             Repository = serviceProvider.GetRequiredService<TRepo>();

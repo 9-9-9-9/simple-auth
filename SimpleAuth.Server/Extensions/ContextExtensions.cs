@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -25,6 +26,14 @@ namespace SimpleAuth.Server.Extensions
         public static ILogger<T> ResolveLogger<T>(this ActionExecutingContext actionExecutingContext)
         {
             return actionExecutingContext.HttpContext.ResolveService<ILogger<T>>();
+        }
+        
+        /// <summary>
+        /// Provide a minimum typing to resolve an ILogger class
+        /// </summary>
+        public static ILogger<T> ResolveLogger<T>(this IServiceProvider serviceProvider)
+        {
+            return serviceProvider.GetService<ILogger<T>>();
         }
 
         /// <summary>
