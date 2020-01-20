@@ -12,9 +12,15 @@ using SimpleAuth.Shared.Domains;
 
 namespace SimpleAuth.Server.Middlewares
 {
+    /// <summary>
+    /// Controllers/Actions which has this attribute, requires Corp-level token in header named x-corp-token
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class RequireCorpTokenAttribute : BaseActionFilterAttribute
     {
+        /// <summary>
+        /// Do the business
+        /// </summary>
         protected override void ComputeAndModifyIfNeeded(ActionExecutingContext actionExecutingContext)
         {
             var logger = actionExecutingContext.ResolveLogger<RequireCorpTokenAttribute>();

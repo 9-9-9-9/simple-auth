@@ -10,9 +10,15 @@ using SimpleAuth.Shared;
 
 namespace SimpleAuth.Server.Middlewares
 {
+    /// <summary>
+    /// Controllers/Actions which has this attribute, requires master token in header named x-master-token
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class RequireMasterTokenAttribute : BaseActionFilterAttribute
     {
+        /// <summary>
+        /// Do the business
+        /// </summary>
         protected override void ComputeAndModifyIfNeeded(ActionExecutingContext actionExecutingContext)
         {
             var expectedToken =

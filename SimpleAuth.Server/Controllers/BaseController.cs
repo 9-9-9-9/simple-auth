@@ -18,10 +18,19 @@ using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Server.Controllers
 {
+    /// <summary>
+    /// Base controller, provide utilities for inherited controllers
+    /// </summary>
     public abstract class BaseController : ControllerBase
     {
+        /// <summary>
+        /// To be used to resolve services
+        /// </summary>
         protected IServiceProvider ServiceProvider;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         protected BaseController(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
@@ -29,6 +38,9 @@ namespace SimpleAuth.Server.Controllers
 
         private RequestAppHeaders _requestAppHeaders;
 
+        /// <summary>
+        /// Decrypted content from x-app-token, this store details about Corp/App which requester is trying to interact with
+        /// </summary>
         protected RequestAppHeaders RequestAppHeaders
         {
             get
@@ -46,6 +58,9 @@ namespace SimpleAuth.Server.Controllers
 
         private RequireCorpToken _requireCorpToken;
 
+        /// <summary>
+        /// Decrypted content from x-corp-token, this store details about Corp which requester is trying to interact with
+        /// </summary>
         protected RequireCorpToken RequireCorpToken
         {
             get
@@ -61,6 +76,10 @@ namespace SimpleAuth.Server.Controllers
             }
         }
 
+        /// <summary>
+        /// Get a request header
+        /// </summary>
+        /// <param name="key">Name of the header</param>
         protected string GetHeader(string key)
         {
             var stringValues = HttpContext.Request.Headers[key];
@@ -69,33 +88,35 @@ namespace SimpleAuth.Server.Controllers
             return stringValues.FirstOrDefault(x => !x.IsBlank());
         }
 
+        /// <summary>
+        /// Procedure an Forbidden result, to be responded to client to notice that there is a mismatch between requested Corp/App resource and x-app-token/x-corp-token provided
+        /// </summary>
+        /// <returns>403 Forbidden</returns>
         protected IActionResult CrossAppToken()
         {
             return StatusCodes.Status403Forbidden.WithMessage($"Cross app token by {Constants.Headers.AppPermission}");
         }
 
+        /// <summary>
+        /// Push a header to response headers collection, indicate this is a response for a search action and provide information about how many the number of results found
+        /// </summary>
+        /// <param name="size">Size of result</param>
+        /// <param name="collectionNo">In case multiple search, use this to indicate identity of the search</param>
         protected void PushHeaderSize(int size, int collectionNo = 1)
         {
             Response.Headers.Add($"CSize{collectionNo}", size.ToString());
         }
 
+        /// <summary>
+        /// Think this is a try/catch, which response http status code based on Exception if any, default response if no error is 200 OK
+        /// </summary>
+        /// <param name="valueFactory">Action to be executed</param>
+        /// <returns>Http status code 200 if execute success, others http status code if exception occured</returns>
         protected async Task<IActionResult> ProcedureDefaultResponseIfError(Func<Task<IActionResult>> valueFactory)
         {
             try
             {
                 return await valueFactory();
-            }
-            catch (Exception e)
-            {
-                return DefaultExceptionHandler(e);
-            }
-        }
-
-        protected IActionResult ProcedureDefaultResponseIfError(Func<IActionResult> valueFactory)
-        {
-            try
-            {
-                return valueFactory();
             }
             catch (Exception e)
             {
