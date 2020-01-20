@@ -83,7 +83,9 @@ namespace SimpleAuth.Repositories
         {
             using var ctx = OpenConnect();
             var dbSet = Include(ctx.Set<TEntity>());
-            return FindManyQueryBuilder(dbSet, expressions, findOptions).ToImmutableArray();
+            var queryable = FindManyQueryBuilder(dbSet, expressions);
+            queryable = ApplyFindOption(queryable, findOptions);
+            return queryable.ToImmutableArray();
         }
 
         public virtual IEnumerable<TEntity> FindManyOrdered<TKey>(
@@ -93,7 +95,7 @@ namespace SimpleAuth.Repositories
         {
             using var ctx = OpenConnect();
             var dbSet = Include(ctx.Set<TEntity>());
-            var queryable = FindManyQueryBuilder(dbSet, expressions, findOptions);
+            var queryable = FindManyQueryBuilder(dbSet, expressions);
 
             if (orderByOption?.Expression != null)
             {
@@ -103,20 +105,25 @@ namespace SimpleAuth.Repositories
                     queryable = queryable.OrderBy(orderByOption.Expression);
             }
 
+            queryable = ApplyFindOption(queryable, findOptions);
+
             return queryable.ToImmutableArray();
         }
 
         private IQueryable<TEntity> FindManyQueryBuilder(IQueryable<TEntity> queryable,
-            IEnumerable<Expression<Func<TEntity, bool>>> expressions,
-            FindOptions findOptions = null)
+            IEnumerable<Expression<Func<TEntity, bool>>> expressions)
         {
-            findOptions ??= new FindOptions();
-
-            queryable = expressions
+            return expressions
                 .Aggregate(
                     queryable,
                     (current, expression) => current.Where(expression)
                 );
+        }
+
+        private IQueryable<TEntity> ApplyFindOption(IQueryable<TEntity> queryable,
+            FindOptions findOptions = null)
+        {
+            findOptions ??= new FindOptions();
 
             if (findOptions.Skip > 0)
                 queryable = queryable.Skip(findOptions.Skip);
@@ -181,7 +188,7 @@ namespace SimpleAuth.Repositories
         {
             await using var ctx = OpenConnect();
             var dbSet = Include(ctx.Set<TEntity>());
-            return await dbSet.SingleOrDefaultAsync(e => e.Id.Equals(id));   
+            return await dbSet.SingleOrDefaultAsync(e => e.Id.Equals(id));
         }
     }
 
