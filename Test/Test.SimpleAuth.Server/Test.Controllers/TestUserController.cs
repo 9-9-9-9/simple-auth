@@ -53,7 +53,7 @@ namespace Test.SimpleAuth.Server.Test.Controllers
 
         protected UserController SetupController(IUserService userService)
         {
-            var isp = MoqU.OfServiceProviderFor<UserController>()
+            var isp = Mu.OfServiceProviderFor<UserController>()
                 .WithIn(userService)
                 .WithIn(MRepo().Object);
 

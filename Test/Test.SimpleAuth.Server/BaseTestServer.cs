@@ -16,7 +16,7 @@ namespace Test.SimpleAuth.Server
     {
         protected Mock<T> M<T>(MockBehavior mockBehavior = MockBehavior.Strict) where T : class
         {
-            return MoqU.Of<T>(mockBehavior);
+            return Mu.Of<T>(mockBehavior);
         }
     }
 
