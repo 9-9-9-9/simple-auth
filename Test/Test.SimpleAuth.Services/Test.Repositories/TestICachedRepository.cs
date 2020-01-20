@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using Test.Shared;
 using Test.SimpleAuth.Shared.Mock.Repositories;
 
 namespace Test.SimpleAuth.Shared.Test.Repositories

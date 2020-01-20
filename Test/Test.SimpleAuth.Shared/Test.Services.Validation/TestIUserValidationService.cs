@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using SimpleAuth.Shared.Validation;
+using Test.Shared;
 
 namespace Test.SimpleAuth.Shared.Services.Validation
 {

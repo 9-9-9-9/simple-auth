@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SimpleAuth.Core.Utils;
 using SimpleAuth.Services;
 using SimpleAuth.Shared;
+using Test.Shared;
 
 namespace Test.SimpleAuth.Shared.Services
 {

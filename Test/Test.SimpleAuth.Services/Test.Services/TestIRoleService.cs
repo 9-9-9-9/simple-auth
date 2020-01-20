@@ -6,6 +6,7 @@ using SimpleAuth.Repositories;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Exceptions;
+using Test.Shared;
 
 namespace Test.SimpleAuth.Shared.Services
 {

@@ -16,4 +16,11 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\DatabasesImplementation\SimpleAuth.InMemoryDb\SimpleAuth.InMemoryDb.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Services\SimpleAuth.Services.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
+    </ItemGroup>
+
 </Project>

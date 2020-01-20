@@ -8,6 +8,7 @@ using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
+using Test.Shared;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
 using User = SimpleAuth.Shared.Domains.User;
 
