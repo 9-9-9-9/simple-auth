@@ -45,29 +45,4 @@ namespace Test.SimpleAuth.Server
         protected Mock<TSvc> MSvc(MockBehavior mockBehavior = MockBehavior.Strict) => M<TSvc>(mockBehavior);
         protected Mock<TRepo> MRepo(MockBehavior mockBehavior = MockBehavior.Strict) => M<TRepo>(mockBehavior);
     }
-
-    public static class BaseTestControllerExtensions
-    {
-        public static TController WithCtx<TController>(this TController controller) where TController : ControllerBase
-        {
-            controller.ControllerContext = new ControllerContext();
-            return controller;
-        }
-        
-        public static TController WithHttpCtx<TController>(this TController controller) where TController : ControllerBase
-        {
-            if (controller.ControllerContext == null)
-                controller = controller.WithCtx();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            return controller;
-        }
-        
-        public static TController WithCtx<TController>(this TController controller, Mock<HttpContext> httpCtx) where TController : ControllerBase
-        {
-            if (controller.ControllerContext == null)
-                controller = controller.WithCtx();
-            controller.ControllerContext.HttpContext = httpCtx.Object;
-            return controller;
-        }
-    }
 }
