@@ -7,9 +7,15 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SimpleAuth.Server.Swagger
 {
+    /// <summary>
+    /// With the controllers which has RequireApp/Corp/MasterToken attributes, a header is require, thus need some details about it
+    /// </summary>
     // ReSharper disable once ClassNeverInstantiated.Global
     public class AddRequiredHeaderParameter : IOperationFilter
     {
+        /// <summary>
+        /// Apply command based details from reflection
+        /// </summary>
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             if (operation.Parameters == null)

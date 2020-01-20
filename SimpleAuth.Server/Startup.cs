@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -13,6 +16,7 @@ using SimpleAuth.Server.Models;
 using SimpleAuth.Server.Services;
 using SimpleAuth.Server.Swagger;
 using Constants = SimpleAuth.Shared.Constants;
+#pragma warning disable 1591
 
 namespace SimpleAuthServer
 {
@@ -50,14 +54,17 @@ namespace SimpleAuthServer
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {
-                    Title = "Values Api", 
-                    Version = "v1", 
+                    Title = "SimpleAuth full API", 
                     Description = "<a href='https://github.com/9-9-9-9/simple-auth'>Watch me on GitHub</a>"
                 });
                 
                 c.OperationFilter<AddRequiredHeaderParameter>();
                 
                 c.DocumentFilter<TagDescriptionsDocumentFilter>();
+                
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
         }
 
@@ -75,7 +82,7 @@ namespace SimpleAuthServer
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Values Api V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SimpleAuth full API");
                 c.RoutePrefix = string.Empty;
             });
 
