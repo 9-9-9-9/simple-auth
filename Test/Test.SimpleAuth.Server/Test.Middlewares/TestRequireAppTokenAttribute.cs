@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
@@ -51,9 +50,8 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
             var scp = M<IServiceScope>();
             var fac = M<IServiceScopeFactory>();
             var tkn = M<ITokenInfoService>();
-            var log = MLog<RequireAppTokenAttribute>();
 
-            svc.Setup(x => x.GetService(typeof(ILogger<RequireAppTokenAttribute>))).Returns(log.Object);
+            svc.WithLogger<RequireAppTokenAttribute>();
             svc.Setup(x => x.GetService(typeof(IEncryptionService))).Returns(new DummyEncryptionService());
             tkn.Setup(x => x.GetCurrentVersionAsync(It.IsAny<TokenInfo>())).ReturnsAsync(1);
             svc.Setup(x => x.GetService(typeof(ITokenInfoService))).Returns(tkn.Object);

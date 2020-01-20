@@ -54,6 +54,13 @@ namespace Test.SimpleAuth.Server.Support.Extensions
             return mock;
         }
 
+        public static Mock<IServiceProvider> WithIn<TMock>(this Mock<IServiceProvider> mock, in TMock newMockObj)
+            where TMock : class
+        {
+            mock.Setup(x => x.GetService(typeof(TMock))).Returns(newMockObj);
+            return mock;
+        }
+
         public class FutureSetup<T> where T : class
         {
             private Mock<T> _mock;

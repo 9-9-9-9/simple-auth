@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SimpleAuth.Repositories;
@@ -11,6 +10,7 @@ using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Exceptions;
 using Test.Shared.Extensions;
+using Test.Shared.Utils;
 using Test.SimpleAuth.Server.Support.Extensions;
 using MockExtensions = Test.SimpleAuth.Server.Support.Extensions.MockExtensions;
 
@@ -53,16 +53,9 @@ namespace Test.SimpleAuth.Server.Test.Controllers
 
         protected UserController SetupController(IUserService userService)
         {
-            var isp = Isp();
-            isp.Setup(x => x.GetService(typeof(IUserService)))
-                .Returns(userService);
-
-            isp.Setup(x => x.GetService(typeof(ILogger<UserController>)))
-                .Returns(MLog<UserController>().Object);
-            
-            var uRepo = MRepo();
-            isp.Setup(x => x.GetService(typeof(IUserRepository)))
-                .Returns(uRepo.Object);
+            var isp = MoqU.OfServiceProviderFor<UserController>()
+                .WithIn(userService)
+                .WithIn(MRepo().Object);
 
             var controller = new UserController(isp.Object, null, null).WithHttpCtx();
             controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
