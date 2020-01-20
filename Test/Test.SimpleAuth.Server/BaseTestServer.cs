@@ -8,6 +8,7 @@ using SimpleAuth.Server.Controllers;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Domains;
+using Test.Shared.Utils;
 
 namespace Test.SimpleAuth.Server
 {
@@ -15,7 +16,7 @@ namespace Test.SimpleAuth.Server
     {
         protected Mock<T> M<T>(MockBehavior mockBehavior = MockBehavior.Strict) where T : class
         {
-            return new Mock<T>(mockBehavior);
+            return MoqU.Of<T>(mockBehavior);
         }
 
         protected Mock<IServiceProvider> Isp(MockBehavior mockBehavior = MockBehavior.Strict) => M<IServiceProvider>(mockBehavior);

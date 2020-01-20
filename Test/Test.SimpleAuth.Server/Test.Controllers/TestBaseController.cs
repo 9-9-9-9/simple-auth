@@ -14,6 +14,8 @@ using SimpleAuth.Services;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Exceptions;
+using Test.Shared.Extensions;
+using Test.Shared.Utils;
 using Test.SimpleAuth.Server.Support.Extensions;
 using MockExtensions = Test.SimpleAuth.Server.Support.Extensions.MockExtensions;
 
@@ -185,15 +187,14 @@ namespace Test.SimpleAuth.Server.Test.Controllers
 
             RolesController SetupController(IRoleService roleService)
             {
-                var isp = Isp();
+                var isp = MoqU.OfServiceProviderFor<RolesController>();
+                
                 isp.Setup(x => x.GetService(typeof(IRoleService)))
                     .Returns(roleService);
 
                 var uRepo = M<IRoleRepository>();
                 isp.Setup(x => x.GetService(typeof(IRoleRepository)))
                     .Returns(uRepo.Object);
-                
-                isp.SetupLogger(MLog<RolesController>());
 
                 var controller = new RolesController(isp.Object, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
@@ -241,15 +242,14 @@ namespace Test.SimpleAuth.Server.Test.Controllers
 
             RoleGroupsController SetupController(IRoleGroupService roleService)
             {
-                var isp = Isp();
+                var isp = MoqU.OfServiceProviderFor<RoleGroupsController>();
+                
                 isp.Setup(x => x.GetService(typeof(IRoleGroupService)))
                     .Returns(roleService);
 
                 var uRepo = M<IRoleGroupRepository>();
                 isp.Setup(x => x.GetService(typeof(IRoleGroupRepository)))
                     .Returns(uRepo.Object);
-
-                isp.SetupLogger(MLog<RoleGroupsController>());
 
                 var controller = new RoleGroupsController(isp.Object, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders

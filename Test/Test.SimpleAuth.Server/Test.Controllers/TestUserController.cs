@@ -10,6 +10,7 @@ using SimpleAuth.Services;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Exceptions;
+using Test.Shared.Extensions;
 using Test.SimpleAuth.Server.Support.Extensions;
 using MockExtensions = Test.SimpleAuth.Server.Support.Extensions.MockExtensions;
 

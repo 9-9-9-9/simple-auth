@@ -2,7 +2,7 @@ using System;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
-namespace Test.SimpleAuth.Server.Support.Extensions
+namespace Test.Shared.Extensions
 {
     public static class AssertE
     {

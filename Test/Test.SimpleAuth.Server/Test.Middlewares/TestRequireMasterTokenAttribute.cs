@@ -14,7 +14,7 @@ using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Server.Models;
 using SimpleAuth.Services;
 using SimpleAuth.Shared;
-using Test.SimpleAuth.Server.Support.Extensions;
+using Test.Shared.Extensions;
 
 namespace Test.SimpleAuth.Server.Test.Middlewares
 {
