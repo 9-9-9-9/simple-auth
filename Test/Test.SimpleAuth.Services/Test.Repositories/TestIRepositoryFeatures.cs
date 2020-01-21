@@ -60,64 +60,63 @@ namespace Test.SimpleAuth.Shared.Test.Repositories
             var repo = Svc<IRoleRepository>();
 
             var corp = RandomCorp();
-            await AddRoleAsync(svc, corp, "a", "e", "t", "m1");
-            await AddRoleAsync(svc, corp, "a", "e", "t", "m2");
-            await AddRoleAsync(svc, corp, "a", "e", "t", "m3");
+            var app = RandomCorp();
+            await AddRoleAsync(svc, corp, app, "e", "t", "m1");
+            await AddRoleAsync(svc, corp, app, "e", "t", "m2");
+            await AddRoleAsync(svc, corp, app, "e", "t", "m3");
 
-            var results = repo.Find(x => x.Corp == corp).ToList();
-            Assert.AreEqual(3, results.Count);
+            var results = Find(0, 0);
+            Assert.AreEqual(3, results.Length);
 
-            results = repo.Find(x => x.Corp == corp, new FindOptions
+            results = Find(1, 0);
+            Assert.AreEqual(2, results.Length);
+            Assert.AreEqual("m2", results[0].Module);
+            //
+            results = FindOrdered(skip: 2);
+            Assert.AreEqual(1, results.Length);
+            Assert.AreEqual("m3", results[0].Module);
+            //
+            results = Find(0, 1);
+            Assert.AreEqual(1, results.Length);
+            Assert.AreEqual("m1", results[0].Module);
+            //
+            results = Find(0, 2);
+            Assert.AreEqual(2, results.Length);
+            Assert.AreEqual("m1", results[0].Module);
+            Assert.AreEqual("m2", results[1].Module);
+            //
+            results = Find(1, 1);
+            Assert.AreEqual(1, results.Length);
+            Assert.AreEqual("m2", results[0].Module);
+            //
+            results = Find(2, 1);
+            Assert.AreEqual(1, results.Length);
+            Assert.AreEqual("m3", results[0].Module);
+            //
+            results = Find(999, 999);
+            Assert.AreEqual(0, results.Length);
+
+            Role[] Find(int skip, int take)
             {
-                Skip = 1
-            }).ToList();
-            Assert.AreEqual(2, results.Count);
-            Assert.AreEqual("m2", results.Skip(0).First().Module);
-//
-            results = repo.Find(x => x.Corp == corp, new FindOptions
+                return repo.Find(x => x.Corp == corp && x.App == app, new FindOptions
+                {
+                    Skip = skip,
+                    Take = take
+                }).ToArray();
+            }
+
+            Role[] FindOrdered(int skip = 0, int take = 0, OrderDirection orderDirection = OrderDirection.Default)
             {
-                Skip = 2
-            }).ToList();
-            Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("m3", results.Skip(0).First().Module);
-//
-            results = repo.Find(x => x.Corp == corp, new FindOptions
-            {
-                Take = 1
-            }).ToList();
-            Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("m1", results.Skip(0).First().Module);
-//
-            results = repo.Find(x => x.Corp == corp, new FindOptions
-            {
-                Take = 2
-            }).ToList();
-            Assert.AreEqual(2, results.Count);
-            Assert.AreEqual("m1", results.Skip(0).First().Module);
-            Assert.AreEqual("m2", results.Skip(1).First().Module);
-//
-            results = repo.Find(x => x.Corp == corp, new FindOptions
-            {
-                Skip = 1,
-                Take = 1
-            }).ToList();
-            Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("m2", results.Skip(0).First().Module);
-//
-            results = repo.Find(x => x.Corp == corp, new FindOptions
-            {
-                Skip = 2,
-                Take = 1
-            }).ToList();
-            Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("m3", results.Skip(0).First().Module);
-//
-            results = repo.Find(x => x.Corp == corp, new FindOptions
-            {
-                Skip = 999,
-                Take = 999
-            }).ToList();
-            Assert.AreEqual(0, results.Count);
+                return repo.FindOrdered(x => x.Corp == corp && x.App == app, new FindOptions
+                {
+                    Skip = skip,
+                    Take = take
+                }, new OrderByOptions<Role, string>
+                {
+                    Expression = x => x.Module,
+                    Direction = orderDirection
+                }).ToArray();
+            }
         }
     }
 }
