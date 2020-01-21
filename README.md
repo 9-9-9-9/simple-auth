@@ -12,7 +12,7 @@ Simple Auth is a simple solution, near zero-configuration, easy idea (RBAC).
 ### Features
 - Authorization APIs. (Core interfaces of SimpleAuth).
 - SDKs for zero integration (Currently support .NET Core)
-- Built-in external authentication providers (Facebook, Google, Linkedin, etc)
+- Built-in external authentication providers (Google, WIP: Facebook, Linkedin, etc)
 - Persistence of your choice (Postgres, sql lite, in memory, etc).
 
 ## Getting Started
