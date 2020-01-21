@@ -2,10 +2,18 @@ Code coverage: 50%
 
 #### I know 50% is too little, but the core part, the service one, is tested
 
-# SimpleAuth
-## A lightweighted Authorization server, integrated with external Authentication providers
+# SimpleAuth (Simple authentication & authrozization)
+## A lightweight Authorization server based on RBAC
 
-// TODO
+## Motivation:
+Designing an AA (Authentication & Authorization) from scratch is a costly, repetitive and time-consuming task. OAuth2 and OpenID connect seem like a very reasonable solution for centralize AA in our industry. However it's very complex and working with it is really stressful when you are just starting out with new ideas. 
+Simple Auth is a simple solution, near zero-configuration, easy idea (RBAC).
+
+### Features
+- Persistence of your choice (Postgres, sql lite, in memory, etc).
+- Authorization APIs. (Core interfaces of SimpleAuth).
+- SDKs for zero integration (Currently support .NET Core)
+- Built-in external authentication providers (Facebook, Google, Linkedin, etc)
 
 ## Getting Started
 
@@ -66,7 +74,7 @@ Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Dotnet Core 3.0](https://dotnet.microsoft.com/download)
+* [Dotnet Core 3.1](https://dotnet.microsoft.com/download)
 * [.Net Standard Library 2.1](https://dotnet.microsoft.com/download)
 * [Minicover](https://github.com/lucaslorentz/minicover) - Used to generate code coverage report
 
