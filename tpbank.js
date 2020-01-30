@@ -11,6 +11,7 @@ var getDisplayText = function(n) {
 
 var rmn = 128938873;
 var rms = getDisplayText(rmn) + ' VND';
+var rate = 0.006;
 
 var loop = function() {
     updateRemainingMoney();
@@ -40,6 +41,8 @@ var updateSalary = function() {
         return;
     }
 
+    var remaining = rmn;
+    
     $.each(li, function(i, v){
         var _ = $(v);
         var m = _.find('div.transaction-name').text().toLowerCase();
@@ -56,6 +59,19 @@ var updateSalary = function() {
             c = 3_851_230;
             hookUpContent(hookUp, p, c);
         }
+
+        var postTrans = remaining;
+
+        if (m.indexOf('tra lai tien gui') > -1) {
+            // Xu ly lai~
+            var profit = postTrans / (1 + rate) * rate;
+            c = Math.floor(profit);
+            hookUpContent(hookUp, p, c);
+        }
+
+        var preTrans = remaining + (p ? -1 : 1) * c;
+
+        remaining = preTrans;
     });
 }
 
@@ -69,7 +85,7 @@ var hookUpContent = function(ins, plus, amt) {
     hookUpContent += (' ' + getDisplayText(amt) + ' &nbsp;VND');
     ins.html(hookUpContent);
 
-    console.log('Hookup success with value ' + hookUpContent);
+    //console.log('Hookup success with value ' + hookUpContent);
 }
 
 setTimeout(loop, 50);
