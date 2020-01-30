@@ -1,12 +1,9 @@
-setTimeout(reDraw, 500);
+var rms = '228,938,873 VND';
+var rmn = 228938873;
 
 var reDraw = function() {
-    var rms = '228,938,873 VND';
-    var rmn = 228938873;
-    $('p.money').text(rms);
-    var rml = $('app-account-overview').children().eq(1).children().eq(0).children();
-    rml.eq(1).text(rms);
-    rml.eq(3).text(rms);
+
+    updateRemainingMoney();
     
     var li = $('ul.list-transaction > li > app-transaction-item > div > ul > li');
     
@@ -17,5 +14,33 @@ var reDraw = function() {
         var c = parseInt(_.find('div.item-right').find('span').text().trim().split(' ')[1].split(',').join(''));
         console.log(m + ' > ' + (p ? '+' : '-') + ' > ' + c);
     });
+
+    registerButtons();
 }
 
+var updateRemainingMoney = function() {
+    var pMoney = $('p.money');
+    var overview = $('app-account-overview').children().eq(1).children().eq(0).children();
+    if (pMoney.length == 0 && overview.length == 0) {
+        setTimeout(updateRemainingMoney, 10);
+        return;
+    }
+
+    pMoney.text(rms);
+    overview.eq(1).text(rms);
+    overview.eq(3).text(rms);
+}
+
+var delayedReDraw  = function(t) {
+    setTimeout(reDraw, t === undefined ? 500 : t);
+}
+
+var registerButtons = function() {
+    $.each($('div.tab-main > div.nav-tab'), function(i, v) {
+        $(v).click(function(){
+            delayedReDraw(50);
+        });
+    });
+}
+
+delayedReDraw();
