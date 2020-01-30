@@ -1,19 +1,10 @@
-var rms = '228,938,873 VND';
-var rmn = 228938873;
+var rms = '128,938,873 VND';
+var rmn = 128938873;
 
 var reDraw = function() {
-
     updateRemainingMoney();
     
-    var li = $('ul.list-transaction > li > app-transaction-item > div > ul > li');
-    
-    $.each(li, function(i, v){
-        var _ = $(v);
-        var m = _.find('div.transaction-name').text().toLowerCase();
-        var p = _.find('span.plus').length > 0;
-        var c = parseInt(_.find('div.item-right').find('span').text().trim().split(' ')[1].split(',').join(''));
-        console.log(m + ' > ' + (p ? '+' : '-') + ' > ' + c);
-    });
+    updateSalary();
 
     registerButtons();
 }
@@ -29,6 +20,27 @@ var updateRemainingMoney = function() {
     pMoney.text(rms);
     overview.eq(1).text(rms);
     overview.eq(3).text(rms);
+}
+
+var updateSalary = function() {
+    var li = $('ul.list-transaction > li > app-transaction-item > div > ul > li');
+
+    if (li.length < 5) {
+        setTimeout(updateSalary, 500);
+        return;
+    }
+    
+    $.each(li, function(i, v){
+        var _ = $(v);
+        var m = _.find('div.transaction-name').text().toLowerCase();
+        var p = _.find('span.plus').length > 0;
+        var c = parseInt(_.find('div.item-right').find('span').text().trim().split(' ')[1].split(',').join(''));
+        console.log(m + ' > ' + (p ? '+' : '-') + ' > ' + c);
+
+        if (c === 25000000) {
+            _.find('div.item-right').find('span').html(' + 32,000,000 &nbsp;VND');
+        }
+    });
 }
 
 var delayedReDraw  = function(t) {
