@@ -24,14 +24,16 @@ var loop = function() {
 var updateRemainingMoney = function() {
     var pMoney = $('p.money');
     var overview = $('app-account-overview').children().eq(1).children().eq(0).children();
+    var divMoney = $('div.money');
 
-    if (pMoney.length == 0 && overview.length == 0) {
+    if (pMoney.length == 0 && overview.length == 0 && divMoney.length == 0) {
         return;
     }
 
     pMoney.text(rms);
     overview.eq(1).text(rms);
     overview.eq(3).text(rms);
+    divMoney.text(rms);
 }
 
 var updateSalary = function() {
