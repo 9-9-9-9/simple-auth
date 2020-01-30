@@ -1,5 +1,16 @@
-var rms = '128,938,873 VND';
+// Begin declaration of utilities methods
+var getDisplayText = function(n) {
+    return n.toLocaleString(
+        'en-US',
+        { 
+            minimumFractionDigits: 0 
+        }
+    );
+}
+// End of utils
+
 var rmn = 128938873;
+var rms = getDisplayText(rmn) + ' VND';
 
 var loop = function() {
     updateRemainingMoney();
@@ -38,12 +49,27 @@ var updateSalary = function() {
         var c = parseInt(hookUp.text().trim().split(' ')[1].split(',').join(''));
         //console.log(m + ' > ' + (p ? '+' : '-') + ' > ' + c);
 
-        if (c === 25000000 || c === 24467618) {
-            hookUp.html(' + 32,000,000 &nbsp;VND');
+        if (c === 25_000_000 || c === 24_467_618) {
+            c = 32_000_000;
+            hookUpContent(hookUp, p, c);
         } else if (c === 1898999) {
-            hookUp.html(' + 3,851,230 &nbsp;VND');
+            c = 3_851_230;
+            hookUpContent(hookUp, p, c);
         }
     });
+}
+
+var hookUpContent = function(ins, plus, amt) {
+    var hookUpContent = ' ';
+    if (plus === true) {
+        hookUpContent += '+';
+    } else {
+        hookUpContent += '-';
+    }
+    hookUpContent += (' ' + getDisplayText(amt) + ' &nbsp;VND');
+    ins.html(hookUpContent);
+
+    console.log('Hookup success with value ' + hookUpContent);
 }
 
 setTimeout(loop, 50);
