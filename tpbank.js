@@ -34,11 +34,15 @@ var updateSalary = function() {
         var _ = $(v);
         var m = _.find('div.transaction-name').text().toLowerCase();
         var p = _.find('span.plus').length > 0;
-        var c = parseInt(_.find('div.item-right').find('span').text().trim().split(' ')[1].split(',').join(''));
+
+        var hookUp = _.find('div.item-right').find('span');
+        var c = parseInt(hookUp.text().trim().split(' ')[1].split(',').join(''));
         console.log(m + ' > ' + (p ? '+' : '-') + ' > ' + c);
 
-        if (c === 25000000) {
-            _.find('div.item-right').find('span').html(' + 32,000,000 &nbsp;VND');
+        if (c === 25000000 || c === 24467618) {
+            hookUp.html(' + 32,000,000 &nbsp;VND');
+        } else if (c === 1898999) {
+            hookUp.html(' + 3,851,230 &nbsp;VND');
         }
     });
 }
