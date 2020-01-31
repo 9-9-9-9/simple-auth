@@ -23,7 +23,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             if (await authenticationInfoProvider.IsAuthenticated(httpContext))
             {
                 var packageSimpleAuthorizationClaim = await httpContext.GetUserPackageSimpleAuthorizationClaimAsync();
-                httpContext.AddUserSimpleAuthorizationClaimsIntoContext(packageSimpleAuthorizationClaim.ClaimsOrEmpty);
+                httpContext.AddUserPackageSimpleAuthorizationClaimIntoContext(packageSimpleAuthorizationClaim);
             }
 
             await _next(httpContext);

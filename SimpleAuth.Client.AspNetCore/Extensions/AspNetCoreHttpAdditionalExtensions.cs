@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,6 @@ using SimpleAuth.Client.AspNetCore.Models;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Utils;
-using SimpleAuth.Core.Extensions;
 
 namespace Microsoft.AspNetCore.Http
 {
@@ -49,17 +47,16 @@ namespace Microsoft.AspNetCore.Http
             return await authenticationInfoProvider.GetPackageSimpleAuthClaimAsync(simpleAuthClaim);
         }
 
-        public static ICollection<SimpleAuthorizationClaim> GetUserSimpleAuthorizationClaimsFromContext(
+        public static PackageSimpleAuthorizationClaim GetUserPackageSimpleAuthorizationClaimFromContext(
             this HttpContext httpContext)
         {
-            return httpContext.GetItemOrDefault<ImmutableList<SimpleAuthorizationClaim>>();
+            return httpContext.GetItemOrDefault<PackageSimpleAuthorizationClaim>();
         }
 
-        public static void AddUserSimpleAuthorizationClaimsIntoContext(
-            this HttpContext httpContext, ICollection<SimpleAuthorizationClaim> userSimpleAuthorizationClaimsAsync)
+        public static void AddUserPackageSimpleAuthorizationClaimIntoContext(
+            this HttpContext httpContext, PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim)
         {
-            if (userSimpleAuthorizationClaimsAsync.IsAny())
-                httpContext.PushItem(userSimpleAuthorizationClaimsAsync.ToImmutableList());
+            httpContext.PushItem(packageSimpleAuthorizationClaim);
         }
 
         public static async Task<ICollection<SimpleAuthorizationClaim>> GetMissingClaimsAsync(

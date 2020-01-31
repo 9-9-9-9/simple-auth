@@ -20,7 +20,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
         // ReSharper disable once UnusedMember.Global
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            var userClaims = httpContext.GetUserSimpleAuthorizationClaimsFromContext();
+            var userClaims = httpContext.GetUserPackageSimpleAuthorizationClaimFromContext().ClaimsOrEmpty;
             
             await httpContext.Response
                 .WithStatus(StatusCodes.Status200OK)
