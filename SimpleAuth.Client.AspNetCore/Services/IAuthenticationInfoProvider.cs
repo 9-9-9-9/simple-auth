@@ -58,7 +58,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
         public async Task<PackageSimpleAuthorizationClaim> GetPackageSimpleAuthClaimAsync(Claim claim)
         {
             if (claim == null)
-                return null;
+                return default;
 
             return await _claimTransformingService.UnpackAsync(claim);
         }

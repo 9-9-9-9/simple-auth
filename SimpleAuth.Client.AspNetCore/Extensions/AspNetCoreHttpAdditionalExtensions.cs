@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,15 +38,15 @@ namespace Microsoft.AspNetCore.Http
             return AuthorizationUtils.GetMissingClaims(existingClaims, requiredClaims);
         }
 
-        public static async Task<ICollection<SimpleAuthorizationClaim>> GetUserSimpleAuthorizationClaimsAsync(
+        public static async Task<PackageSimpleAuthorizationClaim> GetUserPackageSimpleAuthorizationClaimAsync(
             this HttpContext httpContext)
         {
             var authenticationInfoProvider = httpContext.RequestServices.GetService<IAuthenticationInfoProvider>();
             var claims = await authenticationInfoProvider.GetClaimsAsync(httpContext);
             var simpleAuthClaim = authenticationInfoProvider.GetSimpleAuthClaim(claims);
             if (simpleAuthClaim == default)
-                return Enumerable.Empty<SimpleAuthorizationClaim>().ToList();
-            return (await authenticationInfoProvider.GetPackageSimpleAuthClaimAsync(simpleAuthClaim)).Claims;
+                return default;
+            return await authenticationInfoProvider.GetPackageSimpleAuthClaimAsync(simpleAuthClaim);
         }
 
         public static ICollection<SimpleAuthorizationClaim> GetUserSimpleAuthorizationClaimsFromContext(
@@ -67,15 +66,16 @@ namespace Microsoft.AspNetCore.Http
             this HttpContext httpContext,
             IEnumerable<SimpleAuthorizationClaim> requiredClaims)
         {
-            return (await httpContext.GetUserSimpleAuthorizationClaimsAsync()).GetMissingClaims(requiredClaims);
+            var existingClaims = (await httpContext.GetUserPackageSimpleAuthorizationClaimAsync()).ClaimsOrEmpty;
+            return existingClaims.GetMissingClaims(requiredClaims);
         }
 
         public static async Task<ICollection<SimpleAuthorizationClaim>> GetMissingClaimsAsync(
             this HttpContext httpContext,
             ClaimsBuilder claimsBuilder)
         {
-            return (await httpContext.GetUserSimpleAuthorizationClaimsAsync()).GetMissingClaims(
-                claimsBuilder.Build(httpContext));
+            var existingClaims = (await httpContext.GetUserPackageSimpleAuthorizationClaimAsync()).ClaimsOrEmpty;
+            return existingClaims.GetMissingClaims(claimsBuilder.Build(httpContext));
         }
 
         public static HttpContext PushItem<T>(this HttpContext httpContext, T item, string key = null,

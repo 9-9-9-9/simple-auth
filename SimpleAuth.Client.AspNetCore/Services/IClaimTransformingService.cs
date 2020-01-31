@@ -68,10 +68,9 @@ namespace SimpleAuth.Client.AspNetCore.Services
         {
             await Task.CompletedTask;
 
-            if (_dict.TryGetValue(data, out var simpleAuthorizationClaims))
-                return simpleAuthorizationClaims;
-
-            return null;
+            if (!_dict.TryGetValue(data, out var simpleAuthorizationClaims))
+                return default;
+            return simpleAuthorizationClaims;
         }
 
         public override Task<string> TransformAsync(PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim)

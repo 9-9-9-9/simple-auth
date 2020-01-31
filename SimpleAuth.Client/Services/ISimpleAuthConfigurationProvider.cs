@@ -16,6 +16,7 @@ namespace SimpleAuth.Client.Services
         string App { get; set; }
         string Env { get; }
         string Tenant { get; }
+        bool LiveChecking { get; }
         string EndPointUrl { get; }
         Dictionary<string, string> OthersAppsTokens { get; }
     }
@@ -53,6 +54,7 @@ namespace SimpleAuth.Client.Services
 
         public string Env => _simpleAuthSettings.Env;
         public string Tenant => _simpleAuthSettings.Tenant;
+        public bool LiveChecking => _simpleAuthSettings.LiveChecking;
         public string EndPointUrl { get; }
 
         public Dictionary<string, string> OthersAppsTokens
