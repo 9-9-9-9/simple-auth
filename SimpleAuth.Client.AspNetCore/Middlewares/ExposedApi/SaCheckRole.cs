@@ -35,7 +35,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
         // ReSharper disable once UnusedMember.Global
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            var userClaims = httpContext.GetUserSimpleAuthorizationClaimsFromContext();
+            var userClaims = httpContext.GetUserPackageSimpleAuthorizationClaimFromContext().ClaimsOrEmpty;
 
             if (!userClaims.IsAny())
             {
@@ -43,7 +43,9 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                 return;
             }
 
+            // ReSharper disable JoinDeclarationAndInitializer
             string env, tenant, module, subModules, permissions;
+            // ReSharper restore JoinDeclarationAndInitializer
 
             if (!TryExtractQueryParameter(httpContext.Request.Query, ParamEnv, out var envs, false, false))
             {

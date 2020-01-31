@@ -7,8 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Models;
 using SimpleAuth.Client.AspNetCore.Services;
+using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Models;
+using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
 {
@@ -57,30 +60,17 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                         .Build(configurationProvider, requireTenant)
                         .ToArray();
 
-                    var userClaims = httpContext.GetUserSimpleAuthorizationClaimsFromContext();
+                    var packageSimpleAuthorizationClaim = httpContext.GetUserPackageSimpleAuthorizationClaimFromContext();
 
-                    if (!userClaims.IsAny())
+                    if (configurationProvider.LiveChecking)
                     {
-                        await httpContext.Response
-                            .WithStatus(StatusCodes.Status403Forbidden)
-                            .WithBody(
-                                "User doesn't have any permission'"
-                            );
-                        return;
+                        if (!await PerformLiveCheckingPermission(httpContext, packageSimpleAuthorizationClaim, requireClaims)) 
+                            return;
                     }
-
-                    var missingClaims = userClaims.GetMissingClaims(requireClaims)
-                        .OrEmpty()
-                        .ToArray();
-
-                    if (missingClaims.Any())
+                    else
                     {
-                        await httpContext.Response
-                            .WithStatus(StatusCodes.Status403Forbidden)
-                            .WithBody(
-                                $"Require {missingClaims[0].ClientRoleModel}"
-                            );
-                        return;
+                        if (!await PerformLocalCheckingPermission(httpContext, packageSimpleAuthorizationClaim, requireClaims)) 
+                            return;   
                     }
                 }
             }
@@ -109,6 +99,72 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             }
 
             await _next(httpContext);
+        }
+
+        private static async Task<bool> PerformLocalCheckingPermission(HttpContext httpContext,
+            PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim, SimpleAuthorizationClaim[] requireClaims)
+        {
+            var userClaims = packageSimpleAuthorizationClaim.ClaimsOrEmpty;
+
+            if (!userClaims.IsAny())
+            {
+                await httpContext.Response
+                    .WithStatus(StatusCodes.Status403Forbidden)
+                    .WithBody(
+                        "User doesn't have any permission'"
+                    );
+                return false;
+            }
+
+            var missingClaims = userClaims.GetMissingClaims(requireClaims)
+                .OrEmpty()
+                .ToArray();
+
+            if (missingClaims.Any())
+            {
+                await httpContext.Response
+                    .WithStatus(StatusCodes.Status403Forbidden)
+                    .WithBody(
+                        $"Require {missingClaims[0].ClientRoleModel}"
+                    );
+                return false;
+            }
+
+            return true;
+        }
+
+        private static async Task<bool> PerformLiveCheckingPermission(HttpContext httpContext,
+            PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim, SimpleAuthorizationClaim[] requireClaims)
+        {
+            if (packageSimpleAuthorizationClaim.UserId.IsBlank())
+            {
+                await httpContext.Response
+                    .WithStatus(StatusCodes.Status403Forbidden)
+                    .WithBody(
+                        $"Can't find user id from {nameof(PackageSimpleAuthorizationClaim)}"
+                    );
+                return false;
+            }
+            
+            var userAuthService = httpContext.RequestServices.GetService<IUserAuthService>();
+            var missingRoles = await userAuthService.GetMissingRolesAsync(packageSimpleAuthorizationClaim.UserId, new RoleModels
+            {
+                Roles = requireClaims.Select(x => x.ClientRoleModel.ToRole().Cast()).ToArray()
+            });
+
+            if (missingRoles.Any())
+            {
+                var firstRoleModel = missingRoles.First();
+                RoleUtils.Parse(firstRoleModel.Role, firstRoleModel.Permission, out var clientRoleModel);
+                await httpContext.Response
+                    .WithStatus(StatusCodes.Status403Forbidden)
+                    .WithBody(
+                        $"Require {clientRoleModel}"
+                    );
+                return false;
+            }
+
+            return true;
         }
 
         private static Endpoint GetEndpoint(HttpContext context)

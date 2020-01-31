@@ -8,6 +8,7 @@ using SimpleAuth.Shared.Enums;
 
 namespace AppManagementConsole.Commands
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class GetUserCommand : AbstractCommand
     {
         private readonly IUserAuthService _userAuthService;

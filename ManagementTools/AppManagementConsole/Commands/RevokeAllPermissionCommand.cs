@@ -5,6 +5,7 @@ using SimpleAuth.Client.Services;
 
 namespace AppManagementConsole.Commands
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class RevokeAllPermissionCommand : AbstractCommand
     {
         private readonly IRoleGroupManagementService _roleGroupManagementService;

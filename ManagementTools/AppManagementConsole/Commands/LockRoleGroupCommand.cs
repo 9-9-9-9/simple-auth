@@ -6,6 +6,7 @@ using SimpleAuth.Core.Extensions;
 
 namespace AppManagementConsole.Commands
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class LockRoleGroupCommand : AbstractCommand
     {
         private readonly IRoleGroupManagementService _roleGroupManagementService;

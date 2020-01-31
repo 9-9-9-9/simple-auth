@@ -122,7 +122,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddRoles(
             string groupName,
-            [FromBody] UpdateRolesModel model)
+            [FromBody] RoleModels model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(nameof(ModelState));

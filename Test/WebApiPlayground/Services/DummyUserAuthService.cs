@@ -34,6 +34,11 @@ namespace WebApiPlayground.Services
             return Task.FromResult(true);
         }
 
+        public Task<RoleModel[]> GetMissingRolesAsync(string userId, RoleModels roleModels)
+        {
+            return Task.FromResult(new RoleModel[0]);
+        }
+
         private ResponseUserModel GetDummyUser(string userId)
         {
             return new ResponseUserModel

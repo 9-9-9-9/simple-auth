@@ -8,6 +8,7 @@ using SimpleAuth.Core.Extensions;
 
 namespace AppManagementConsole.Commands
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ListingRolesOfGroupCommand : AbstractCommand
     {
         private readonly IRoleGroupManagementService _roleGroupManagementService;
