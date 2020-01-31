@@ -6,6 +6,7 @@ using SimpleAuth.Shared.Models;
 
 namespace AppManagementConsole.Commands
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class CreateUserCommand : AbstractCommand
     {
         private readonly IUserManagementService _userManagementService;

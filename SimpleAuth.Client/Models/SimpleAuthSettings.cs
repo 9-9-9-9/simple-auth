@@ -11,6 +11,7 @@ namespace SimpleAuth.Client.Models
         public string SimpleAuthServerUrl { get; set; } = "https://standingtrust.com"; //TODO https
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class SimpleAuthTokenSettings
     {
         public string MasterToken { get; set; }

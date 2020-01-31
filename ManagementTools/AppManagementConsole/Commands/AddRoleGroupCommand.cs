@@ -7,6 +7,7 @@ using SimpleAuth.Shared.Models;
 
 namespace AppManagementConsole.Commands
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class AddRoleGroupCommand : AbstractCommand
     {
         private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
