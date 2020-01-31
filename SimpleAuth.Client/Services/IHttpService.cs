@@ -96,14 +96,30 @@ namespace SimpleAuth.Client.Services
                 {
                     var responseContentString = await response.Content.ReadAsStringAsync();
                     if (responseContentString != null)
+                    {
                         $"Response error with message: {responseContentString}".Write();
+                        try
+                        {
+                            responseContent = responseContentString.JsonDeserialize<TResult>();
+                        }
+                        catch
+                        {
+                            // ignore error
+                        }
+                    }
                 }
+#if !DEBUG
+                catch
+                {
+                    
+                }
+#endif
+#if DEBUG
                 catch (Exception e)
                 {
-#if DEBUG
                     $"Unable to try reading response with err message: {e.Message}".Write();
-#endif
                 }
+#endif
             }
 
             return (response.IsSuccessStatusCode, response.StatusCode, responseContent);
@@ -171,12 +187,18 @@ namespace SimpleAuth.Client.Services
                     if (responseContentString != null)
                         $"Response error with message: {responseContentString}".Write();
                 }
+#if !DEBUG
+                catch
+                {
+                    
+                }
+#endif
+#if DEBUG
                 catch (Exception e)
                 {
-#if DEBUG
                     $"Unable to try reading response with err message: {e.Message}".Write();
-#endif
                 }
+#endif
             }
 
             return (response.IsSuccessStatusCode, response.StatusCode);

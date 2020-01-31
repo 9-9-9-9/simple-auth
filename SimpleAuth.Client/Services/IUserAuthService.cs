@@ -104,6 +104,7 @@ namespace SimpleAuth.Client.Services
             );
             if (res.Item2 == HttpStatusCode.OK)
                 return new RoleModel[0];
+            
             if (res.Item2 == HttpStatusCode.NotAcceptable)
             {
                 if (!res.Item3.IsAny())
