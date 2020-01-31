@@ -196,15 +196,14 @@ namespace SimpleAuth.Server.Controllers
                     var ePermission = permission.Deserialize();
                     _logger.LogInformation($"Checking permission [{roleId}, {ePermission}] for user {userId}");
 
-                    return Service.IsHaveActivePermissionAsync(
+                    return Service.GetMissingRolesAsync(
                         userId,
-                        roleId,
-                        ePermission,
+                        new[] {(roleId, ePermission)},
                         RequestAppHeaders.Corp, RequestAppHeaders.App
                     ).ContinueWith(
-                        x => (x.Result
-                                ? StatusCodes.Status200OK
-                                : StatusCodes.Status406NotAcceptable
+                        x => (x.Result.IsAny()
+                                ? StatusCodes.Status406NotAcceptable
+                                : StatusCodes.Status200OK
                             ).WithEmpty()
                     );
                 }

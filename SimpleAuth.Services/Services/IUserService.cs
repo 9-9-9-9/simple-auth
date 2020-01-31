@@ -26,8 +26,13 @@ namespace SimpleAuth.Services
         Task AssignUserToGroupsAsync(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromGroupsAsync(User user, RoleGroup[] roleGroups);
         Task UnAssignUserFromAllGroupsAsync(User user, string corp);
-        Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null, string tenant = null);
-        Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app);
+
+        Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null,
+            string tenant = null);
+
+        Task<ICollection<Role>> GetMissingRolesAsync(string userId, (string, Permission)[] permissions, string corp,
+            string app);
+
         Task UpdateLockStatusAsync(User user);
         Task UpdatePasswordAsync(User user);
     }
@@ -41,9 +46,9 @@ namespace SimpleAuth.Services
         private readonly ILocalUserInfoRepository _localUserInfoRepository;
 
         public DefaultUserService(IServiceProvider serviceProvider, IEncryptionService encryptionService,
-            IRoleGroupRepository roleGroupRepository, IRoleGroupUserRepository roleGroupUserRepository, 
+            IRoleGroupRepository roleGroupRepository, IRoleGroupUserRepository roleGroupUserRepository,
             IRoleRepository roleRepository,
-            ILocalUserInfoRepository localUserInfoRepository) : 
+            ILocalUserInfoRepository localUserInfoRepository) :
             base(serviceProvider)
         {
             _encryptionService = encryptionService;
@@ -199,7 +204,8 @@ namespace SimpleAuth.Services
             );
         }
 
-        public async Task<ICollection<Role>> GetActiveRolesAsync(string userId, string corp, string app, string env = null,
+        public async Task<ICollection<Role>> GetActiveRolesAsync(string userId, string corp, string app,
+            string env = null,
             string tenant = null)
         {
             var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
@@ -233,21 +239,32 @@ namespace SimpleAuth.Services
             return roles;
         }
 
-        public async Task<bool> IsHaveActivePermissionAsync(string userId, string roleId, Permission permission, string corp, string app)
+        public async Task<ICollection<Role>> GetMissingRolesAsync(string userId, (string, Permission)[] permissions,
+            string corp, string app)
         {
-            if (permission == Permission.None)
-                throw new ArgumentException(nameof(permission));
+            if (permissions.Any(x => x.Item2 == Permission.None))
+                throw new ArgumentException("Permission None is not a valid option");
 
             var activeRoles = await GetActiveRolesAsync(userId, corp, app);
             var userActiveClientRoleModels = activeRoles.Select(x => x.ToClientRoleModel());
-            
-            RoleUtils.Parse(roleId, out var requireClientRoleModel);
-            requireClientRoleModel.Permission = permission;
 
-            return userActiveClientRoleModels.Any(x => RoleUtils.ContainsOrEquals(x, requireClientRoleModel, RoleUtils.ComparisionFlag.All));
+            var requireClientRoleModels = permissions.Select(x =>
+            {
+                RoleUtils.Parse(x.Item1, out var requireClientRoleModel);
+                requireClientRoleModel.Permission = x.Item2;
+                return requireClientRoleModel;
+            }).ToArray();
+
+            var missing = requireClientRoleModels.Where(requireClientRoleModel =>
+                !userActiveClientRoleModels.Any(activeRole =>
+                    RoleUtils.ContainsOrEquals(activeRole, requireClientRoleModel, RoleUtils.ComparisionFlag.All))
+            );
+
+            return missing.Select(x => x.ToRole()).ToList();
         }
 
-        private async Task<IEnumerable<RoleRecord>> FindRoleRecordsBasedOnFilterAsync(string userId, string corp, string app, string env, string tenant)
+        private async Task<IEnumerable<RoleRecord>> FindRoleRecordsBasedOnFilterAsync(string userId, string corp,
+            string app, string env, string tenant)
         {
             if (userId.IsBlank())
                 throw new ArgumentNullException(nameof(userId));
@@ -288,7 +305,7 @@ namespace SimpleAuth.Services
 
             if (!tenant.IsBlank())
                 roleRecords = roleRecords.Where(rr => rr.Tenant == Constants.WildCard || rr.Tenant == tenant);
-            
+
             return roleRecords;
         }
 
