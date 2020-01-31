@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SimpleAuth.Repositories;
@@ -14,6 +13,8 @@ using SimpleAuth.Services;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Exceptions;
+using Test.Shared.Extensions;
+using Test.Shared.Utils;
 using Test.SimpleAuth.Server.Support.Extensions;
 using MockExtensions = Test.SimpleAuth.Server.Support.Extensions.MockExtensions;
 
@@ -110,16 +111,9 @@ namespace Test.SimpleAuth.Server.Test.Controllers
 
             UserController SetupController(IUserService userService)
             {
-                var isp = Isp();
-                isp.Setup(x => x.GetService(typeof(IUserService)))
-                    .Returns(userService);
-
-                isp.Setup(x => x.GetService(typeof(ILogger<UserController>)))
-                    .Returns(MLog<UserController>().Object);
-
-                var uRepo = M<IUserRepository>();
-                isp.Setup(x => x.GetService(typeof(IUserRepository)))
-                    .Returns(uRepo.Object);
+                var isp = Mu.OfServiceProviderFor<UserController>()
+                    .WithIn(userService)
+                    .With<IUserRepository>(out _);
 
                 var controller = new UserController(isp.Object, null, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
@@ -185,15 +179,10 @@ namespace Test.SimpleAuth.Server.Test.Controllers
 
             RolesController SetupController(IRoleService roleService)
             {
-                var isp = Isp();
+                var isp = Mu.OfServiceProviderFor<RolesController, IRoleRepository>();
+                
                 isp.Setup(x => x.GetService(typeof(IRoleService)))
                     .Returns(roleService);
-
-                var uRepo = M<IRoleRepository>();
-                isp.Setup(x => x.GetService(typeof(IRoleRepository)))
-                    .Returns(uRepo.Object);
-                
-                isp.SetupLogger(MLog<RolesController>());
 
                 var controller = new RolesController(isp.Object, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders
@@ -241,15 +230,8 @@ namespace Test.SimpleAuth.Server.Test.Controllers
 
             RoleGroupsController SetupController(IRoleGroupService roleService)
             {
-                var isp = Isp();
-                isp.Setup(x => x.GetService(typeof(IRoleGroupService)))
-                    .Returns(roleService);
-
-                var uRepo = M<IRoleGroupRepository>();
-                isp.Setup(x => x.GetService(typeof(IRoleGroupRepository)))
-                    .Returns(uRepo.Object);
-
-                isp.SetupLogger(MLog<RoleGroupsController>());
+                var isp = Mu.OfServiceProviderFor<RoleGroupsController, IRoleGroupRepository>()
+                    .WithIn(roleService);
 
                 var controller = new RoleGroupsController(isp.Object, null).WithHttpCtx();
                 controller.HttpContext.Items[Constants.Headers.AppPermission] = new RequestAppHeaders

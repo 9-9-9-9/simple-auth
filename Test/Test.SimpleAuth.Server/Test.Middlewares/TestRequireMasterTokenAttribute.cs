@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
@@ -14,6 +12,8 @@ using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Server.Models;
 using SimpleAuth.Services;
 using SimpleAuth.Shared;
+using Test.Shared.Extensions;
+using Test.Shared.Utils;
 using Test.SimpleAuth.Server.Support.Extensions;
 
 namespace Test.SimpleAuth.Server.Test.Middlewares
@@ -37,27 +37,16 @@ namespace Test.SimpleAuth.Server.Test.Middlewares
         [TestCase(null, false)]
         public void RequireMasterToken(string input, bool valid)
         {
-            var ctx = M<HttpContext>();
-            var req = M<HttpRequest>();
-            var res = M<HttpResponse>();
-            var svc = M<IServiceProvider>();
-            var scp = M<IServiceScope>();
-            var fac = M<IServiceScopeFactory>();
+            var ctx = Mu.OfHttpContext(out var svc, out _, out _, out _, out _,
+                requestHeaders: new HeaderDictionary(
+                    new Dictionary<string, StringValues>()
+                    {
+                        {Constants.Headers.MasterToken, new StringValues(input)}
+                    }));
 
-            svc.Setup(x => x.GetService(typeof(IEncryptionService))).Returns(new DummyEncryptionService());
-            svc.Setup(x => x.GetService(typeof(SecretConstants))).Returns(new SecretConstants(MasterToken));
-            ctx.SetupGet(x => x.RequestServices).Returns(svc.Object);
-            svc.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(fac.Object);
-            fac.Setup(x => x.CreateScope()).Returns(scp.Object);
-            scp.SetupGet(x => x.ServiceProvider).Returns(svc.Object);
-            ctx.SetupGet(x => x.Request).Returns(req.Object);
-            ctx.SetupGet(x => x.Response).Returns(res.Object);
-            req.SetupGet(x => x.Headers).Returns(
-                new HeaderDictionary(new Dictionary<string, StringValues>()
-                {
-                    {Constants.Headers.MasterToken, new StringValues(input)}
-                })
-            );
+            svc
+                .WithIn<IEncryptionService>(new DummyEncryptionService())
+                .WithIn(new SecretConstants(MasterToken));
 
             var attr = new RequireMasterTokenAttribute();
             var actionContext = new ActionContext(

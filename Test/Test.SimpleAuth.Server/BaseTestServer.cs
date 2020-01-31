@@ -8,6 +8,7 @@ using SimpleAuth.Server.Controllers;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Domains;
+using Test.Shared.Utils;
 
 namespace Test.SimpleAuth.Server
 {
@@ -15,22 +16,7 @@ namespace Test.SimpleAuth.Server
     {
         protected Mock<T> M<T>(MockBehavior mockBehavior = MockBehavior.Strict) where T : class
         {
-            return new Mock<T>(mockBehavior);
-        }
-
-        protected Mock<IServiceProvider> Isp(MockBehavior mockBehavior = MockBehavior.Strict) => M<IServiceProvider>(mockBehavior);
-
-        protected Mock<ILogger<T>> MLog<T>(MockBehavior mockBehavior = MockBehavior.Strict)
-        {
-            var logger = M<ILogger<T>>(mockBehavior);
-            logger.Setup(x => x.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                (Func<It.IsAnyType, Exception, string>) It.IsAny<object>())
-            );
-            return logger;
+            return Mu.Of<T>(mockBehavior);
         }
     }
 
@@ -58,30 +44,5 @@ namespace Test.SimpleAuth.Server
         
         protected Mock<TSvc> MSvc(MockBehavior mockBehavior = MockBehavior.Strict) => M<TSvc>(mockBehavior);
         protected Mock<TRepo> MRepo(MockBehavior mockBehavior = MockBehavior.Strict) => M<TRepo>(mockBehavior);
-    }
-
-    public static class BaseTestControllerExtensions
-    {
-        public static TController WithCtx<TController>(this TController controller) where TController : ControllerBase
-        {
-            controller.ControllerContext = new ControllerContext();
-            return controller;
-        }
-        
-        public static TController WithHttpCtx<TController>(this TController controller) where TController : ControllerBase
-        {
-            if (controller.ControllerContext == null)
-                controller = controller.WithCtx();
-            controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            return controller;
-        }
-        
-        public static TController WithCtx<TController>(this TController controller, Mock<HttpContext> httpCtx) where TController : ControllerBase
-        {
-            if (controller.ControllerContext == null)
-                controller = controller.WithCtx();
-            controller.ControllerContext.HttpContext = httpCtx.Object;
-            return controller;
-        }
     }
 }

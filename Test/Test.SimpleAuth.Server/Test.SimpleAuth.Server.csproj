@@ -18,6 +18,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\SimpleAuth.Server\SimpleAuth.Server.csproj" />
+      <ProjectReference Include="..\Test.Shared\Test.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Support.Extensions" />
     </ItemGroup>
 
 </Project>

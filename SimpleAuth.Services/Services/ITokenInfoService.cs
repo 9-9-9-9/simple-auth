@@ -9,7 +9,7 @@ namespace SimpleAuth.Services
     public interface ITokenInfoService : IDomainService
     {
         Task<int> IncreaseVersionAsync(TokenInfo tokenInfo);
-        Task<int> GetCurrentVersionAsync(TokenInfo tokenInfo);
+        Task<int> GetCurrentVersionAsync(TokenInfo tokenInfo, bool noCaching = false);
     }
 
     public class DefaultTokenInfoService : DomainService<ITokenInfoRepository, Entities.TokenInfo>,
@@ -52,13 +52,16 @@ namespace SimpleAuth.Services
             return entity.Version;
         }
 
-        public async Task<int> GetCurrentVersionAsync(TokenInfo tokenInfo)
+        public async Task<int> GetCurrentVersionAsync(TokenInfo tokenInfo, bool noCaching = false)
         {
-            var currentVersion = _cachedTokenInfoRepository.Get(tokenInfo.Corp, tokenInfo.App)?.Version ?? 0;
+            if (!noCaching)
+            {
+                var currentVersion = _cachedTokenInfoRepository.Get(tokenInfo.Corp, tokenInfo.App)?.Version ?? 0;
 
-            if (currentVersion > 0)
-                return currentVersion;
-            
+                if (currentVersion > 0)
+                    return currentVersion;
+            }
+
             var entity = await Repository
                 .FindSingleAsync(x =>
                     x.Corp == tokenInfo.Corp

@@ -1,6 +1,6 @@
 using SimpleAuth.InMemoryDb;
 
-namespace Test.SimpleAuth.Shared
+namespace Test.Shared
 {
     public class DbContext : InMemoryDbContext
     {

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Language.Flow;
-using SimpleAuth.Server.Controllers;
+using Test.Shared.Utils;
 
 namespace Test.SimpleAuth.Server.Support.Extensions
 {
@@ -32,10 +31,41 @@ namespace Test.SimpleAuth.Server.Support.Extensions
             return setup.Returns(Task.FromResult(result));
         }
 
-        public static Mock<IServiceProvider> SetupLogger<T>(this Mock<IServiceProvider> isp, Mock<ILogger<T>> mockLogger)
+        public static Mock<IServiceProvider> WithLogger<T>(this Mock<IServiceProvider> isp)
         {
-            isp.Setup(x => x.GetService(typeof(ILogger<T>))).Returns(mockLogger.Object);
+            isp.With<ILogger<T>>(out var logger);
+
+            logger.Setup(x => x.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>) It.IsAny<object>())
+            );
+
             return isp;
+        }
+
+        public static Mock<IServiceProvider> With<TMock>(this Mock<IServiceProvider> mock, out Mock<TMock> newMockObj,
+            MockBehavior mockBehavior = MockBehavior.Strict)
+            where TMock : class
+        {
+            newMockObj = Mu.Of<TMock>(mockBehavior);
+            mock.Setup(x => x.GetService(typeof(TMock))).Returns(newMockObj.Object);
+            return mock;
+        }
+
+        public static Mock<IServiceProvider> WithIn<TMock>(this Mock<IServiceProvider> mock, in Mock<TMock> newMockObj)
+            where TMock : class
+        {
+            return mock.WithIn(newMockObj.Object);
+        }
+
+        public static Mock<IServiceProvider> WithIn<TMock>(this Mock<IServiceProvider> mock, in TMock newMockObj)
+            where TMock : class
+        {
+            mock.Setup(x => x.GetService(typeof(TMock))).Returns(newMockObj);
+            return mock;
         }
 
         public class FutureSetup<T> where T : class

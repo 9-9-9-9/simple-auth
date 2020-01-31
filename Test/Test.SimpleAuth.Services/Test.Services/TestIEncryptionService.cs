@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SimpleAuth.Core.Utils;
 using SimpleAuth.Services;
 using SimpleAuth.Shared;
+using Test.Shared;
 
 namespace Test.SimpleAuth.Shared.Services
 {
@@ -28,6 +29,13 @@ namespace Test.SimpleAuth.Shared.Services
             var encrypted = svc.Encrypt(originalPlainText);
             var decrypted = svc.Decrypt(encrypted);
             Assert.AreEqual(originalPlainText, decrypted);
+            
+            Assert.IsTrue(svc.TryEncrypt(originalPlainText, out var encryptedData));
+            Assert.IsTrue(svc.TryDecrypt(encryptedData, out var decryptedData));
+            Assert.AreEqual(originalPlainText, decryptedData);
+            
+            Assert.IsFalse(svc.TryDecrypt("This can not be decrypted due to malformed", out _));
+            Assert.IsFalse(svc.TryEncrypt(null, out _));
         }
     }
 }

@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ using Sql_ProjectRegistrableModules = SimpleAuth.InMemoryDb.ProjectRegistrableMo
 using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
 using User = SimpleAuth.Shared.Domains.User;
 
-namespace Test.SimpleAuth.Shared
+namespace Test.Shared
 {
     public abstract class BaseTestClass
     {
