@@ -58,3 +58,5 @@ fi
 rm -f *.nupkg
 
 echo $(date)' > '$VERSION >> nuget.version.log
+
+echo 'Success'
