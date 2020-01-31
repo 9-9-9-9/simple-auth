@@ -14,7 +14,7 @@ namespace SimpleAuth.Client.Services
     {
         Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel);
         Task<RoleGroup> GetRoleGroupAsync(string roleGroupName);
-        Task AddRoleToGroupAsync(string roleGroupName, UpdateRolesModel updateRolesModel);
+        Task AddRoleToGroupAsync(string roleGroupName, RoleModels updateRolesModel);
         Task DeleteRolesAsync(string roleGroupName, params RoleModel[] roleModels);
         Task DeleteAllRolesAsync(string roleGroupName);
         Task SetLockRoleGroup(string roleGroupName, bool @lock);
@@ -56,7 +56,7 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public Task AddRoleToGroupAsync(string roleGroupName, UpdateRolesModel updateRolesModel)
+        public Task AddRoleToGroupAsync(string roleGroupName, RoleModels updateRolesModel)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,

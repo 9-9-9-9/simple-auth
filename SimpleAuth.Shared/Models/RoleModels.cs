@@ -46,14 +46,9 @@ namespace SimpleAuth.Shared.Models
         }
     }
 
-    public class UpdateRolesModel
+    public class RoleModels
     {
         [Required]
-        public RoleModel[] Roles { get; set; }
-    }
-
-    public class DeleteRolesModel
-    {
         public RoleModel[] Roles { get; set; }
     }
 

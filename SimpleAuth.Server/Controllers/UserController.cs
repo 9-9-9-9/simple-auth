@@ -211,6 +211,43 @@ namespace SimpleAuth.Server.Controllers
         }
 
         /// <summary>
+        /// Check if user has all permissions which are declared in payload
+        /// </summary>
+        /// <param name="userId">User to be checked</param>
+        /// <param name="roleModels">Role to be checked, with full parts, example: corp.app.env.tenant.module.subModules, permission is serialized Permission (byte value)</param>
+        /// <returns>Status code is 200 without content if user has all required permissions or status code 406 with json array of missing permissions</returns>
+        /// <response code="200">User HAS all the required permissions</response>
+        /// <response code="406">Any of the permissions user does not have</response>
+        /// <response code="404">User is not exists</response>
+        [HttpGet, Route("{userId}/roles/_missing")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetMissingPermissions(string userId, [FromBody] RoleModels roleModels)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return await ProcedureDefaultResponseIfError(() =>
+                {
+                    var roles = roleModels.Roles.Select(x => (x.Role, x.Permission.Deserialize())).ToArray();
+                    _logger.LogInformation(
+                        $"Checking permissions [{string.Join(",", roles.Select(x => $"{x.Role},{x.Item2}"))}] for user {userId}");
+
+                    return Service.GetMissingRolesAsync(
+                        userId,
+                        roles,
+                        RequestAppHeaders.Corp, RequestAppHeaders.App
+                    ).ContinueWith(
+                        x => x.Result.IsAny() 
+                            ? StatusCodes.Status406NotAcceptable.WithJson(x.Result.ToArray()) 
+                            : StatusCodes.Status200OK.WithEmpty()
+                    );
+                }
+            );
+        }
+
+        /// <summary>
         /// Get user's information, if the specified user and password are correct
         /// </summary>
         /// <param name="userId">User id to check</param>

@@ -55,7 +55,7 @@ namespace AppManagementConsole.Commands
                 return;
             }
 
-            await _roleGroupManagementService.AddRoleToGroupAsync(args[0], new UpdateRolesModel
+            await _roleGroupManagementService.AddRoleToGroupAsync(args[0], new RoleModels
             {
                 Roles = roleModels.ToArray()
             });
