@@ -219,7 +219,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">User HAS all the required permissions</response>
         /// <response code="406">Any of the permissions user does not have</response>
         /// <response code="404">User is not exists</response>
-        [HttpGet, Route("{userId}/roles/_missing")]
+        [HttpPost, Route("{userId}/roles/_missing")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -240,7 +240,7 @@ namespace SimpleAuth.Server.Controllers
                         RequestAppHeaders.Corp, RequestAppHeaders.App
                     ).ContinueWith(
                         x => x.Result.IsAny() 
-                            ? StatusCodes.Status406NotAcceptable.WithJson(x.Result.ToArray()) 
+                            ? StatusCodes.Status406NotAcceptable.WithJson(x.Result.Select(r => r.Cast()).ToArray()) 
                             : StatusCodes.Status200OK.WithEmpty()
                     );
                 }

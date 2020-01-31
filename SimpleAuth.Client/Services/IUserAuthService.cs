@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using SimpleAuth.Client.Exceptions;
 using SimpleAuth.Client.InternalExtensions;
 using SimpleAuth.Client.Utils;
+using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
+using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.Services
@@ -18,6 +20,7 @@ namespace SimpleAuth.Client.Services
         Task<ResponseUserModel> GetUserAsync(string userId, string password);
         Task<ResponseUserModel> GetUserAsync(LoginByGoogleRequest loginByGoogleRequest);
         Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Permission permission);
+        Task<RoleModel[]> GetMissingRolesAsync(string userId, RoleModels roleModels);
     }
 
     public class DefaultUserAuthService : ClientService, IUserAuthService
@@ -87,6 +90,27 @@ namespace SimpleAuth.Client.Services
                 return true;
             if (res.Item2 == HttpStatusCode.NotAcceptable)
                 return false;
+            
+            throw new SimpleAuthHttpRequestException(res.Item2);
+        }
+
+        public async Task<RoleModel[]> GetMissingRolesAsync(string userId, RoleModels roleModels)
+        {
+            var res = await _httpService.DoHttpRequestAsync<RoleModel[]>(
+                NewRequest()
+                    .Append(EndpointBuilder.User.GetMissingPermissions(userId))
+                    .Method(Constants.HttpMethods.POST),
+                roleModels.JsonSerialize()
+            );
+            if (res.Item2 == HttpStatusCode.OK)
+                return new RoleModel[0];
+            if (res.Item2 == HttpStatusCode.NotAcceptable)
+            {
+                if (!res.Item3.IsAny())
+                    throw new DataVerificationMismatchException($"Expected array of {nameof(RoleModel)} as response content");
+                return res.Item3;
+            }
+            
             throw new SimpleAuthHttpRequestException(res.Item2);
         }
     }
