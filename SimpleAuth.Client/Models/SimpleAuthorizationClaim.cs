@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
@@ -36,6 +37,14 @@ namespace SimpleAuth.Client.Models
             return RoleUtils.ContainsOrEquals(big.ClientRoleModel, small.ClientRoleModel,
                 RoleUtils.ComparisionFlag.All);
         }
+    }
+
+    public class PackageSimpleAuthorizationClaim
+    {
+        [Required]
+        public string UserId { get; set; }
+
+        public SimpleAuthorizationClaim[] Claims { get; set; }
     }
 
     public static class SimpleAuthorizationClaimExtensions

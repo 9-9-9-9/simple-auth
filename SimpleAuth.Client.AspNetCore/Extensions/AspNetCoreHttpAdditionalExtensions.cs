@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.Http
             var simpleAuthClaim = authenticationInfoProvider.GetSimpleAuthClaim(claims);
             if (simpleAuthClaim == default)
                 return Enumerable.Empty<SimpleAuthorizationClaim>().ToList();
-            return await authenticationInfoProvider.GetSimpleAuthClaimsAsync(simpleAuthClaim);
+            return (await authenticationInfoProvider.GetPackageSimpleAuthClaimAsync(simpleAuthClaim)).Claims;
         }
 
         public static ICollection<SimpleAuthorizationClaim> GetUserSimpleAuthorizationClaimsFromContext(

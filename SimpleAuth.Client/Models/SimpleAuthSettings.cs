@@ -7,6 +7,7 @@ namespace SimpleAuth.Client.Models
         public string App { get; set; }
         public string Env { get; set; }
         public string Tenant { get; set; }
+        public bool LiveChecking { get; set; }
         
         public string SimpleAuthServerUrl { get; set; } = "https://standingtrust.com"; //TODO https
     }

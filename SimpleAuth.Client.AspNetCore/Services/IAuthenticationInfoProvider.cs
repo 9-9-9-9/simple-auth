@@ -16,8 +16,8 @@ namespace SimpleAuth.Client.AspNetCore.Services
         Task<ICollection<Claim>> GetClaimsAsync(HttpContext httpContext);
         Task<Claim> GetSimpleAuthClaimAsync(HttpContext httpContext);
         Claim GetSimpleAuthClaim(ICollection<Claim> claims);
-        Task<Claim> GenerateSimpleAuthClaimAsync(ICollection<SimpleAuthorizationClaim> claims);
-        Task<ICollection<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim);
+        Task<Claim> GenerateSimpleAuthClaimAsync(PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim);
+        Task<PackageSimpleAuthorizationClaim> GetPackageSimpleAuthClaimAsync(Claim claim);
     }
 
     public class DefaultAuthenticationInfoProvider : IAuthenticationInfoProvider
@@ -50,15 +50,15 @@ namespace SimpleAuth.Client.AspNetCore.Services
             return GetSimpleAuthClaim(await GetClaimsAsync(httpContext));
         }
 
-        public Task<Claim> GenerateSimpleAuthClaimAsync(ICollection<SimpleAuthorizationClaim> claims)
+        public Task<Claim> GenerateSimpleAuthClaimAsync(PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim)
         {
-            return _claimTransformingService.PackAsync(claims);
+            return _claimTransformingService.PackAsync(packageSimpleAuthorizationClaim);
         }
 
-        public async Task<ICollection<SimpleAuthorizationClaim>> GetSimpleAuthClaimsAsync(Claim claim)
+        public async Task<PackageSimpleAuthorizationClaim> GetPackageSimpleAuthClaimAsync(Claim claim)
         {
             if (claim == null)
-                return Enumerable.Empty<SimpleAuthorizationClaim>().ToList();
+                return null;
 
             return await _claimTransformingService.UnpackAsync(claim);
         }
