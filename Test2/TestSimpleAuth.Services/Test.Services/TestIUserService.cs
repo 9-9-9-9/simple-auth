@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -12,11 +13,12 @@ using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
+using Test.SimpleAuth.Server.Support.Extensions;
 
 namespace Test.SimpleAuth.Services.Test.Services
 {
     public class TestIUserService : BaseTestService<IUserRepository, User, string>
-    {
+    {   
         [Test]
         public void GetUser()
         {
@@ -240,6 +242,110 @@ namespace Test.SimpleAuth.Services.Test.Services
             {
                 Corp = corp,
             }));
+        }
+
+        [Test]
+        public async Task AssignUserToGroupsAsync()
+        {
+            var svc = Prepare<IRoleGroupRepository, RoleGroup, Guid>(out var mockUserRepository, out var mockRoleGroupRepository).GetRequiredService<IUserService>();
+
+
+            mockUserRepository.Setup(x => x.AssignUserToGroups(It.IsAny<User>(), It.IsAny<RoleGroup[]>()))
+                .Returns(Task.CompletedTask);
+
+            var userId = RandomUser();
+            var corp1 = RandomCorp();
+            var corp2 = RandomCorp();
+            var app1 = RandomApp();
+            var app2 = RandomApp();
+            var roleGroup1 = RandomRoleGroup();
+            var roleGroup2 = RandomRoleGroup();
+
+            var user = new global::SimpleAuth.Shared.Domains.User
+            {
+                Id = userId
+            };
+
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.AssignUserToGroupsAsync(null, new []
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1
+                }
+            }));
+
+            Assert.CatchAsync<ArgumentException>(async () => await svc.AssignUserToGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]));
+
+            Assert.CatchAsync<ArgumentException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1
+                },
+                null
+            }));
+
+            Assert.CatchAsync<InvalidOperationException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1,
+                    App = app1
+                },
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1,
+                    App = app2
+                }
+            }));
+
+            mockRoleGroupRepository.Setup(x =>
+                    x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>(), It.IsAny<FindOptions>()))
+                .Returns((IEnumerable<RoleGroup>) null);
+            
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1,
+                    App = app1
+                },
+            }));
+
+            mockRoleGroupRepository.Setup(x =>
+                    x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>(), It.IsAny<FindOptions>()))
+                .Returns(new []
+                {
+                    new RoleGroup
+                    {
+                        Name = roleGroup1,
+                        Corp = corp1,
+                        App = app1
+                    }
+                });
+            
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Name = roleGroup2,
+                    Corp = corp1,
+                    App = app1
+                },
+            }));
+
+            await svc.AssignUserToGroupsAsync(user, new[]
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Name = roleGroup1,
+                    Corp = corp1,
+                    App = app1
+                },
+            });
+            
+            //TODO here
+            mockUserRepository.Verify(m => m.AssignUserToGroups(It.Is<User>(u => true), It.Is<RoleGroup[]>(rgs => true)));
         }
     }
 }

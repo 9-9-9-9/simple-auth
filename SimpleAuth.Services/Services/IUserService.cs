@@ -110,6 +110,12 @@ namespace SimpleAuth.Services
 
         public async Task AssignUserToGroupsAsync(User user, RoleGroup[] roleGroups)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            
+            if (!roleGroups.IsAny() || roleGroups.Any(x => x == null))
+                throw new ArgumentException(nameof(roleGroups));
+            
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException($"Groups must belong to same application");
 
@@ -128,16 +134,13 @@ namespace SimpleAuth.Services
                         {
                             Take = roleGroups.Length
                         }
-                    )
+                    ).OrEmpty()
                     .ToArray();
 
             var missingRoleGroups = roleGroups
-                .Where(g => lookupRoleGroups.All(lg =>
-                    lg.Name != g.Name
-                    &&
-                    lg.Corp != g.Corp
-                    &&
-                    lg.App != g.App)).ToArray();
+                .Select(x => (x.Name, x.Corp, x.App))
+                .Except(lookupRoleGroups.Select(x => (x.Name, x.Corp, x.App)))
+                .ToArray();
             if (missingRoleGroups.Any())
                 throw new EntityNotExistsException(missingRoleGroups.Select(g => g.Name));
 

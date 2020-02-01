@@ -18,5 +18,20 @@ namespace Test.SimpleAuth.Services.Test.Services
             var repoObj = mockRepo.Object;
             return Prepare(services => { services.AddSingleton(repoObj); });
         }
+        
+        protected IServiceProvider Prepare<TRepo2, TEntity2, TEntityKey2>(out Mock<TRepo> mockRepo, out Mock<TRepo2> mockRepo2)
+            where TRepo2 : class, IRepository<TEntity2>
+            where TEntity2 : BaseEntity<TEntityKey2>
+        {
+            mockRepo = Mu.Of<TRepo>();
+            mockRepo2 = Mu.Of<TRepo2>();
+            var repoObj = mockRepo.Object;
+            var repoObj2 = mockRepo2.Object;
+            return Prepare(services =>
+            {
+                services.AddSingleton(repoObj);
+                services.AddSingleton(repoObj2);
+            });
+        }
     }
 }

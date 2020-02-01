@@ -245,6 +245,8 @@ namespace Test.Shared
 
         protected string RandomText(int len = 5) => Guid.NewGuid().ToString().Replace("-", "").Substring(0, len);
         protected string RandomCorp() => RandomText();
+        protected string RandomApp() => RandomText();
+        protected string RandomRoleGroup() => RandomText();
         protected string RandomUser() => RandomText();
         protected string RandomEmail() => $"{RandomText()}@{RandomText(3)}.{RandomText(3)}";
 
