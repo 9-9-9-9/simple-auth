@@ -659,5 +659,142 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
         }
+
+        [Test]
+        public async Task UpdatePasswordAsync()
+        {
+            var sp = Prepare<ILocalUserInfoRepository, LocalUserInfo, Guid>(out var mockUserRepository,
+                out var mockLocalUserInfoRepository);
+            var svc = sp.GetRequiredService<IUserService>();
+            BasicSetup<ILocalUserInfoRepository, LocalUserInfo, Guid>(mockLocalUserInfoRepository);
+
+
+            var userId = RandomUser();
+            var corp1 = RandomCorp();
+            var corp2 = RandomCorp();
+            var corp3 = RandomCorp();
+
+            var pass1 = RandomText();
+            var pass2 = RandomText();
+            var pass3 = RandomText();
+
+            var encryptionService = sp.GetRequiredService<IEncryptionService>();
+            var pass1Enc = encryptionService.Encrypt(pass1);
+            var pass2Enc = encryptionService.Encrypt(pass2);
+            var pass3Enc = encryptionService.Encrypt(pass3);
+
+            var user = new global::SimpleAuth.Shared.Domains.User
+            {
+                Id = userId
+            };
+
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UpdatePasswordAsync(null));
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UpdatePasswordAsync(user));
+
+            user.LocalUserInfos = new global::SimpleAuth.Shared.Domains.LocalUserInfo[0];
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UpdatePasswordAsync(user));
+            user.LocalUserInfos = new global::SimpleAuth.Shared.Domains.LocalUserInfo[] {null};
+            Assert.CatchAsync<ArgumentException>(async () => await svc.UpdatePasswordAsync(user));
+
+            user.LocalUserInfos = new[]
+            {
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                }
+            };
+
+            SetupFindReturns(null);
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdatePasswordAsync(user));
+            
+            SetupFindReturns(new User
+            {
+                Id = userId,
+                UserInfos = null
+            });
+
+            await svc.UpdatePasswordAsync(user);
+            mockLocalUserInfoRepository.VerifyNoOtherCalls();
+            
+            SetupFindReturns(new User
+            {
+                Id = userId,
+                UserInfos = new List<LocalUserInfo>
+                {
+                    new LocalUserInfo
+                    {
+                        Corp = corp1
+                    },
+                    new LocalUserInfo
+                    {
+                        Corp = corp2
+                    }
+                }
+            });
+            user.LocalUserInfos = new[]
+            {
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp3
+                }
+            };
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdatePasswordAsync(user));
+            
+            SetupFindReturns(new User
+            {
+                Id = userId,
+                UserInfos = new List<LocalUserInfo>
+                {
+                    new LocalUserInfo
+                    {
+                        Corp = corp1,
+                        EncryptedPassword = pass1Enc
+                    },
+                    new LocalUserInfo
+                    {
+                        Corp = corp2,
+                        EncryptedPassword = null
+                    },
+                    new LocalUserInfo
+                    {
+                        Corp = corp3,
+                        EncryptedPassword = pass3Enc
+                    }
+                }
+            });
+            
+            user.LocalUserInfos = new[]
+            {
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp1,
+                    PlainPassword = pass1
+                },
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp2,
+                    PlainPassword = pass2
+                }
+            };
+            await svc.UpdatePasswordAsync(user);
+            // ReSharper disable PossibleMultipleEnumeration
+            mockLocalUserInfoRepository.Verify(m => m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 2)));
+            // ReSharper restore PossibleMultipleEnumeration
+            
+            user.LocalUserInfos = new[]
+            {
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp1,
+                    PlainPassword = string.Empty
+                }
+            };
+            await svc.UpdatePasswordAsync(user);
+            // ReSharper disable PossibleMultipleEnumeration
+            mockLocalUserInfoRepository.Verify(m => m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 1 && lus.First().EncryptedPassword == null)));
+            // ReSharper restore PossibleMultipleEnumeration
+            
+
+            void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
+        }
     }
 }
