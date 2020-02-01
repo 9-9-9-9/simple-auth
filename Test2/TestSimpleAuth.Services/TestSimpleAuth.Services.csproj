@@ -14,4 +14,9 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\SimpleAuth.Services\SimpleAuth.Services.csproj" />
+      <ProjectReference Include="..\..\Test\Test.Shared\Test.Shared.csproj" />
+    </ItemGroup>
+
 </Project>

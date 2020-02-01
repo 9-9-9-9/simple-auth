@@ -25,4 +25,16 @@ namespace SimpleAuth.Services.Entities
             };
         }
     }
+
+    public static class RoleRecordExtensions
+    {
+        public static RoleRecord ToEntityObject(this Shared.Domains.Role role)
+        {
+            return new RoleRecord
+            {
+                RoleId = role.RoleId,
+                Permission = role.Permission
+            };
+        }
+    }
 }

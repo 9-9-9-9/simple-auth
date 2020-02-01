@@ -40,15 +40,6 @@ namespace SimpleAuth.Services.Entities
             return RoleUtils.JoinSubModules(subModules);
         }
         
-        public static RoleRecord ToEntityObject(this Shared.Domains.Role role)
-        {
-            return new RoleRecord
-            {
-                RoleId = role.RoleId,
-                Permission = role.Permission
-            };
-        }
-        
         public static Role ConvertToEntity(this CreateRoleModel model)
         {
             var entity = new Role()
