@@ -14,7 +14,10 @@ namespace Test.SimpleAuth.Shared.Test.Models
             var rg = new RoleGroup
             {
                 Name = "rg",
-                Roles = null
+                Roles = null,
+                Corp = "c",
+                App = "a",
+                Locked = false
             };
 
             var res = RoleGroupResponseModel.Cast(rg);
