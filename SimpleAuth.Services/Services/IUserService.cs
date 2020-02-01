@@ -152,9 +152,18 @@ namespace SimpleAuth.Services
 
         public async Task UnAssignUserFromGroupsAsync(User user, RoleGroup[] roleGroups)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            
+            if (roleGroups == null)
+                throw new ArgumentNullException(nameof(roleGroups));
+
             if (roleGroups.IsEmpty())
                 return;
-
+            
+            if (roleGroups.Any(x => x == null))
+                throw new ArgumentException(nameof(roleGroups));
+            
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException($"Groups must belong to same application");
 
@@ -171,7 +180,7 @@ namespace SimpleAuth.Services
             }, new FindOptions
             {
                 Take = roleGroups.Length
-            }).ToArray();
+            }).OrEmpty().ToArray();
 
             if (tobeRemoved.Length != roleGroups.Length)
                 throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
@@ -185,6 +194,9 @@ namespace SimpleAuth.Services
 
         public async Task UnAssignUserFromAllGroupsAsync(User user, string corp)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));
 
@@ -196,6 +208,9 @@ namespace SimpleAuth.Services
                 return;
 
             var tobeRemoved = lookupUser.RoleGroupUsers.Where(rg => rg.RoleGroup.Corp == corp).ToList();
+
+            if (tobeRemoved.IsEmpty())
+                return;
 
             await Repository.UnAssignUserFromGroups(new Entities.User
                 {
@@ -314,33 +329,63 @@ namespace SimpleAuth.Services
 
         public async Task UpdateLockStatusAsync(User user)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            
+            if (!user.LocalUserInfos.IsAny())
+                throw new ArgumentNullException($"Require {nameof(user.LocalUserInfos)} of {nameof(user)}");
+            
+            if (user.LocalUserInfos.Any(x => x == null))
+                throw new ArgumentException($"{nameof(user.LocalUserInfos)} of {nameof(user)} contains null");
+            
             var lookupUser = Repository.Find(user.Id);
 
             if (lookupUser == null)
                 throw new EntityNotExistsException(user.Id);
 
+            if (!lookupUser.UserInfos.IsAny())
+                return;
+
             var tobeUpdated = new List<Entities.LocalUserInfo>();
 
             foreach (var localUserInfo in user.LocalUserInfos)
             {
-                var lookupUserUserInfo = lookupUser.UserInfos?.FirstOrDefault(x => x.Corp == localUserInfo.Corp);
+                var lookupUserUserInfo = lookupUser.UserInfos.FirstOrDefault(x => x.Corp == localUserInfo.Corp);
                 if (lookupUserUserInfo == null)
                     throw new EntityNotExistsException($"{user.Id} at {localUserInfo.Corp}");
 
+                if (lookupUserUserInfo.Locked == localUserInfo.Locked)
+                    continue;
+                
                 lookupUserUserInfo.Locked = localUserInfo.Locked;
 
                 tobeUpdated.Add(lookupUserUserInfo);
             }
+
+            if (!tobeUpdated.Any())
+                return;
 
             await _localUserInfoRepository.UpdateManyAsync(tobeUpdated);
         }
 
         public async Task UpdatePasswordAsync(User user)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            
+            if (!user.LocalUserInfos.IsAny())
+                throw new ArgumentNullException($"Require {nameof(user.LocalUserInfos)} of {nameof(user)}");
+            
+            if (user.LocalUserInfos.Any(x => x == null))
+                throw new ArgumentException($"{nameof(user.LocalUserInfos)} of {nameof(user)} contains null");
+            
             var lookupUser = Repository.Find(user.Id);
 
             if (lookupUser == null)
                 throw new EntityNotExistsException(user.Id);
+
+            if (!lookupUser.UserInfos.IsAny())
+                return;
 
             var tobeUpdated = new List<Entities.LocalUserInfo>();
 

@@ -13,12 +13,11 @@ using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
-using Test.SimpleAuth.Server.Support.Extensions;
 
 namespace Test.SimpleAuth.Services.Test.Services
 {
     public class TestIUserService : BaseTestService<IUserRepository, User, string>
-    {   
+    {
         [Test]
         public void GetUser()
         {
@@ -233,29 +232,30 @@ namespace Test.SimpleAuth.Services.Test.Services
             );
 
             mockUserRepository.Setup(x =>
-                x.CreateUserAsync(It.IsAny<User>(), It.IsAny<LocalUserInfo>())).ThrowsAsync(new EntityAlreadyExistsException(string.Empty));
+                    x.CreateUserAsync(It.IsAny<User>(), It.IsAny<LocalUserInfo>()))
+                .ThrowsAsync(new EntityAlreadyExistsException(string.Empty));
 
-            Assert.CatchAsync<EntityAlreadyExistsException>(async () => await svc.CreateUserAsync(new global::SimpleAuth.Shared.Domains.User
-            {
-                Id = userId
-            }, new global::SimpleAuth.Shared.Domains.LocalUserInfo
-            {
-                Corp = corp,
-            }));
+            Assert.CatchAsync<EntityAlreadyExistsException>(async () => await svc.CreateUserAsync(
+                new global::SimpleAuth.Shared.Domains.User
+                {
+                    Id = userId
+                }, new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp,
+                }));
         }
 
         [Test]
         public async Task AssignUserToGroupsAsync()
         {
-            var svc = Prepare<IRoleGroupRepository, RoleGroup, Guid>(out var mockUserRepository, out var mockRoleGroupRepository).GetRequiredService<IUserService>();
-
+            var svc = Prepare<IRoleGroupRepository, RoleGroup, Guid>(out var mockUserRepository,
+                out var mockRoleGroupRepository).GetRequiredService<IUserService>();
 
             mockUserRepository.Setup(x => x.AssignUserToGroups(It.IsAny<User>(), It.IsAny<RoleGroup[]>()))
                 .Returns(Task.CompletedTask);
 
             var userId = RandomUser();
             var corp1 = RandomCorp();
-            var corp2 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
             var roleGroup1 = RandomRoleGroup();
@@ -266,7 +266,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 Id = userId
             };
 
-            Assert.CatchAsync<ArgumentNullException>(async () => await svc.AssignUserToGroupsAsync(null, new []
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.AssignUserToGroupsAsync(null, new[]
             {
                 new global::SimpleAuth.Shared.Domains.RoleGroup
                 {
@@ -274,9 +274,10 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             }));
 
-            Assert.CatchAsync<ArgumentException>(async () => await svc.AssignUserToGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]));
+            Assert.CatchAsync<ArgumentException>(async () =>
+                await svc.AssignUserToGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]));
 
-            Assert.CatchAsync<ArgumentException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+            Assert.CatchAsync<ArgumentException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
                 new global::SimpleAuth.Shared.Domains.RoleGroup
                 {
@@ -285,7 +286,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 null
             }));
 
-            Assert.CatchAsync<InvalidOperationException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+            Assert.CatchAsync<InvalidOperationException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
                 new global::SimpleAuth.Shared.Domains.RoleGroup
                 {
@@ -302,8 +303,8 @@ namespace Test.SimpleAuth.Services.Test.Services
             mockRoleGroupRepository.Setup(x =>
                     x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>(), It.IsAny<FindOptions>()))
                 .Returns((IEnumerable<RoleGroup>) null);
-            
-            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
                 new global::SimpleAuth.Shared.Domains.RoleGroup
                 {
@@ -314,7 +315,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             mockRoleGroupRepository.Setup(x =>
                     x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>(), It.IsAny<FindOptions>()))
-                .Returns(new []
+                .Returns(new[]
                 {
                     new RoleGroup
                     {
@@ -323,8 +324,8 @@ namespace Test.SimpleAuth.Services.Test.Services
                         App = app1
                     }
                 });
-            
-            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new []
+
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
                 new global::SimpleAuth.Shared.Domains.RoleGroup
                 {
@@ -343,9 +344,320 @@ namespace Test.SimpleAuth.Services.Test.Services
                     App = app1
                 },
             });
+
+            mockUserRepository.Verify(m => m.AssignUserToGroups(It.Is<User>(u => u.Id == userId),
+                It.Is<RoleGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == roleGroup1)));
+        }
+
+        [Test]
+        public async Task UnAssignUserFromGroupsAsync()
+        {
+            var svc = Prepare<IRoleGroupUserRepository, RoleGroupUser>(out var mockUserRepository,
+                out var mockRoleGroupUserRepository).GetRequiredService<IUserService>();
+
+            mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<RoleGroup[]>()))
+                .Returns(Task.CompletedTask);
+
+            var userId = RandomUser();
+            var corp1 = RandomCorp();
+            var app1 = RandomApp();
+            var app2 = RandomApp();
+            var roleGroup1 = RandomRoleGroup();
+            var roleGroup2 = RandomRoleGroup();
+
+            var user = new global::SimpleAuth.Shared.Domains.User
+            {
+                Id = userId
+            };
+
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromGroupsAsync(null, new[]
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1
+                }
+            }));
+
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromGroupsAsync(user, null));
+
+            await svc.UnAssignUserFromGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]);
+            mockRoleGroupUserRepository.VerifyNoOtherCalls();
+
+            Assert.CatchAsync<ArgumentException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1
+                },
+                null
+            }));
+
+            Assert.CatchAsync<InvalidOperationException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1,
+                    App = app1
+                },
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1,
+                    App = app2
+                }
+            }));
+
+            SetupFindManyReturns(null);
+
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Corp = corp1,
+                    App = app1
+                },
+            }));
+
+            SetupFindManyReturns(new[]
+            {
+                new RoleGroupUser
+                {
+                    UserId = userId,
+                    RoleGroup = new RoleGroup
+                    {
+                        Name = roleGroup1,
+                        Corp = corp1,
+                        App = app1
+                    }
+                }
+            });
+
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Name = roleGroup1,
+                    Corp = corp1,
+                    App = app1
+                },
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Name = roleGroup2,
+                    Corp = corp1,
+                    App = app1
+                },
+            }));
+
+            await svc.UnAssignUserFromGroupsAsync(user, new[]
+            {
+                new global::SimpleAuth.Shared.Domains.RoleGroup
+                {
+                    Name = roleGroup1,
+                    Corp = corp1,
+                    App = app1
+                },
+            });
+
+            mockUserRepository.Verify(m => m.UnAssignUserFromGroups(It.Is<User>(u => u.Id == userId),
+                It.Is<RoleGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == roleGroup1)));
+
+            void SetupFindManyReturns(IEnumerable<RoleGroupUser> roleGroupUsers) =>
+                mockRoleGroupUserRepository.Setup(x =>
+                        x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroupUser, bool>>>>(),
+                            It.IsAny<FindOptions>()))
+                    .Returns(roleGroupUsers);
+        }
+
+        [Test]
+        public async Task UnAssignUserFromAllGroupsAsync()
+        {
+            var svc = Prepare(out var mockUserRepository).GetRequiredService<IUserService>();
+
+            mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<RoleGroup[]>()))
+                .Returns(Task.CompletedTask);
+
+            var userId = RandomUser();
+            var corp1 = RandomCorp();
+            var corp2 = RandomCorp();
+            var corp3 = RandomCorp();
+            var roleGroup1 = RandomRoleGroup();
+            var roleGroup2 = RandomRoleGroup();
+            var roleGroup3 = RandomRoleGroup();
+
+            var user = new global::SimpleAuth.Shared.Domains.User
+            {
+                Id = userId
+            };
+
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromAllGroupsAsync(null, corp1));
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await svc.UnAssignUserFromAllGroupsAsync(user, string.Empty));
+
+            SetupFindReturns(null);
+            Assert.CatchAsync<EntityNotExistsException>(async () =>
+                await svc.UnAssignUserFromAllGroupsAsync(user, corp1));
+
+            SetupFindReturns(new User
+            {
+                RoleGroupUsers = null
+            });
+            await svc.UnAssignUserFromAllGroupsAsync(user, corp1);
+            mockUserRepository.Verify(m => m.Find(It.IsAny<string>()));
+            mockUserRepository.VerifyNoOtherCalls();
+
+            SetupFindReturns(new User
+            {
+                RoleGroupUsers = new List<RoleGroupUser>
+                {
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = roleGroup1,
+                            Corp = corp1
+                        },
+                    },
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = roleGroup2,
+                            Corp = corp1
+                        },
+                    },
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = roleGroup3,
+                            Corp = corp3
+                        },
+                    }
+                }
+            });
+            await svc.UnAssignUserFromAllGroupsAsync(user, corp2);
+            mockUserRepository.Verify(m => m.Find(It.IsAny<string>()));
+            mockUserRepository.VerifyNoOtherCalls();
+
+            await svc.UnAssignUserFromAllGroupsAsync(user, corp1);
+
+            mockUserRepository.Verify(m => m.UnAssignUserFromGroups(It.Is<User>(u => u.Id == userId),
+                It.Is<RoleGroup[]>(rgs =>
+                    rgs.Length == 2 && rgs[0].Name == roleGroup1 && rgs.All(x => x.Corp == corp1))));
+
+            void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
+        }
+
+        [Test]
+        public async Task UpdateLockStatusAsync()
+        {
+            var svc = Prepare<ILocalUserInfoRepository, LocalUserInfo, Guid>(out var mockUserRepository,
+                out var mockLocalUserInfoRepository).GetRequiredService<IUserService>();
+            BasicSetup<ILocalUserInfoRepository, LocalUserInfo, Guid>(mockLocalUserInfoRepository);
+
+
+            var userId = RandomUser();
+            var corp1 = RandomCorp();
+            var corp2 = RandomCorp();
+            var corp3 = RandomCorp();
+
+            var user = new global::SimpleAuth.Shared.Domains.User
+            {
+                Id = userId
+            };
+
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UpdateLockStatusAsync(null));
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UpdateLockStatusAsync(user));
+
+            user.LocalUserInfos = new global::SimpleAuth.Shared.Domains.LocalUserInfo[0];
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.UpdateLockStatusAsync(user));
+            user.LocalUserInfos = new global::SimpleAuth.Shared.Domains.LocalUserInfo[] {null};
+            Assert.CatchAsync<ArgumentException>(async () => await svc.UpdateLockStatusAsync(user));
+
+            user.LocalUserInfos = new[]
+            {
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                }
+            };
+
+            SetupFindReturns(null);
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdateLockStatusAsync(user));
             
-            //TODO here
-            mockUserRepository.Verify(m => m.AssignUserToGroups(It.Is<User>(u => true), It.Is<RoleGroup[]>(rgs => true)));
+            SetupFindReturns(new User
+            {
+                Id = userId,
+                UserInfos = null
+            });
+
+            await svc.UpdateLockStatusAsync(user);
+            mockLocalUserInfoRepository.VerifyNoOtherCalls();
+            
+            SetupFindReturns(new User
+            {
+                Id = userId,
+                UserInfos = new List<LocalUserInfo>
+                {
+                    new LocalUserInfo
+                    {
+                        Corp = corp1
+                    },
+                    new LocalUserInfo
+                    {
+                        Corp = corp2
+                    }
+                }
+            });
+            user.LocalUserInfos = new[]
+            {
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp3
+                }
+            };
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdateLockStatusAsync(user));
+            
+            SetupFindReturns(new User
+            {
+                Id = userId,
+                UserInfos = new List<LocalUserInfo>
+                {
+                    new LocalUserInfo
+                    {
+                        Corp = corp1,
+                        Locked = true
+                    },
+                    new LocalUserInfo
+                    {
+                        Corp = corp2,
+                        Locked = true
+                    }
+                }
+            });
+            
+            user.LocalUserInfos = new[]
+            {
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp1,
+                    Locked = true
+                },
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo
+                {
+                    Corp = corp2,
+                    Locked = true
+                }
+            };
+            await svc.UpdateLockStatusAsync(user);
+            mockLocalUserInfoRepository.VerifyNoOtherCalls();
+
+            user.LocalUserInfos[0].Locked = false;
+            await svc.UpdateLockStatusAsync(user);
+            // ReSharper disable PossibleMultipleEnumeration
+            mockLocalUserInfoRepository.Verify(m => m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 1 && lus.First().Corp == corp1)));
+            // ReSharper restore PossibleMultipleEnumeration
+            
+
+            void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
         }
     }
 }
