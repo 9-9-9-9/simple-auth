@@ -6,12 +6,12 @@ namespace Test.SimpleAuth.Shared.Mock.Services
     {
         public string Encrypt(string plainTextData)
         {
-            return plainTextData;
+            return "e" + plainTextData;
         }
 
         public string Decrypt(string encryptedData)
         {
-            return encryptedData;
+            return encryptedData.Substring(1);
         }
 
         public bool TryEncrypt(string plainTextData, out string encryptedData)

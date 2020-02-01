@@ -48,7 +48,7 @@ namespace SimpleAuth.Repositories
         {
             var lookupUser = Find(user.Id);
 
-            using var ctx = OpenConnect();
+            await using var ctx = OpenConnect();
             var dbUsers = ctx.Set<User>();
             var persist = false;
             if (lookupUser == null)
@@ -147,7 +147,7 @@ namespace SimpleAuth.Repositories
                 throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
                     .Except(lookupRoleGroups.Select(g => g.Name)));
 
-            using var ctx = OpenConnect();
+            await using var ctx = OpenConnect();
 
             var lookupUser = await ctx.Set<User>()
                 .Include(x => x.RoleGroupUsers)

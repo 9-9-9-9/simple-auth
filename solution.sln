@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSimpleAuth.Client", "Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSimpleAuth.Client.AspNetCore", "Test2\TestSimpleAuth.Client.AspNetCore\TestSimpleAuth.Client.AspNetCore.csproj", "{BFD440A2-630B-447A-ACFC-EB1BA1EAD3E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Integration.Repositories", "Test2\Test.Integration.Repositories\Test.Integration.Repositories.csproj", "{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -399,6 +401,18 @@ Global
 		{BFD440A2-630B-447A-ACFC-EB1BA1EAD3E8}.Release|x64.Build.0 = Release|Any CPU
 		{BFD440A2-630B-447A-ACFC-EB1BA1EAD3E8}.Release|x86.ActiveCfg = Release|Any CPU
 		{BFD440A2-630B-447A-ACFC-EB1BA1EAD3E8}.Release|x86.Build.0 = Release|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Debug|x64.Build.0 = Debug|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Debug|x86.Build.0 = Debug|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Release|x64.ActiveCfg = Release|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Release|x64.Build.0 = Release|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Release|x86.ActiveCfg = Release|Any CPU
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -425,6 +439,7 @@ Global
 		{0BF88745-2E90-4160-BF79-FE2B1E64F54D} = {F0CCBA31-4484-404D-AF49-769C97746857}
 		{7BB85C64-9011-40C2-BDED-9203B2FA409D} = {F0CCBA31-4484-404D-AF49-769C97746857}
 		{BFD440A2-630B-447A-ACFC-EB1BA1EAD3E8} = {F0CCBA31-4484-404D-AF49-769C97746857}
+		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A} = {F0CCBA31-4484-404D-AF49-769C97746857}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B53DD286-B6DE-4EBF-8E02-1081D86E57B1}

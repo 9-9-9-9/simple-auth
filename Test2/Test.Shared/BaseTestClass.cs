@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,8 +26,14 @@ namespace Test.Shared
     {
         protected virtual IServiceProvider Prepare()
         {
+            return Prepare(x => { });
+        }
+
+        protected virtual IServiceProvider Prepare(Action<IServiceCollection> registerSvcAct)
+        {
             var services = new ServiceCollection();
             RegisteredServices(services);
+            registerSvcAct(services);
             return services.BuildServiceProvider();
         }
 
@@ -126,12 +131,12 @@ namespace Test.Shared
 
             serviceCollection.AddSingleton(MLog<DefaultEncryptionService>().Object);
         }
-        
+
         protected Mock<T> M<T>(MockBehavior mockBehavior = MockBehavior.Strict) where T : class
         {
             return new Mock<T>(mockBehavior);
         }
-        
+
         protected Mock<ILogger<T>> MLog<T>(MockBehavior mockBehavior = MockBehavior.Strict)
         {
             var logger = M<ILogger<T>>(mockBehavior);
@@ -238,7 +243,20 @@ namespace Test.Shared
             }
         }
 
-        protected string RandomCorp() => Guid.NewGuid().ToString().Substring(0, 5);
-        protected string RandomUser() => Guid.NewGuid().ToString().Substring(0, 5);
+        protected string RandomText(int len = 5) => Guid.NewGuid().ToString().Replace("-", "").Substring(0, len);
+        protected string RandomCorp() => RandomText();
+        protected string RandomUser() => RandomText();
+        protected string RandomEmail() => $"{RandomText()}@{RandomText(3)}.{RandomText(3)}";
+
+        protected Mock<TRepo> BasicSetup<TRepo, TEntity, TEntityKey>(Mock<TRepo> mockRepo)
+            where TRepo : class, IRepository<TEntity, TEntityKey>
+            where TEntity : BaseEntity<TEntityKey>
+        {
+            mockRepo.Setup(x => x.CreateManyAsync(It.IsAny<IEnumerable<TEntity>>())).ReturnsAsync(1);
+            mockRepo.Setup(x => x.UpdateManyAsync(It.IsAny<IEnumerable<TEntity>>())).ReturnsAsync(1);
+            mockRepo.Setup(x => x.DeleteManyAsync(It.IsAny<IEnumerable<TEntity>>())).ReturnsAsync(1);
+
+            return mockRepo;
+        }
     }
 }

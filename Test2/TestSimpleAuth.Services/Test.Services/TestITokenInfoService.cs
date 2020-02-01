@@ -11,25 +11,17 @@ using SimpleAuth.Repositories;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Exceptions;
-using Test.Shared;
-using Test.Shared.Utils;
 
 namespace Test.SimpleAuth.Services.Test.Services
 {
-    public class TestITokenInfoService : BaseTestClass
+    public class TestITokenInfoService : BaseTestService<ITokenInfoRepository, TokenInfo, Guid>
     {
-        protected IServiceProvider Prepare(out Mock<ITokenInfoRepository> mockTokenInfoRepository)
-        {
-            mockTokenInfoRepository = Mu.Of<ITokenInfoRepository>();
-            var repoObj = mockTokenInfoRepository.Object;
-            return Prepare(services => { services.AddSingleton(repoObj); });
-        }
-
         [Test]
         public async Task IncreaseVersionAsync()
         {
             var svc = Prepare(out var mockTokenInfoRepository).GetRequiredService<ITokenInfoService>();
 
+            mockTokenInfoRepository = BasicSetup<ITokenInfoRepository, TokenInfo, Guid>(mockTokenInfoRepository);
             mockTokenInfoRepository.Setup(x => x.CreateManyAsync(It.IsAny<IEnumerable<TokenInfo>>())).ReturnsAsync(1);
             mockTokenInfoRepository.Setup(x => x.UpdateManyAsync(It.IsAny<IEnumerable<TokenInfo>>())).ReturnsAsync(1);
 
