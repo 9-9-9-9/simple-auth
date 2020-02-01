@@ -32,7 +32,7 @@ namespace AppManagementConsole.Commands
                 
 
                 sb.AppendLine($"Email: {model.Email}");
-                sb.AppendLine($"Token expire: {model.TokenExpireAfterSeconds?.ToString() ?? "None"} secs");
+                sb.AppendLine($"Token expire: {model.ExpiryDate?.ToString() ?? "None"} secs");
                 sb.AppendLine($"Active roles:");
                 model.ActiveRoles?.ToList().ForEach(rm => {sb.AppendLine($"<{rm.Permission.Deserialize(),20}> {rm.Role}");});
                 

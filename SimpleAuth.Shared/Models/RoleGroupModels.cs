@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Domains;
 
 namespace SimpleAuth.Shared.Models
@@ -25,7 +26,7 @@ namespace SimpleAuth.Shared.Models
             return new RoleGroupResponseModel
             {
                 Name = group.Name,
-                Roles = group.Roles.Select(RoleModel.Cast).ToArray()
+                Roles = (group.Roles?.Select(RoleModel.Cast)).OrEmpty().ToArray()
             };
         }
     }

@@ -35,7 +35,7 @@ namespace SimpleAuth.Services.Entities
 
     public static class RoleExtensions
     {
-        public static string JoinSubModules(this IEnumerable<string> subModules)
+        public static string JoinSubModules(this ICollection<string> subModules)
         {
             return RoleUtils.JoinSubModules(subModules);
         }

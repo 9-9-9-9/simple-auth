@@ -18,10 +18,5 @@ namespace Test.Shared.Extensions
                 return (T)(object)null;
             }
         }
-        
-        public static void Ex<TException>(ActualValueDelegate<object> avd) where TException : Exception
-        {
-            Assert.That(avd, Throws.TypeOf<TException>());
-        }
     }
 }
