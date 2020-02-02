@@ -44,10 +44,10 @@ namespace SimpleAuth.Shared.Utils
         public static string JoinSubModules(ICollection<string> subModules)
         {
             subModules = subModules.OrEmpty().ToList();
-            
+
             if (subModules.Count < 2)
                 return subModules.FirstOrDefault().IsBlank() ? null : subModules.First();
-            
+
             if (subModules.Any(x => x.IsBlank()))
                 throw new ArgumentNullException($"{nameof(subModules)} contains blank string, which is not allowed");
 
@@ -229,6 +229,24 @@ namespace SimpleAuth.Shared.Utils
                 throw new ArgumentException(nameof(merged));
 
             return (spl[0], spl[1].Deserialize());
+        }
+
+        public static IEnumerable<(string, Permission)> ParseToMinimum(string roleId, Permission permission)
+        {
+            foreach (var p in ParseToMinimum(permission))
+                yield return (roleId, p);
+        }
+
+        public static IEnumerable<Permission> ParseToMinimum(Permission permission)
+        {
+            if (permission.HasFlag(Permission.Add))
+                yield return Permission.Add;
+            if (permission.HasFlag(Permission.View))
+                yield return Permission.View;
+            if (permission.HasFlag(Permission.Edit))
+                yield return Permission.Edit;
+            if (permission.HasFlag(Permission.Delete))
+                yield return Permission.Delete;
         }
     }
 }

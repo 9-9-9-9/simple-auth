@@ -112,10 +112,10 @@ namespace SimpleAuth.Services
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            
+
             if (!roleGroups.IsAny() || roleGroups.Any(x => x == null))
                 throw new ArgumentException(nameof(roleGroups));
-            
+
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException($"Groups must belong to same application");
 
@@ -154,16 +154,16 @@ namespace SimpleAuth.Services
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            
+
             if (roleGroups == null)
                 throw new ArgumentNullException(nameof(roleGroups));
 
             if (roleGroups.IsEmpty())
                 return;
-            
+
             if (roleGroups.Any(x => x == null))
                 throw new ArgumentException(nameof(roleGroups));
-            
+
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException($"Groups must belong to same application");
 
@@ -196,7 +196,7 @@ namespace SimpleAuth.Services
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            
+
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));
 
@@ -266,12 +266,14 @@ namespace SimpleAuth.Services
             var activeRoles = await GetActiveRolesAsync(userId, corp, app);
             var userActiveClientRoleModels = activeRoles.Select(x => x.ToClientRoleModel());
 
-            var requireClientRoleModels = permissions.Select(x =>
-            {
-                RoleUtils.Parse(x.Item1, out var requireClientRoleModel);
-                requireClientRoleModel.Permission = x.Item2;
-                return requireClientRoleModel;
-            }).ToArray();
+            var requireClientRoleModels = permissions
+                .SelectMany(x => RoleUtils.ParseToMinimum(x.Item1, x.Item2))
+                .Select(x =>
+                {
+                    RoleUtils.Parse(x.Item1, out var requireClientRoleModel);
+                    requireClientRoleModel.Permission = x.Item2;
+                    return requireClientRoleModel;
+                }).ToArray();
 
             var missing = requireClientRoleModels.Where(requireClientRoleModel =>
                 !userActiveClientRoleModels.Any(activeRole =>
@@ -331,13 +333,13 @@ namespace SimpleAuth.Services
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            
+
             if (!user.LocalUserInfos.IsAny())
                 throw new ArgumentNullException($"Require {nameof(user.LocalUserInfos)} of {nameof(user)}");
-            
+
             if (user.LocalUserInfos.Any(x => x == null))
                 throw new ArgumentException($"{nameof(user.LocalUserInfos)} of {nameof(user)} contains null");
-            
+
             var lookupUser = Repository.Find(user.Id);
 
             if (lookupUser == null)
@@ -356,7 +358,7 @@ namespace SimpleAuth.Services
 
                 if (lookupUserUserInfo.Locked == localUserInfo.Locked)
                     continue;
-                
+
                 lookupUserUserInfo.Locked = localUserInfo.Locked;
 
                 tobeUpdated.Add(lookupUserUserInfo);
@@ -372,13 +374,13 @@ namespace SimpleAuth.Services
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            
+
             if (!user.LocalUserInfos.IsAny())
                 throw new ArgumentNullException($"Require {nameof(user.LocalUserInfos)} of {nameof(user)}");
-            
+
             if (user.LocalUserInfos.Any(x => x == null))
                 throw new ArgumentException($"{nameof(user.LocalUserInfos)} of {nameof(user)} contains null");
-            
+
             var lookupUser = Repository.Find(user.Id);
 
             if (lookupUser == null)

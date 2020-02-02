@@ -711,7 +711,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             });
 
             #endregion
-            
+
             #region Test without any locked role
 
             SetupFindRolesReturns(null);
@@ -726,16 +726,16 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             roles = await svc.GetActiveRolesAsync(userId, corp1, app1, tenant: tenant);
             Assert.AreEqual(6, roles.Count);
-            
+
             roles = await svc.GetActiveRolesAsync(userId, corp2, app2);
             Assert.AreEqual(3, roles.Count);
             Assert.IsTrue(roles.All(x => x.RoleId.Contains("t.m2")));
-            
+
             roles = await svc.GetActiveRolesAsync(userId, corp2, RandomApp());
             Assert.AreEqual(0, roles.Count);
 
             #endregion
-            
+
             #region Test when some locked roles
 
             SetupFindRolesReturns(new List<Role>
@@ -781,11 +781,11 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             roles = await svc.GetActiveRolesAsync(userId, corp1, app1, tenant: tenant);
             Assert.AreEqual(2, roles.Count);
-            
+
             roles = await svc.GetActiveRolesAsync(userId, corp2, app2);
             Assert.AreEqual(1, roles.Count);
             Assert.IsTrue(roles.First().RoleId.EndsWith("1"));
-            
+
             roles = await svc.GetActiveRolesAsync(userId, corp2, RandomApp());
             Assert.AreEqual(0, roles.Count);
 
@@ -804,7 +804,184 @@ namespace Test.SimpleAuth.Services.Test.Services
         [Test]
         public async Task GetMissingRolesAsync()
         {
+            var svc = Prepare<IRoleRepository, Role, string>(out var mockUserRepository, out var mockRoleRepository)
+                .GetRequiredService<IUserService>();
+
+            var userId = RandomUser();
+            var corp1 = RandomCorp();
+            var corp2 = RandomCorp();
+            var app1 = RandomApp();
+            var app2 = RandomApp();
+            var env = RandomEnv();
+            var tenant = RandomTenant();
+
+            #region Arguments validation
+
+            // catch null arg
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await svc.GetMissingRolesAsync(string.Empty, new (string, Permission)[0], corp1, app1));
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await svc.GetMissingRolesAsync(userId, new (string, Permission)[0], string.Empty, app1));
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await svc.GetMissingRolesAsync(userId, new (string, Permission)[0], corp1, string.Empty));
+
+            // not allow arg contains permission None
+            Assert.CatchAsync<ArgumentException>(async () =>
+                await svc.GetMissingRolesAsync(userId, new (string, Permission)[]
+                {
+                    ("any", Permission.None)
+                }, corp1, app1)
+            );
+
+            #endregion
+
+            // catch user not found
+            SetupFindUserReturns(null);
+            Assert.CatchAsync<EntityNotExistsException>(async () =>
+                await svc.GetMissingRolesAsync(userId, new (string, Permission)[]
+                {
+                    ("any", Permission.Add)
+                }, corp1, app1)
+            );
+
+            // normal
+
+            #region SetupFindUserReturns
+
+            SetupFindUserReturns(new User
+            {
+                UserInfos = new List<LocalUserInfo>
+                {
+                    new LocalUserInfo
+                    {
+                        UserId = userId,
+                        Corp = corp1
+                    },
+                    new LocalUserInfo
+                    {
+                        UserId = userId,
+                        Corp = corp2
+                    }
+                },
+                RoleGroupUsers = new List<RoleGroupUser>
+                {
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = "g1",
+                            Corp = corp1,
+                            App = app1,
+                            RoleRecords = new List<RoleRecord>
+                            {
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp1}.{app1}.e.t.crud",
+                                    Permission = Permission.Crud
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp1}.{app1}.e.t.full",
+                                    Permission = Permission.Full
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp1}.{app1}.e.t.ae",
+                                    Permission = Permission.Add | Permission.Edit
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp1}.{app1}.e.t.d",
+                                    Permission = Permission.Delete
+                                },
+                            }
+                        }
+                    },
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = "g2",
+                            Corp = corp2,
+                            App = app2,
+                            RoleRecords = new List<RoleRecord>
+                            {
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp2}.{app2}.e.t.crud",
+                                    Permission = Permission.Crud
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp2}.{app2}.e.t.full",
+                                    Permission = Permission.Full
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp2}.{app2}.e.t.ae",
+                                    Permission = Permission.Add | Permission.Edit
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = $"{corp2}.{app2}.e.t.d",
+                                    Permission = Permission.Delete
+                                },
+                            }
+                        }
+                    }
+                }
+            });
+
+            #endregion
+
+            SetupFindRolesReturns(null);
+
+            #region corp1
+
+            var missingRoles = await svc.GetMissingRolesAsync(userId, new[]
+            {
+                ($"{corp1}.{app1}.e.t.crud", Permission.Edit), // usr has
+                ($"{corp1}.{app1}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
+                ($"{corp1}.{app1}.e.t.d", Permission.Edit), // expect
+            }, corp1, app1);
             
+            Assert.AreEqual(2, missingRoles.Count);
+            var ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp1}.{app1}.e.t.ae");
+            Assert.NotNull(ae);
+            Assert.AreEqual(Permission.View, ae.Permission);
+            var d = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp1}.{app1}.e.t.d");
+            Assert.NotNull(ae);
+            Assert.AreEqual(Permission.Edit, d.Permission);
+
+            #endregion
+
+            #region corp2
+
+            missingRoles = await svc.GetMissingRolesAsync(userId, new[]
+            {
+                ($"{corp2}.{app2}.e.t.crud", Permission.Edit), // usr has
+                ($"{corp2}.{app2}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
+                ($"{corp2}.{app2}.e.t.d", Permission.Edit), // expect
+            }, corp2, app2);
+            
+            Assert.AreEqual(2, missingRoles.Count);
+            ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp2}.{app2}.e.t.ae");
+            Assert.NotNull(ae);
+            Assert.AreEqual(Permission.View, ae.Permission);
+            d = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp2}.{app2}.e.t.d");
+            Assert.NotNull(ae);
+            Assert.AreEqual(Permission.Edit, d.Permission);
+
+            #endregion
+
+            void SetupFindUserReturns(User u) =>
+                mockUserRepository.Setup(x => x.FindAsync(It.IsAny<string>())).ReturnsAsync(u);
+
+            void SetupFindRolesReturns(ICollection<Role> rs) =>
+                mockRoleRepository
+                    .Setup(x =>
+                        x.FindMany(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>(), It.IsAny<FindOptions>())
+                    ).Returns(rs);
         }
 
         [Test]
