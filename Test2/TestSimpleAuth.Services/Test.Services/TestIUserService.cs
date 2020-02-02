@@ -11,6 +11,7 @@ using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 
@@ -548,6 +549,265 @@ namespace Test.SimpleAuth.Services.Test.Services
         }
 
         [Test]
+        public async Task GetActiveRolesAsync()
+        {
+            var svc = Prepare<IRoleRepository, Role, string>(out var mockUserRepository, out var mockRoleRepository)
+                .GetRequiredService<IUserService>();
+
+            var userId = RandomUser();
+            var corp1 = RandomCorp();
+            var corp2 = RandomCorp();
+            var app1 = RandomApp();
+            var app2 = RandomApp();
+            var env = RandomEnv();
+            var tenant = RandomTenant();
+
+            #region Arguments validation
+
+            // catch null arg
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await svc.GetActiveRolesAsync(null, corp1, app1, env, tenant));
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await svc.GetActiveRolesAsync(userId, null, app1, env, tenant));
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await svc.GetActiveRolesAsync(userId, corp1, null, env, tenant));
+
+            // catch wildcard not supported
+            Assert.CatchAsync<ArgumentException>(async () =>
+                await svc.GetActiveRolesAsync(userId, corp1, app1, env, Constants.WildCard));
+            Assert.CatchAsync<ArgumentException>(async () =>
+                await svc.GetActiveRolesAsync(userId, corp1, app1, Constants.WildCard, tenant));
+
+            #endregion
+
+            // catch user not found
+            SetupFindUserReturns(null);
+            Assert.CatchAsync<EntityNotExistsException>(async () =>
+                await svc.GetActiveRolesAsync(userId, corp1, app1));
+
+            // normal
+
+            #region SetupFindUserReturns 3 RoleGroupUsers of groups named g11, g12, g21
+
+            SetupFindUserReturns(new User
+            {
+                UserInfos = new List<LocalUserInfo>
+                {
+                    new LocalUserInfo
+                    {
+                        UserId = userId,
+                        Corp = corp1
+                    },
+                    new LocalUserInfo
+                    {
+                        UserId = userId,
+                        Corp = corp2
+                    }
+                },
+                RoleGroupUsers = new List<RoleGroupUser>
+                {
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = "g11",
+                            Corp = corp1,
+                            App = app1,
+                            RoleRecords = new List<RoleRecord>
+                            {
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m111",
+                                    Env = env,
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m112",
+                                    Env = env,
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m113",
+                                    Env = RandomEnv(),
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                            }
+                        }
+                    },
+
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = "g12",
+                            Corp = corp1,
+                            App = app1,
+                            RoleRecords = new List<RoleRecord>
+                            {
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m121",
+                                    Env = env,
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m122",
+                                    Env = env,
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m123",
+                                    Env = RandomEnv(),
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                            }
+                        }
+                    },
+
+                    new RoleGroupUser
+                    {
+                        RoleGroup = new RoleGroup
+                        {
+                            Name = "g21",
+                            Corp = corp2,
+                            App = app2,
+                            RoleRecords = new List<RoleRecord>
+                            {
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m211",
+                                    Env = env,
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m212",
+                                    Env = env,
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                                new RoleRecord
+                                {
+                                    RoleId = "c.a.e.t.m213",
+                                    Env = RandomEnv(),
+                                    Tenant = tenant,
+                                    Permission = Permission.Add
+                                },
+                            }
+                        }
+                    }
+                }
+            });
+
+            #endregion
+            
+            #region Test without any locked role
+
+            SetupFindRolesReturns(null);
+
+            var roles = await svc.GetActiveRolesAsync(userId, corp1, app1);
+            Assert.AreEqual(6, roles.Count);
+            Assert.IsTrue(roles.All(x => x.RoleId.Contains("t.m1")));
+
+            roles = await svc.GetActiveRolesAsync(userId, corp1, app1, env);
+            Assert.AreEqual(4, roles.Count);
+            Assert.IsFalse(roles.Any(x => x.RoleId.EndsWith("3")));
+
+            roles = await svc.GetActiveRolesAsync(userId, corp1, app1, tenant: tenant);
+            Assert.AreEqual(6, roles.Count);
+            
+            roles = await svc.GetActiveRolesAsync(userId, corp2, app2);
+            Assert.AreEqual(3, roles.Count);
+            Assert.IsTrue(roles.All(x => x.RoleId.Contains("t.m2")));
+            
+            roles = await svc.GetActiveRolesAsync(userId, corp2, RandomApp());
+            Assert.AreEqual(0, roles.Count);
+
+            #endregion
+            
+            #region Test when some locked roles
+
+            SetupFindRolesReturns(new List<Role>
+            {
+                new Role
+                {
+                    Id = "c.a.e.t.m112",
+                    Locked = true,
+                },
+                new Role
+                {
+                    Id = "c.a.e.t.m113",
+                    Locked = true,
+                },
+                new Role
+                {
+                    Id = "c.a.e.t.m122",
+                    Locked = true,
+                },
+                new Role
+                {
+                    Id = "c.a.e.t.m123",
+                    Locked = true,
+                },
+                new Role
+                {
+                    Id = "c.a.e.t.m212",
+                    Locked = true,
+                },
+                new Role
+                {
+                    Id = "c.a.e.t.m213",
+                    Locked = true,
+                }
+            });
+
+            roles = await svc.GetActiveRolesAsync(userId, corp1, app1);
+            Assert.AreEqual(2, roles.Count);
+            Assert.IsTrue(roles.All(x => x.RoleId.EndsWith("1")));
+
+            roles = await svc.GetActiveRolesAsync(userId, corp1, app1, env);
+            Assert.AreEqual(2, roles.Count);
+
+            roles = await svc.GetActiveRolesAsync(userId, corp1, app1, tenant: tenant);
+            Assert.AreEqual(2, roles.Count);
+            
+            roles = await svc.GetActiveRolesAsync(userId, corp2, app2);
+            Assert.AreEqual(1, roles.Count);
+            Assert.IsTrue(roles.First().RoleId.EndsWith("1"));
+            
+            roles = await svc.GetActiveRolesAsync(userId, corp2, RandomApp());
+            Assert.AreEqual(0, roles.Count);
+
+            #endregion
+
+            void SetupFindUserReturns(User u) =>
+                mockUserRepository.Setup(x => x.FindAsync(It.IsAny<string>())).ReturnsAsync(u);
+
+            void SetupFindRolesReturns(ICollection<Role> rs) =>
+                mockRoleRepository
+                    .Setup(x =>
+                        x.FindMany(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>(), It.IsAny<FindOptions>())
+                    ).Returns(rs);
+        }
+
+        [Test]
+        public async Task GetMissingRolesAsync()
+        {
+            
+        }
+
+        [Test]
         public async Task UpdateLockStatusAsync()
         {
             var svc = Prepare<ILocalUserInfoRepository, LocalUserInfo, Guid>(out var mockUserRepository,
@@ -582,7 +842,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             SetupFindReturns(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdateLockStatusAsync(user));
-            
+
             SetupFindReturns(new User
             {
                 Id = userId,
@@ -591,7 +851,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             await svc.UpdateLockStatusAsync(user);
             mockLocalUserInfoRepository.VerifyNoOtherCalls();
-            
+
             SetupFindReturns(new User
             {
                 Id = userId,
@@ -615,7 +875,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             };
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdateLockStatusAsync(user));
-            
+
             SetupFindReturns(new User
             {
                 Id = userId,
@@ -633,7 +893,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     }
                 }
             });
-            
+
             user.LocalUserInfos = new[]
             {
                 new global::SimpleAuth.Shared.Domains.LocalUserInfo
@@ -653,9 +913,11 @@ namespace Test.SimpleAuth.Services.Test.Services
             user.LocalUserInfos[0].Locked = false;
             await svc.UpdateLockStatusAsync(user);
             // ReSharper disable PossibleMultipleEnumeration
-            mockLocalUserInfoRepository.Verify(m => m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 1 && lus.First().Corp == corp1)));
+            mockLocalUserInfoRepository.Verify(m =>
+                m.UpdateManyAsync(
+                    It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 1 && lus.First().Corp == corp1)));
             // ReSharper restore PossibleMultipleEnumeration
-            
+
 
             void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
         }
@@ -705,7 +967,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             SetupFindReturns(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdatePasswordAsync(user));
-            
+
             SetupFindReturns(new User
             {
                 Id = userId,
@@ -714,7 +976,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             await svc.UpdatePasswordAsync(user);
             mockLocalUserInfoRepository.VerifyNoOtherCalls();
-            
+
             SetupFindReturns(new User
             {
                 Id = userId,
@@ -738,7 +1000,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             };
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UpdatePasswordAsync(user));
-            
+
             SetupFindReturns(new User
             {
                 Id = userId,
@@ -761,7 +1023,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     }
                 }
             });
-            
+
             user.LocalUserInfos = new[]
             {
                 new global::SimpleAuth.Shared.Domains.LocalUserInfo
@@ -777,9 +1039,10 @@ namespace Test.SimpleAuth.Services.Test.Services
             };
             await svc.UpdatePasswordAsync(user);
             // ReSharper disable PossibleMultipleEnumeration
-            mockLocalUserInfoRepository.Verify(m => m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 2)));
+            mockLocalUserInfoRepository.Verify(m =>
+                m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 2)));
             // ReSharper restore PossibleMultipleEnumeration
-            
+
             user.LocalUserInfos = new[]
             {
                 new global::SimpleAuth.Shared.Domains.LocalUserInfo
@@ -790,9 +1053,11 @@ namespace Test.SimpleAuth.Services.Test.Services
             };
             await svc.UpdatePasswordAsync(user);
             // ReSharper disable PossibleMultipleEnumeration
-            mockLocalUserInfoRepository.Verify(m => m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus => lus.Count() == 1 && lus.First().EncryptedPassword == null)));
+            mockLocalUserInfoRepository.Verify(m =>
+                m.UpdateManyAsync(It.Is<IEnumerable<LocalUserInfo>>(lus =>
+                    lus.Count() == 1 && lus.First().EncryptedPassword == null)));
             // ReSharper restore PossibleMultipleEnumeration
-            
+
 
             void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
         }

@@ -244,11 +244,11 @@ namespace SimpleAuth.Services
                     x.Locked
                     &&
                     roleIds.Any(id => id == x.Id),
-            }).Select(x => x.Id).ToList();
+            }).OrEmpty().Select(x => x.Id).ToList();
 
+            roles = roles.Where(x => !lockedRoles.Contains(x.RoleId)).ToList();
+            roles = roles.DistinctRoles().ToList();
             roles = roles
-                .Where(x => !lockedRoles.Contains(x.RoleId))
-                .DistinctRoles()
                 .Select(x => x.ToClientRoleModel())
                 .DistinctRoles()
                 .Select(x => x.ToRole())
