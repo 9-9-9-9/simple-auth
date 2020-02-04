@@ -209,6 +209,9 @@ namespace SimpleAuth.Services
 
         public async Task DeleteAllRolesFromGroupAsync(RoleGroup roleGroup)
         {
+            if (roleGroup == null)
+                throw new ArgumentNullException(nameof(roleGroup));
+            
             var domain = await GetRoleGroupByNameAsync(roleGroup.Name, roleGroup.Corp, roleGroup.App);
 
             if (domain == default)
@@ -222,12 +225,15 @@ namespace SimpleAuth.Services
 
         public async Task DeleteRoleGroupAsync(RoleGroup roleGroup)
         {
-            var g = Repository.Find(x =>
+            if (roleGroup == null)
+                throw new ArgumentNullException(nameof(roleGroup));
+
+            var g = await Repository.FindSingleAsync(x =>
                 x.Name == roleGroup.Name
                 &&
                 x.Corp == roleGroup.Corp
                 &&
-                x.App == roleGroup.App).FirstOrDefault();
+                x.App == roleGroup.App);
 
             if (g == null)
                 throw new EntityNotExistsException(roleGroup.Name);

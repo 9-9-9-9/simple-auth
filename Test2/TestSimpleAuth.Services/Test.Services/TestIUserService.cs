@@ -74,6 +74,12 @@ namespace Test.SimpleAuth.Services.Test.Services
                     new RoleGroupUser
                     {
                         UserId = userId,
+                        User = new User
+                        {
+                            Id = userId,
+                            NormalizedId = userId
+                        },
+                        RoleGroupId = Guid.NewGuid(),
                         RoleGroup = new RoleGroup
                         {
                             Name = "g11",
