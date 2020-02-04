@@ -110,6 +110,12 @@ namespace SimpleAuth.Services
 
         public async Task AssignUserToGroupsAsync(User user, RoleGroup[] roleGroups)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
+            if (!roleGroups.IsAny() || roleGroups.Any(x => x == null))
+                throw new ArgumentException(nameof(roleGroups));
+
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException($"Groups must belong to same application");
 
@@ -128,16 +134,13 @@ namespace SimpleAuth.Services
                         {
                             Take = roleGroups.Length
                         }
-                    )
+                    ).OrEmpty()
                     .ToArray();
 
             var missingRoleGroups = roleGroups
-                .Where(g => lookupRoleGroups.All(lg =>
-                    lg.Name != g.Name
-                    &&
-                    lg.Corp != g.Corp
-                    &&
-                    lg.App != g.App)).ToArray();
+                .Select(x => (x.Name, x.Corp, x.App))
+                .Except(lookupRoleGroups.Select(x => (x.Name, x.Corp, x.App)))
+                .ToArray();
             if (missingRoleGroups.Any())
                 throw new EntityNotExistsException(missingRoleGroups.Select(g => g.Name));
 
@@ -149,8 +152,17 @@ namespace SimpleAuth.Services
 
         public async Task UnAssignUserFromGroupsAsync(User user, RoleGroup[] roleGroups)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
+            if (roleGroups == null)
+                throw new ArgumentNullException(nameof(roleGroups));
+
             if (roleGroups.IsEmpty())
                 return;
+
+            if (roleGroups.Any(x => x == null))
+                throw new ArgumentException(nameof(roleGroups));
 
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException($"Groups must belong to same application");
@@ -168,7 +180,7 @@ namespace SimpleAuth.Services
             }, new FindOptions
             {
                 Take = roleGroups.Length
-            }).ToArray();
+            }).OrEmpty().ToArray();
 
             if (tobeRemoved.Length != roleGroups.Length)
                 throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
@@ -182,6 +194,9 @@ namespace SimpleAuth.Services
 
         public async Task UnAssignUserFromAllGroupsAsync(User user, string corp)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));
 
@@ -193,6 +208,9 @@ namespace SimpleAuth.Services
                 return;
 
             var tobeRemoved = lookupUser.RoleGroupUsers.Where(rg => rg.RoleGroup.Corp == corp).ToList();
+
+            if (tobeRemoved.IsEmpty())
+                return;
 
             await Repository.UnAssignUserFromGroups(new Entities.User
                 {
@@ -226,11 +244,11 @@ namespace SimpleAuth.Services
                     x.Locked
                     &&
                     roleIds.Any(id => id == x.Id),
-            }).Select(x => x.Id).ToList();
+            }).OrEmpty().Select(x => x.Id).ToList();
 
+            roles = roles.Where(x => !lockedRoles.Contains(x.RoleId)).ToList();
+            roles = roles.DistinctRoles().ToList();
             roles = roles
-                .Where(x => !lockedRoles.Contains(x.RoleId))
-                .DistinctRoles()
                 .Select(x => x.ToClientRoleModel())
                 .DistinctRoles()
                 .Select(x => x.ToRole())
@@ -248,12 +266,14 @@ namespace SimpleAuth.Services
             var activeRoles = await GetActiveRolesAsync(userId, corp, app);
             var userActiveClientRoleModels = activeRoles.Select(x => x.ToClientRoleModel());
 
-            var requireClientRoleModels = permissions.Select(x =>
-            {
-                RoleUtils.Parse(x.Item1, out var requireClientRoleModel);
-                requireClientRoleModel.Permission = x.Item2;
-                return requireClientRoleModel;
-            }).ToArray();
+            var requireClientRoleModels = permissions
+                .SelectMany(x => RoleUtils.ParseToMinimum(x.Item1, x.Item2))
+                .Select(x =>
+                {
+                    RoleUtils.Parse(x.Item1, out var requireClientRoleModel);
+                    requireClientRoleModel.Permission = x.Item2;
+                    return requireClientRoleModel;
+                }).ToArray();
 
             var missing = requireClientRoleModels.Where(requireClientRoleModel =>
                 !userActiveClientRoleModels.Any(activeRole =>
@@ -311,33 +331,63 @@ namespace SimpleAuth.Services
 
         public async Task UpdateLockStatusAsync(User user)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
+            if (!user.LocalUserInfos.IsAny())
+                throw new ArgumentNullException($"Require {nameof(user.LocalUserInfos)} of {nameof(user)}");
+
+            if (user.LocalUserInfos.Any(x => x == null))
+                throw new ArgumentException($"{nameof(user.LocalUserInfos)} of {nameof(user)} contains null");
+
             var lookupUser = Repository.Find(user.Id);
 
             if (lookupUser == null)
                 throw new EntityNotExistsException(user.Id);
 
+            if (!lookupUser.UserInfos.IsAny())
+                return;
+
             var tobeUpdated = new List<Entities.LocalUserInfo>();
 
             foreach (var localUserInfo in user.LocalUserInfos)
             {
-                var lookupUserUserInfo = lookupUser.UserInfos?.FirstOrDefault(x => x.Corp == localUserInfo.Corp);
+                var lookupUserUserInfo = lookupUser.UserInfos.FirstOrDefault(x => x.Corp == localUserInfo.Corp);
                 if (lookupUserUserInfo == null)
                     throw new EntityNotExistsException($"{user.Id} at {localUserInfo.Corp}");
+
+                if (lookupUserUserInfo.Locked == localUserInfo.Locked)
+                    continue;
 
                 lookupUserUserInfo.Locked = localUserInfo.Locked;
 
                 tobeUpdated.Add(lookupUserUserInfo);
             }
 
+            if (!tobeUpdated.Any())
+                return;
+
             await _localUserInfoRepository.UpdateManyAsync(tobeUpdated);
         }
 
         public async Task UpdatePasswordAsync(User user)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
+            if (!user.LocalUserInfos.IsAny())
+                throw new ArgumentNullException($"Require {nameof(user.LocalUserInfos)} of {nameof(user)}");
+
+            if (user.LocalUserInfos.Any(x => x == null))
+                throw new ArgumentException($"{nameof(user.LocalUserInfos)} of {nameof(user)} contains null");
+
             var lookupUser = Repository.Find(user.Id);
 
             if (lookupUser == null)
                 throw new EntityNotExistsException(user.Id);
+
+            if (!lookupUser.UserInfos.IsAny())
+                return;
 
             var tobeUpdated = new List<Entities.LocalUserInfo>();
 

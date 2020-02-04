@@ -35,18 +35,9 @@ namespace SimpleAuth.Services.Entities
 
     public static class RoleExtensions
     {
-        public static string JoinSubModules(this IEnumerable<string> subModules)
+        public static string JoinSubModules(this ICollection<string> subModules)
         {
             return RoleUtils.JoinSubModules(subModules);
-        }
-        
-        public static RoleRecord ToEntityObject(this Shared.Domains.Role role)
-        {
-            return new RoleRecord
-            {
-                RoleId = role.RoleId,
-                Permission = role.Permission
-            };
         }
         
         public static Role ConvertToEntity(this CreateRoleModel model)

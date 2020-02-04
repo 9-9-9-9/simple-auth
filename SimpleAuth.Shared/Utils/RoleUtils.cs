@@ -11,8 +11,10 @@ namespace SimpleAuth.Shared.Utils
     public static class RoleUtils
     {
         public static string ComputeRoleId(string corp, string app, string env, string tenant, string module,
-            string subModules)
+            string joinedSubModules)
         {
+            ThrowIfBlank(corp, app, env, tenant, module);
+
             var sb = new StringBuilder();
             sb.Append(corp);
             sb.Append(Constants.SplitterRoleParts);
@@ -24,25 +26,48 @@ namespace SimpleAuth.Shared.Utils
             sb.Append(Constants.SplitterRoleParts);
             sb.Append(module);
 
-            if (!subModules.IsBlank())
+            if (!joinedSubModules.IsBlank())
             {
                 sb.Append(Constants.SplitterRoleParts);
-                sb.Append(subModules);
+                sb.Append(joinedSubModules);
             }
 
             return sb.ToString().NormalizeInput();
         }
+
         public static string ComputeRoleId(string corp, string app, string env, string tenant, string module,
             string[] subModules)
         {
             return ComputeRoleId(corp, app, env, tenant, module, JoinSubModules(subModules));
         }
-        
-        public static string JoinSubModules(IEnumerable<string> subModules)
+
+        public static string JoinSubModules(ICollection<string> subModules)
         {
+            subModules = subModules.OrEmpty().ToList();
+
+            if (subModules.Count < 2)
+                return subModules.FirstOrDefault().IsBlank() ? null : subModules.First();
+
+            if (subModules.Any(x => x.IsBlank()))
+                throw new ArgumentNullException($"{nameof(subModules)} contains blank string, which is not allowed");
+
             return string.Join(Constants.SplitterSubModules, subModules.Or(new string[0]));
         }
-        
+
+        private static void ThrowIfBlank(string corp, string app, string env, string tenant, string module)
+        {
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+            if (app.IsBlank())
+                throw new ArgumentNullException(nameof(app));
+            if (env.IsBlank())
+                throw new ArgumentNullException(nameof(env));
+            if (tenant.IsBlank())
+                throw new ArgumentNullException(nameof(tenant));
+            if (module.IsBlank())
+                throw new ArgumentNullException(nameof(module));
+        }
+
         public static void Parse(string roleId, out ClientRoleModel clientRoleModel)
         {
             var spl = roleId.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
@@ -53,14 +78,14 @@ namespace SimpleAuth.Shared.Utils
             if (spl.Length == 6)
             {
                 subModules = spl[5].Split(new[] {Constants.ChSplitterSubModules}, StringSplitOptions.None);
-                if (subModules.Length == 0)
+                if (subModules.Length == 0 || (subModules.Length == 1 && subModules.First().IsBlank()))
                     throw new ArgumentException($"{nameof(roleId)}: empty but declared submodules");
             }
             else
             {
                 subModules = new string[0];
             }
-            
+
             clientRoleModel = new ClientRoleModel
             {
                 Corp = spl[0],
@@ -78,7 +103,7 @@ namespace SimpleAuth.Shared.Utils
             tmpClientRoleModel.Permission = permission.Deserialize();
             clientRoleModel = tmpClientRoleModel;
         }
-        
+
         public static bool ContainsOrEquals(ClientRoleModel big, ClientRoleModel small, ComparisionFlag comparisionFlag)
         {
             if (comparisionFlag.HasFlag(ComparisionFlag.Corp) && !ContainsOrEquals(big.Corp, small.Corp))
@@ -142,15 +167,16 @@ namespace SimpleAuth.Shared.Utils
                     continue;
                 foreach (var candidateSmall in org)
                 {
+                    // ReSharper disable once PossibleUnintendedReferenceComparison
                     if (candidateBig == candidateSmall)
                         continue;
-                 
+
                     if (toBeRemoved.Contains(candidateSmall))
                         continue;
 
                     if (ContainsOrEquals(candidateBig, candidateSmall, ComparisionFlag.All))
                         toBeRemoved.Add(candidateSmall);
-                }    
+                }
             }
 
             return org.Except(toBeRemoved);
@@ -178,25 +204,19 @@ namespace SimpleAuth.Shared.Utils
         {
             if (roleId.IsBlank())
                 throw new ArgumentNullException(nameof(roleId));
-            
+
             if (permission.IsBlank())
                 throw new ArgumentNullException(nameof(permission));
-            
+
             if (permission == "0")
                 throw new ArgumentException(nameof(permission));
-            
+
             return $"{roleId}{Constants.ChSplitterMergedRoleIdWithPermission}{permission}";
         }
 
         public static string Merge(string roleId, Permission permission)
         {
-            if (roleId.IsBlank())
-                throw new ArgumentNullException(nameof(roleId));
-            
-            if (permission == Permission.None)
-                throw new ArgumentException(nameof(permission));
-            
-            return $"{roleId}{Constants.ChSplitterMergedRoleIdWithPermission}{permission.Serialize()}";
+            return Merge(roleId, permission.Serialize());
         }
 
         public static (string, Permission) UnMerge(string merged)
@@ -209,6 +229,24 @@ namespace SimpleAuth.Shared.Utils
                 throw new ArgumentException(nameof(merged));
 
             return (spl[0], spl[1].Deserialize());
+        }
+
+        public static IEnumerable<(string, Permission)> ParseToMinimum(string roleId, Permission permission)
+        {
+            foreach (var p in ParseToMinimum(permission))
+                yield return (roleId, p);
+        }
+
+        public static IEnumerable<Permission> ParseToMinimum(Permission permission)
+        {
+            if (permission.HasFlag(Permission.Add))
+                yield return Permission.Add;
+            if (permission.HasFlag(Permission.View))
+                yield return Permission.View;
+            if (permission.HasFlag(Permission.Edit))
+                yield return Permission.Edit;
+            if (permission.HasFlag(Permission.Delete))
+                yield return Permission.Delete;
         }
     }
 }

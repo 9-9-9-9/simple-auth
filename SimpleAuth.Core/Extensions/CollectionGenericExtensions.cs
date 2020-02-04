@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +28,8 @@ namespace SimpleAuth.Core.Extensions
 
         public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T newElement)
         {
+            if (newElement is null)
+                throw new ArgumentNullException(nameof(newElement));
             var newList = source.OrEmpty().ToList();
             newList.Add(newElement);
             return newList;

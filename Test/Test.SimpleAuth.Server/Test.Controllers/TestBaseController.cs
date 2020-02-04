@@ -205,7 +205,7 @@ namespace Test.SimpleAuth.Server.Test.Controllers
                 return M<IRoleGroupService>()
                     .FSet(s =>
                         s.Setup(x =>
-                            x.GetRoleGroupByName(
+                            x.GetRoleGroupByNameAsync(
                                 It.IsAny<string>(),
                                 It.IsAny<string>(),
                                 It.IsAny<string>()

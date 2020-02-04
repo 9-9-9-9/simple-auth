@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Domains;
@@ -85,7 +86,7 @@ namespace SimpleAuth.Shared.Models
 
         protected bool Equals(ClientRoleModel other)
         {
-            return Corp == other.Corp && App == other.App && Env == other.Env && Tenant == other.Tenant && Module == other.Module && Equals(SubModules, other.SubModules) && Permission == other.Permission;
+            return Corp == other.Corp && App == other.App && Env == other.Env && Tenant == other.Tenant && Module == other.Module && SubModules.SequenceEqual(other.SubModules) && Permission == other.Permission;
         }
 
         public override bool Equals(object obj)
@@ -119,6 +120,19 @@ namespace SimpleAuth.Shared.Models
         public string ComputeId()
         {
             return RoleUtils.ComputeRoleId(Corp, App, Env, Tenant, Module, SubModules);
+        }
+
+        public static ClientRoleModel From(string roleId, string permission)
+        {
+            RoleUtils.Parse(roleId, permission, out var clientRoleModel);
+            return clientRoleModel;
+        }
+
+        public static ClientRoleModel From(string roleId, Permission permission)
+        {
+            RoleUtils.Parse(roleId, out var clientRoleModel);
+            clientRoleModel.Permission = permission;
+            return clientRoleModel;
         }
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Domains;
@@ -337,7 +338,13 @@ namespace SimpleAuth.Shared.Validation
             {
                 if (src.Trim() != src || src.Contains(' ') || src.Contains('\t'))
                     return ValidationResult.Invalid("Email contains spaces");
+                if (src.IndexOf("@", StringComparison.Ordinal) <= 0)
+                    return ValidationResult.Invalid("Wrong email format");
+                if (!src.Contains("."))
+                    return ValidationResult.Invalid("Wrong email format");
                 if (!new EmailAddressAttribute().IsValid(src))
+                    return ValidationResult.Invalid("Wrong email format");
+                if (!src.Equals(new MailAddress(src).Address))
                     return ValidationResult.Invalid("Wrong email format");
                 return ValidationResult.Valid();
             }

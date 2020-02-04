@@ -21,13 +21,13 @@ namespace SimpleAuth.Shared.Models
         public RoleModel[] ActiveRoles { get; set; }
         
         public GoogleTokenResponseResult GoogleToken { get; set; }
-        public long? TokenExpireAfterSeconds { get; set; }
+        public long? ExpiryDate { get; set; }
 
         public void ExpireAt(DateTime expiryDate)
         {
             if (expiryDate.Kind != DateTimeKind.Utc)
                 throw new InvalidDataException("Only accept UTC");
-            TokenExpireAfterSeconds = (long) (expiryDate - DateTime.UtcNow).TotalSeconds;
+            ExpiryDate = (long) (expiryDate - new DateTime(1970, 1, 1, 1, 1, 1, DateTimeKind.Utc)).TotalSeconds;
         }
     }
 

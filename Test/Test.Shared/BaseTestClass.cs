@@ -27,8 +27,14 @@ namespace Test.Shared
     {
         protected virtual IServiceProvider Prepare()
         {
+            return Prepare(x => { });
+        }
+        
+        protected virtual IServiceProvider Prepare(Action<IServiceCollection> registerSvcAct)
+        {
             var services = new ServiceCollection();
             RegisteredServices(services);
+            registerSvcAct(services);
             return services.BuildServiceProvider();
         }
 

@@ -3,7 +3,7 @@ using SimpleAuth.Services.Entities;
 
 namespace SimpleAuth.Repositories
 {
-    public interface ICachedTokenInfoRepository : IMemoryCachedRepository<TokenInfo>
+    public interface ICachedTokenInfoRepository : ICachedRepository<TokenInfo>
     {
         void Push(TokenInfo tokenInfo);
         TokenInfo Get(string corp, string app);
