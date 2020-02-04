@@ -143,7 +143,8 @@ namespace SimpleAuth.Services
             if (roleModels.IsEmpty() || roleModels.Any(x => x == null))
                 throw new ArgumentException(nameof(roleModels));
             if (roleGroup.Roles.IsAny())
-                throw new InvalidOperationException($"Domain object {nameof(roleGroup)} should not contains value in property {nameof(roleGroup.Roles)} to prevent un-expected operation");
+                throw new InvalidOperationException(
+                    $"Domain object {nameof(roleGroup)} should not contains value in property {nameof(roleGroup.Roles)} to prevent un-expected operation");
 
             var acceptRolePrefix =
                 string.Join(Constants.SplitterRoleParts, roleGroup.Corp, roleGroup.App, string.Empty);
@@ -151,19 +152,16 @@ namespace SimpleAuth.Services
             var crossAppRoleModels = roleModels.Where(x => !x.Role.StartsWith(acceptRolePrefix)).ToArray();
             if (crossAppRoleModels.Any())
                 throw new SimpleAuthSecurityException(string.Join(',', crossAppRoleModels.Select(x => x.Role)));
-            
-            var newRoles = roleGroup.Roles
-                .OrEmpty()
-                .Concat(
-                    roleModels.Select(r => new Role
+
+            var newRoles =
+                roleModels.Select(r => new Role
                     {
                         RoleId = r.Role,
                         Permission = r.Permission.Deserialize()
                     })
-                )
-                .DistinctRoles()
-                .Select(r => r.ToEntityObject().WithRandomId())
-                .ToList();
+                    .DistinctRoles()
+                    .Select(r => r.ToEntityObject().WithRandomId())
+                    .ToList();
 
             await UpdateRolesAsync(roleGroup, newRoles);
         }
@@ -177,8 +175,16 @@ namespace SimpleAuth.Services
             if (roleModels.IsEmpty() || roleModels.Any(x => x == null))
                 throw new ArgumentException(nameof(roleModels));
             if (roleGroup.Roles.IsAny())
-                throw new InvalidOperationException($"Domain object {nameof(roleGroup)} should not contains value in property {nameof(roleGroup.Roles)} to prevent un-expected operation");
-            
+                throw new InvalidOperationException(
+                    $"Domain object {nameof(roleGroup)} should not contains value in property {nameof(roleGroup.Roles)} to prevent un-expected operation");
+
+            var acceptRolePrefix =
+                string.Join(Constants.SplitterRoleParts, roleGroup.Corp, roleGroup.App, string.Empty);
+
+            var crossAppRoleModels = roleModels.Where(x => !x.Role.StartsWith(acceptRolePrefix)).ToArray();
+            if (crossAppRoleModels.Any())
+                throw new SimpleAuthSecurityException(string.Join(',', crossAppRoleModels.Select(x => x.Role)));
+
             var domainGroup = await GetRoleGroupByNameAsync(roleGroup.Name, roleGroup.Corp, roleGroup.App);
 
             if (domainGroup == default)
@@ -239,7 +245,7 @@ namespace SimpleAuth.Services
                 if (role == default)
                     throw new EntityNotExistsException(newRole.RoleId);
                 newRole.Env = role.Env;
-                newRole.Tenant = role.Tenant;   
+                newRole.Tenant = role.Tenant;
             }
 
             await Repository.UpdateRoleRecordsAsync(await GetEntity(roleGroup), newRoles);

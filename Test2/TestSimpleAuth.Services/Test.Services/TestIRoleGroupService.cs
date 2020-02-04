@@ -13,7 +13,6 @@ using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
-using SimpleAuth.Shared.Validation;
 
 namespace Test.SimpleAuth.Services.Test.Services
 {
@@ -360,13 +359,8 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
-            var corp3 = RandomCorp();
             var app1 = RandomApp();
-            var app2 = RandomApp();
-            var app3 = RandomApp();
             var roleGroup1 = RandomRoleGroup();
-            var roleGroup2 = RandomRoleGroup();
-            var roleGroup3 = RandomRoleGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.RoleGroup
             {
@@ -395,7 +389,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             }));
             // Domain object should not store value in property Roles to prevent un-expected behavior
-            rg1.Roles = new[]{new global::SimpleAuth.Shared.Domains.Role()};
+            rg1.Roles = new[] {new global::SimpleAuth.Shared.Domains.Role()};
             Assert.CatchAsync<InvalidOperationException>(async () => await svc.AddRolesToGroupAsync(rg1, new[]
             {
                 new RoleModel
@@ -404,9 +398,10 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             }));
             rg1.Roles = null;
-            
+
             // if role not found so throw EntityNotExistsException
-            mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>())).ReturnsAsync((Role)null);
+            mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
+                .ReturnsAsync((Role) null);
             mockRoleGroupRepo
                 .Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>()))
                 .ReturnsAsync(new RoleGroup
@@ -415,7 +410,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Corp = corp1,
                     App = app1,
                 });
-            Assert.CatchAsync<EntityNotExistsException>(async() => await svc.AddRolesToGroupAsync(rg1, new[]
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AddRolesToGroupAsync(rg1, new[]
             {
                 new RoleModel
                 {
@@ -428,26 +423,31 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Permission = Permission.Add.Serialize()
                 }
             }));
-            
+
             // normal without any existing role
             mockRoleGroupRepo.Setup(x => x.UpdateRoleRecordsAsync(It.IsAny<RoleGroup>(), It.IsAny<List<RoleRecord>>()))
                 .ReturnsAsync(1);
-            mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>())).ReturnsAsync(new Role
-            {
-                Env = "e",
-                Tenant = "t"
-            });
+            mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
+                .ReturnsAsync(new Role
+                {
+                    Env = "e",
+                    Tenant = "t"
+                });
             await SetupFindSingleReturnsAndThenUpdate();
-            mockRoleGroupRepo.Verify(m => m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => true), It.Is<List<RoleRecord>>(rrs => rrs.Count == 2 && rrs.All(x => x.Permission != Permission.None && x.Id != Guid.Empty && !x.RoleId.IsBlank() && !x.Env.IsBlank() && !x.Tenant.IsBlank()))));
-            
+            mockRoleGroupRepo.Verify(m => m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => true),
+                It.Is<List<RoleRecord>>(rrs => rrs.Count == 2 && rrs.All(x =>
+                                                   x.Permission != Permission.None && x.Id != Guid.Empty &&
+                                                   !x.RoleId.IsBlank() && !x.Env.IsBlank() && !x.Tenant.IsBlank()))));
+
             // normal with some existing roles
             mockRoleGroupRepo.Setup(x => x.UpdateRoleRecordsAsync(It.IsAny<RoleGroup>(), It.IsAny<List<RoleRecord>>()))
                 .ReturnsAsync(1);
-            mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>())).ReturnsAsync(new Role
-            {
-                Env = "e",
-                Tenant = "t"
-            });
+            mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
+                .ReturnsAsync(new Role
+                {
+                    Env = "e",
+                    Tenant = "t"
+                });
             await SetupFindSingleReturnsAndThenUpdate(new List<RoleRecord>
             {
                 new RoleRecord
@@ -456,8 +456,9 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Permission = Permission.Edit
                 }
             });
-            mockRoleGroupRepo.Verify(m => m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => true), It.Is<List<RoleRecord>>(rrs => rrs.Count == 2 /*still 2*/)));
-            
+            mockRoleGroupRepo.Verify(m => m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => true),
+                It.Is<List<RoleRecord>>(rrs => rrs.Count == 2 /*still 2*/)));
+
             Task SetupFindSingleReturnsAndThenUpdate(
                 ICollection<RoleRecord> existingRoleRecords = null)
             {
@@ -490,6 +491,220 @@ namespace Test.SimpleAuth.Services.Test.Services
                     }
                 });
             }
+        }
+
+        [Test]
+        public async Task DeleteRolesFromGroupAsync()
+        {
+            var svc = Prepare<IRoleRepository, Role, string>(out var mockRoleGroupRepo, out var mockRoleRepo)
+                .GetRequiredService<IRoleGroupService>();
+
+            var corp1 = RandomCorp();
+            var corp2 = RandomCorp();
+            var app1 = RandomApp();
+            var roleGroup1 = RandomRoleGroup();
+
+            var rg1 = new global::SimpleAuth.Shared.Domains.RoleGroup
+            {
+                Name = roleGroup1,
+                Corp = corp1,
+                App = app1,
+            };
+
+            // Argument verification
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteRolesFromGroupAsync(null, new[]
+            {
+                new RoleModel()
+            }));
+            Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, null));
+            Assert.CatchAsync<ArgumentException>(async () =>
+                await svc.DeleteRolesFromGroupAsync(rg1, new RoleModel[0]));
+            Assert.CatchAsync<ArgumentException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel(), null
+            }));
+            // RoleIds must from corp and app of the provided domain role group
+            Assert.CatchAsync<SimpleAuthSecurityException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp2}.{app1}.e.t.m"
+                }
+            }));
+            // Domain object should not store value in property Roles to prevent un-expected behavior
+            rg1.Roles = new[] {new global::SimpleAuth.Shared.Domains.Role()};
+            Assert.CatchAsync<InvalidOperationException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp1}.{app1}.e.t.m"
+                }
+            }));
+            rg1.Roles = null;
+
+            // if role group does not exists, so throwing EntityNotExistsException
+
+
+            // if role not found so throw EntityNotExistsException
+            mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
+                .ReturnsAsync((Role) null);
+            SetupFindSingleRoleGroup(new RoleGroup
+            {
+                Name = roleGroup1,
+                Corp = corp1,
+                App = app1,
+                RoleRecords = new List<RoleRecord>
+                {
+                    new RoleRecord
+                    {
+                        RoleId = $"{corp1}.{app1}.e.t.m1"
+                    }
+                }
+            });
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp1}.{app1}.e.t.m1",
+                    Permission = Permission.Add.Serialize()
+                },
+                new RoleModel
+                {
+                    Role = $"{corp1}.{app1}.e.t.m2",
+                    Permission = Permission.Add.Serialize()
+                }
+            }));
+
+            // if role group not found so throw EntityNotExistsException
+            SetupFindSingleRoleGroup(null);
+            Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp1}.{app1}.e.t.m1",
+                    Permission = Permission.Add.Serialize()
+                }
+            }));
+
+            // if role group does not contains any roles, so stop execution immediately
+            ResetMocks();
+            SetupFindSingleRoleGroup(new RoleGroup
+            {
+                Id = Guid.NewGuid(),
+                Name = roleGroup1,
+                Corp = corp1,
+                App = app1,
+                RoleRecords = null
+            });
+            await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp1}.{app1}.e.t.m1",
+                    Permission = Permission.Add.Serialize()
+                }
+            });
+            mockRoleGroupRepo.Verify(m =>
+                m.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>()));
+            mockRoleGroupRepo.VerifyNoOtherCalls();
+            mockRoleRepo.VerifyNoOtherCalls();
+
+            // Normal
+            SetupFindSingleRoleGroup(new RoleGroup
+            {
+                Id = Guid.NewGuid(),
+                Name = roleGroup1,
+                Corp = corp1,
+                App = app1,
+                RoleRecords = new List<RoleRecord>
+                {
+                    RoleRecord(1, corp1, app1, Permission.Add),
+                    RoleRecord(2, corp1, app1, Permission.Add, Permission.Edit),
+                    RoleRecord(3, corp1, app1, Permission.Crud),
+                }
+            });
+            SetupFindSingleRoleAsyncReturns(1, out var expectedEnv, out var expectedTenant);
+            mockRoleGroupRepo.Setup(x => x.UpdateRoleRecordsAsync(It.IsAny<RoleGroup>(), It.IsAny<List<RoleRecord>>()))
+                .ReturnsAsync(1);
+            await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp1}.{app1}.e.t.m1",
+                    Permission = Permission.Add.Serialize()
+                }
+            });
+            mockRoleGroupRepo.Verify(m =>
+                m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => rg.Name == roleGroup1),
+                    It.Is<List<RoleRecord>>(rrs =>
+                        rrs.Count == 3
+                        && 1 == rrs.Count(x =>
+                            x.RoleId.EndsWith(".m1") && x.Permission == Permission.None && x.Env == expectedEnv && x.Tenant == expectedTenant
+                        )
+                    )
+                )
+            );
+            //
+            SetupFindSingleRoleAsyncReturns(2, out expectedEnv, out expectedTenant);
+            await svc.DeleteRolesFromGroupAsync(rg1, new[]
+            {
+                new RoleModel
+                {
+                    Role = $"{corp1}.{app1}.e.t.m2",
+                    Permission = (Permission.Edit | Permission.Delete).Serialize()
+                }
+            });
+            mockRoleGroupRepo.Verify(m =>
+                m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => rg.Name == roleGroup1),
+                    It.Is<List<RoleRecord>>(rrs =>
+                        rrs.Count == 3
+                        && 1 == rrs.Count(x =>
+                            x.RoleId.EndsWith(".m2") && x.Permission == Permission.Add && x.Env == expectedEnv && x.Tenant == expectedTenant
+                        )
+                    )
+                )
+            );
+
+            #region Local methods
+
+            void SetupFindSingleRoleGroup(RoleGroup rg) => mockRoleGroupRepo.Setup(x =>
+                    x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>()))
+                .ReturnsAsync(rg);
+
+            void ResetMocks()
+            {
+                mockRoleGroupRepo.Reset();
+                mockRoleRepo.Reset();
+            }
+
+            RoleRecord RoleRecord(int moduleNo, string corp, string app, params Permission[] permissions)
+            {
+                return new RoleRecord
+                {
+                    Id = Guid.NewGuid(),
+                    RoleId = $"{corp}.{app}.e.t.m{moduleNo}",
+                    Permission = Permission.None.Grant(permissions),
+                    Env = "e",
+                    Tenant = "t"
+                };
+            }
+
+            void SetupFindSingleRoleAsyncReturns(int moduleNo, out string randomEnv, out string randomTenant)
+            {
+                randomEnv = RandomEnv();
+                randomTenant = RandomTenant();
+                var env = randomEnv;
+                var tenant = randomTenant;
+                mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
+                    .ReturnsAsync(new Role
+                    {
+                        Id = $"{corp1}.{app1}.e.t.m{moduleNo}",
+                        Env = env,
+                        Tenant = tenant
+                    });
+            }
+
+            #endregion
         }
     }
 }

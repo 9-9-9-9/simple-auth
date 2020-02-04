@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 
 namespace SimpleAuth.Repositories
@@ -56,6 +57,8 @@ namespace SimpleAuth.Repositories
 
         public async Task<int> UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles)
         {
+            newRoles = newRoles.Where(x => x.Permission != Permission.None).ToList();
+            
             await using var ctx = OpenConnect();
             var dbGroups = ctx.Set<RoleGroup>();
             var dbRecords = ctx.Set<RoleRecord>();
