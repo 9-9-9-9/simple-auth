@@ -34,7 +34,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             {
                 await AddRoleGroupAsync(gSvc, grName, "c", "a");
 
-                var roleGroup = await gSvc.GetRoleGroupByName(grName, "c", "a");
+                var roleGroup = await gSvc.GetRoleGroupByNameAsync(grName, "c", "a");
                 Assert.NotNull(roleGroup);
 
                 foreach (var role in YieldRoles(testedGr * noOfRoles + 1, (testedGr + 1) * noOfRoles))
@@ -53,7 +53,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
                 Assert.AreEqual(noOfRoles, roleGroup.Roles.Length);
 
-                roleGroup = await gSvc.GetRoleGroupByName(grName, "c", "a");
+                roleGroup = await gSvc.GetRoleGroupByNameAsync(grName, "c", "a");
                 Assert.AreEqual(noOfRoles, roleGroup.Roles.Length);
                 Assert.IsTrue(roleGroup.Roles.Any(x => x.RoleId.StartsWith("c.a")));
 
@@ -126,7 +126,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             async Task<global::SimpleAuth.Shared.Domains.RoleGroup> Get()
             {
-                return await gSvc.GetRoleGroupByName(randomGroupName, "c", "a");
+                return await gSvc.GetRoleGroupByNameAsync(randomGroupName, "c", "a");
             }
         }
 
@@ -175,7 +175,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             async Task<global::SimpleAuth.Shared.Domains.RoleGroup> Get()
             {
-                return await gSvc.GetRoleGroupByName("g", "c", "a");
+                return await gSvc.GetRoleGroupByNameAsync("g", "c", "a");
             }
         }
 
@@ -244,7 +244,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             async Task<global::SimpleAuth.Shared.Domains.RoleGroup> Get(string name, string app)
             {
-                return await gSvc.GetRoleGroupByName(name, randomCorp, app);
+                return await gSvc.GetRoleGroupByNameAsync(name, randomCorp, app);
             }
         }
 
@@ -335,7 +335,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             Assert.AreEqual(Permission.Delete,
                 (await Get()).Roles.First(x => x.RoleId.EndsWith(".m2")).Permission);
 
-            await gSvc.DeleteRolesFromGroupAsync(await gSvc.GetRoleGroupByName("g3", "c", "a"),
+            await gSvc.DeleteRolesFromGroupAsync(await gSvc.GetRoleGroupByNameAsync("g3", "c", "a"),
                 new[]
                 {
                     new RoleModel
@@ -359,7 +359,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             async Task<global::SimpleAuth.Shared.Domains.RoleGroup> Get()
             {
-                return await gSvc.GetRoleGroupByName("g1", "c", "a");
+                return await gSvc.GetRoleGroupByNameAsync("g1", "c", "a");
             }
         }
 
@@ -383,8 +383,8 @@ namespace Test.SimpleAuth.Shared.Test.Services
                 await AddRoleAsync(rSvc, "c", "a", "e", "t", "m2");
                 await AddRoleAsync(rSvc, "c", "a", "e", "t", "m3");
 
-                var g1 = await gSvc.GetRoleGroupByName("g1", "c", "a");
-                var g2 = await gSvc.GetRoleGroupByName("g2", "c", "a");
+                var g1 = await gSvc.GetRoleGroupByNameAsync("g1", "c", "a");
+                var g2 = await gSvc.GetRoleGroupByNameAsync("g2", "c", "a");
                 await gSvc.AddRolesToGroupAsync(g1, new[]
                 {
                     new RoleModel
@@ -421,8 +421,8 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             #endregion
 
-            await gSvc.DeleteAllRolesFromGroupAsync(await gSvc.GetRoleGroupByName(groupName, "c", "a"));
-            Assert.IsTrue((await gSvc.GetRoleGroupByName(groupName, "c", "a")).Roles.IsEmpty());
+            await gSvc.DeleteAllRolesFromGroupAsync(await gSvc.GetRoleGroupByNameAsync(groupName, "c", "a"));
+            Assert.IsTrue((await gSvc.GetRoleGroupByNameAsync(groupName, "c", "a")).Roles.IsEmpty());
         }
 
         [Test]
@@ -481,7 +481,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
             Assert.AreEqual(1, svc.SearchRoleGroups("n1", randomCorp, "a1").ToArray().Length);
             Assert.AreEqual(0, svc.SearchRoleGroups("n3", randomCorp, "a2").ToArray().Length);
 
-            var gr = await svc.GetRoleGroupByName("n1", randomCorp, "a1");
+            var gr = await svc.GetRoleGroupByNameAsync("n1", randomCorp, "a1");
             gr.Locked = true;
             await svc.UpdateLockStatusAsync(gr);
             Assert.AreEqual(2, svc.SearchRoleGroups("n", randomCorp, "a1").ToArray().Length);
@@ -563,7 +563,7 @@ namespace Test.SimpleAuth.Shared.Test.Services
 
             async Task<global::SimpleAuth.Shared.Domains.RoleGroup> Group(string name)
             {
-                return await gSvc.GetRoleGroupByName(name, corp, "a");
+                return await gSvc.GetRoleGroupByNameAsync(name, corp, "a");
             }
         }
     }

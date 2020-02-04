@@ -262,7 +262,7 @@ namespace SimpleAuth.Server.Controllers
 
         private async Task<Shared.Domains.RoleGroup> FindRoleGroupAsync(string name, string corp, string app)
         {
-            var group = await Service.GetRoleGroupByName(name, corp, app);
+            var group = await Service.GetRoleGroupByNameAsync(name, corp, app);
             if (group == null)
                 throw new EntityNotExistsException(name);
             return group;

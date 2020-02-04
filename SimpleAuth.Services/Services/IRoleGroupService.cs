@@ -19,7 +19,7 @@ namespace SimpleAuth.Services
     public interface IRoleGroupService : IDomainService
     {
         IEnumerable<RoleGroup> SearchRoleGroups(string term, string corp, string app, FindOptions findOptions = null);
-        Task<RoleGroup> GetRoleGroupByName(string name, string corp, string app);
+        Task<RoleGroup> GetRoleGroupByNameAsync(string name, string corp, string app);
         IEnumerable<RoleGroup> FindByName(string[] nameList, string corp, string app);
         Task AddRoleGroupAsync(CreateRoleGroupModel newRoleGroup);
         Task UpdateLockStatusAsync(RoleGroup roleGroup);
@@ -44,10 +44,11 @@ namespace SimpleAuth.Services
             FindOptions findOptions = null)
         {
             return Repository.Search(term, corp, app, findOptions)
+                .OrEmpty()
                 .Select(x => x.ToDomainObject());
         }
 
-        public async Task<RoleGroup> GetRoleGroupByName(string name, string corp, string app)
+        public async Task<RoleGroup> GetRoleGroupByNameAsync(string name, string corp, string app)
         {
             return (
                 await Repository
@@ -79,6 +80,7 @@ namespace SimpleAuth.Services
 
             return Repository
                 .FindMany(expressions)
+                .OrEmpty()
                 .Select(x => x.ToDomainObject());
         }
 
@@ -90,9 +92,7 @@ namespace SimpleAuth.Services
                 && x.App == newRoleGroup.App
             );
             if (findSingleAsync != default)
-            {
                 throw new EntityAlreadyExistsException(newRoleGroup.Name);
-            }
 
             Role[] initRoles = new Role[0];
             if (newRoleGroup.CopyFromRoleGroups.IsAny())
@@ -156,7 +156,7 @@ namespace SimpleAuth.Services
 
         public async Task DeleteRolesFromGroupAsync(RoleGroup roleGroup, RoleModel[] roleModels)
         {
-            var domain = await GetRoleGroupByName(roleGroup.Name, roleGroup.Corp, roleGroup.App);
+            var domain = await GetRoleGroupByNameAsync(roleGroup.Name, roleGroup.Corp, roleGroup.App);
             
             if (domain == default)
                 throw new EntityNotExistsException($"{roleGroup.Name}");
@@ -180,7 +180,7 @@ namespace SimpleAuth.Services
 
         public async Task DeleteAllRolesFromGroupAsync(RoleGroup roleGroup)
         {
-            var domain = await GetRoleGroupByName(roleGroup.Name, roleGroup.Corp, roleGroup.App);
+            var domain = await GetRoleGroupByNameAsync(roleGroup.Name, roleGroup.Corp, roleGroup.App);
             
             if (domain == default)
                 throw new EntityNotExistsException($"{roleGroup.Name}");

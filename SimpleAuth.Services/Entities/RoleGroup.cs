@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Models;
 using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
@@ -32,7 +33,7 @@ namespace SimpleAuth.Services.Entities
                 Corp = Corp,
                 App = App,
                 Locked = Locked,
-                Roles = RoleRecords?.Select(x => x.ToDomainObject()).ToArray(),
+                Roles = RoleRecords.OrEmpty().Select(x => x.ToDomainObject()).ToArray(),
             };
         }
     }
