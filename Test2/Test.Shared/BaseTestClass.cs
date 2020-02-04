@@ -244,7 +244,7 @@ namespace Test.Shared
         }
 
         protected string RandomText(int len = 5) => Guid.NewGuid().ToString().Replace("-", "").Substring(0, len);
-        protected string RandomCorp() => RandomText();
+        protected string RandomCorp() => RandomText(8);
         protected string RandomApp() => RandomText();
         protected string RandomEnv() => RandomText();
         protected string RandomTenant() => RandomText();
