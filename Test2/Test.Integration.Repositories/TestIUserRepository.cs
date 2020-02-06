@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
@@ -26,12 +28,15 @@ namespace Test.Integration.Repositories
                 Corp = corp,
             };
 
+            Assert.CatchAsync<ArgumentNullException>(async () => await repo.CreateUserAsync(user, null));
+            Assert.CatchAsync<ArgumentNullException>(async () => await repo.CreateUserAsync(null, userInfo));
+
             // expect success
             await Create();
 
             // user already at corp
             Assert.CatchAsync<EntityAlreadyExistsException>(async () => await Create());
-            
+
             // expect success
             await Create(new LocalUserInfo
             {
@@ -45,6 +50,257 @@ namespace Test.Integration.Repositories
             {
                 return repo.CreateUserAsync(user, userInfoCustom ?? userInfo);
             }
+        }
+
+        [Test]
+        public void DeleteManyAsync()
+        {
+            var repo = Svc<IUserRepository>();
+            Assert.CatchAsync<NotSupportedException>(async () => await repo.DeleteManyAsync(null));
+        }
+
+        [Test]
+        public async Task AssignUserToGroups()
+        {
+            var sp = Prepare();
+            var userRepo = sp.GetRequiredService<IUserRepository>();
+            var groupRepo = sp.GetRequiredService<IRoleGroupRepository>();
+
+            var userId = RandomUser();
+            var gId1 = Guid.NewGuid();
+            var gId2 = Guid.NewGuid();
+            var group1 = RandomRoleGroup();
+            var group2 = RandomRoleGroup();
+            var corp = RandomCorp();
+            var app = RandomApp();
+
+            // Validate params
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await userRepo.AssignUserToGroups(null, new[] {new RoleGroup()}));
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await userRepo.AssignUserToGroups(new User(), null));
+
+            await CreateGroup();
+
+            // user not found
+            Assert.CatchAsync<EntityNotExistsException>(async () => await userRepo.AssignUserToGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = gId1,
+                },
+                new RoleGroup
+                {
+                    Id = gId2,
+                }
+            }));
+
+            // create user
+            await userRepo.CreateUserAsync(new User
+            {
+                Id = userId,
+                NormalizedId = userId,
+            }, new LocalUserInfo
+            {
+                UserId = userId,
+                Corp = corp,
+            });
+            var user = userRepo.Find(userId);
+            Assert.NotNull(user);
+
+            // group not found
+            Assert.CatchAsync<EntityNotExistsException>(async () => await userRepo.AssignUserToGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = Guid.NewGuid()
+                }
+            }));
+
+            // add user to gr 1 success
+            await userRepo.AssignUserToGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = gId1
+                }
+            });
+            Assert.AreEqual(1, userRepo.Find(userId).RoleGroupUsers.Count);
+
+            // add user to gr 1 AGAIN, still success
+            await userRepo.AssignUserToGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = gId1
+                }
+            });
+            Assert.AreEqual(1, userRepo.Find(userId).RoleGroupUsers.Count);
+
+            #region Local methods
+
+            Task CreateGroup()
+            {
+                return groupRepo.CreateManyAsync(new[]
+                {
+                    new RoleGroup
+                    {
+                        Id = gId1,
+                        Name = group1,
+                        Corp = corp,
+                        App = app,
+                    },
+                    new RoleGroup
+                    {
+                        Id = gId2,
+                        Name = group2,
+                        Corp = corp,
+                        App = app,
+                    },
+                });
+            }
+
+            #endregion
+        }
+
+        [Test]
+        public async Task UnAssignUserFromGroups()
+        {
+            var sp = Prepare();
+            var userRepo = sp.GetRequiredService<IUserRepository>();
+            var groupRepo = sp.GetRequiredService<IRoleGroupRepository>();
+
+            var userId = RandomUser();
+            var gId1 = Guid.NewGuid();
+            var gId2 = Guid.NewGuid();
+            var group1 = RandomRoleGroup();
+            var group2 = RandomRoleGroup();
+            var corp = RandomCorp();
+            var app = RandomApp();
+
+            // Validate params
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await userRepo.UnAssignUserFromGroups(null, new[] {new RoleGroup()}));
+            Assert.CatchAsync<ArgumentNullException>(async () =>
+                await userRepo.UnAssignUserFromGroups(new User(), null));
+
+            await CreateGroup();
+
+            // user not found
+            Assert.CatchAsync<EntityNotExistsException>(async () => await userRepo.UnAssignUserFromGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = gId1,
+                },
+                new RoleGroup
+                {
+                    Id = gId2,
+                }
+            }));
+
+            // create user
+            await userRepo.CreateUserAsync(new User
+            {
+                Id = userId,
+                NormalizedId = userId,
+            }, new LocalUserInfo
+            {
+                UserId = userId,
+                Corp = corp,
+            });
+            var user = userRepo.Find(userId);
+            Assert.NotNull(user);
+
+            // group not found
+            Assert.CatchAsync<EntityNotExistsException>(async () => await userRepo.UnAssignUserFromGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = Guid.NewGuid()
+                }
+            }));
+            
+            // user doesn't belong to any group so no error
+            await userRepo.UnAssignUserFromGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = gId1
+                }
+            });
+
+            // add user to gr 1 success
+            await userRepo.AssignUserToGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = gId1
+                }
+            });
+            Assert.AreEqual(1, userRepo.Find(userId).RoleGroupUsers.Count);
+
+            // Un-assign success
+            await userRepo.UnAssignUserFromGroups(new User
+            {
+                Id = userId
+            }, new[]
+            {
+                new RoleGroup
+                {
+                    Id = gId1
+                }
+            });
+            Assert.AreEqual(0, userRepo.Find(userId).RoleGroupUsers.Count);
+
+            #region Local methods
+
+            Task CreateGroup()
+            {
+                return groupRepo.CreateManyAsync(new[]
+                {
+                    new RoleGroup
+                    {
+                        Id = gId1,
+                        Name = group1,
+                        Corp = corp,
+                        App = app,
+                    },
+                    new RoleGroup
+                    {
+                        Id = gId2,
+                        Name = group2,
+                        Corp = corp,
+                        App = app,
+                    },
+                });
+            }
+
+            #endregion
         }
     }
 }
