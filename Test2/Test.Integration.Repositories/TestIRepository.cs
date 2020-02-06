@@ -2,11 +2,13 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared.Utils;
+using Test.Shared;
 
 namespace Test.Integration.Repositories
 {
@@ -314,6 +316,74 @@ namespace Test.Integration.Repositories
             var rg = await tokenRepo.FindSingleAsync(x => x.Corp == corp2 && x.App == "a2");
             await tokenRepo.DeleteAsync(rg);
             Assert.IsNull(await tokenRepo.FindSingleAsync(x => x.Corp == corp2 && x.App == "a2"));
+        }
+    }
+
+    public class TestOtherRepos : BaseTestClass
+    {
+        [Test]
+        public async Task LocalUserInfo()
+        {
+            var sp = Prepare();
+            var userRepo = sp.GetRequiredService<IUserRepository>();
+            var localUserInfoRepo = sp.GetRequiredService<ILocalUserInfoRepository>();
+            var userId = RandomUser();
+            var corp = RandomCorp();
+
+            await userRepo.CreateUserAsync(new User
+            {
+                Id = userId,
+            }, new LocalUserInfo
+            {
+                UserId = userId,
+                Corp = corp
+            });
+
+            var user = userRepo.Find(userId);
+            Assert.NotNull(user);
+            Assert.AreEqual(1, user.UserInfos.Count);
+
+            var localUserInfo = localUserInfoRepo.Find(x => x.UserId == userId).ToList();
+            Assert.NotNull(localUserInfo);
+            Assert.AreEqual(1, localUserInfo.Count);
+        }
+
+        [Test]
+        public async Task RoleGroupUser()
+        {
+            var sp = Prepare();
+            var userRepo = sp.GetRequiredService<IUserRepository>();
+            var groupRepo = sp.GetRequiredService<IRoleGroupRepository>();
+            var roleGroupUserRepo = sp.GetRequiredService<IRoleGroupUserRepository>();
+            var userId = RandomUser();
+            var corp = RandomCorp();
+            var app = RandomApp();
+            var groupId = RandomRoleGroup();
+
+            await userRepo.CreateUserAsync(new User
+            {
+                Id = userId,
+            }, new LocalUserInfo
+            {
+                UserId = userId,
+                Corp = corp
+            });
+
+            var user = userRepo.Find(userId);
+            await groupRepo.CreateAsync(new RoleGroup
+            {
+                Name = groupId,
+                Corp = corp,
+                App = app,
+            });
+
+            await userRepo.AssignUserToGroups(user, groupRepo.Find(x => x.Name == groupId).ToArray());
+            
+            // Verify
+            user = userRepo.Find(userId);
+            Assert.AreEqual(1, user.RoleGroupUsers.Count);
+            var roleGroupUsers = roleGroupUserRepo.Find(x => x.UserId == userId).ToList();
+            Assert.AreEqual(1, roleGroupUsers.Count);
         }
     }
 }
