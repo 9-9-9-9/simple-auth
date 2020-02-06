@@ -32,7 +32,7 @@ namespace SimpleAuth.Repositories
         {
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));
-            if (app.IsBlank())
+            if (app == null)
                 throw new ArgumentNullException(nameof(app));
             return _memoryCachedRepository.GetAsync(BuildKey(new TokenInfo
             {
@@ -45,7 +45,7 @@ namespace SimpleAuth.Repositories
         {
             if (corp.IsBlank())
                 throw new ArgumentNullException(nameof(corp));
-            if (app.IsBlank())
+            if (app == null)
                 throw new ArgumentNullException(nameof(app));
             return _memoryCachedRepository.ClearAsync(corp, app);
         }
