@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using SimpleAuth.Core.Extensions;
 
 namespace SimpleAuth.Repositories
 {
     public interface ICachedRepository<T> where T : class
     {
-        void Push(T obj, string key, string corp, string app);
-        T Get(string key, string corp, string app);
-        void Clear(string corp, string app);
+        Task PushAsync(T obj, string key, string corp, string app);
+        Task<T> GetAsync(string key, string corp, string app);
+        Task ClearAsync(string corp, string app);
     }
 
     public interface IMemoryCachedRepository<T> : ICachedRepository<T> where T : class
@@ -20,27 +21,34 @@ namespace SimpleAuth.Repositories
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, T>> _cache =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, T>>();
 
-        public void Push(T obj, string key, string corp, string app)
+        public async Task PushAsync(T obj, string key, string corp, string app)
         {
+            await Task.CompletedTask;
             ThrowIfBlank(key, corp, app);
+            
             _cache
                 .GetOrAdd(Key(corp, app), s => new ConcurrentDictionary<string, T>())
                 .AddOrUpdate(key, s => obj, (s2, o) => obj);
         }
 
-        public T Get(string key, string corp, string app)
+        public async Task<T> GetAsync(string key, string corp, string app)
         {
+            await Task.CompletedTask;
             ThrowIfBlank(key, corp, app);
+            
             if (_cache
                 .GetOrAdd(Key(corp, app), s => new ConcurrentDictionary<string, T>())
                 .TryGetValue(key, out var res))
                 return res;
+            
             return null;
         }
 
-        public void Clear(string corp, string app)
+        public async Task ClearAsync(string corp, string app)
         {
+            await Task.CompletedTask;
             ThrowIfBlank(corp, app);
+            
             _cache
                 .GetOrAdd(Key(corp, app), s => new ConcurrentDictionary<string, T>()).Clear();
         }

@@ -7,6 +7,7 @@ namespace Test.SimpleAuth.Shared.Test.Repositories
 {
     public class TestICachedRepository : BaseTestClass
     {
+        /*
         [Test]
         public void MemoryCachedRepository()
         {
@@ -36,5 +37,6 @@ namespace Test.SimpleAuth.Shared.Test.Repositories
             svc.Push(null, "k2", "c", "a");
             Assert.IsNull(svc.Get("k2", "c", "a"));
         }
+        */
     }
 }

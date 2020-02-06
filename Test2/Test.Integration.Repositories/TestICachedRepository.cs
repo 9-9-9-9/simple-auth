@@ -4,7 +4,7 @@ using NUnit.Framework;
 using SimpleAuth.Repositories;
 using Test.Shared;
 
-namespace Test.SimpleAuth.Services.Test.Repositories
+namespace Test.Integration.Repositories
 {
     public class TestICachedRepository : BaseTestClass
     {

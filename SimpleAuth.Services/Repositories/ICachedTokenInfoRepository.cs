@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Services.Entities;
 
@@ -5,9 +6,9 @@ namespace SimpleAuth.Repositories
 {
     public interface ICachedTokenInfoRepository
     {
-        void Push(TokenInfo tokenInfo);
-        TokenInfo Get(string corp, string app);
-        void Clear(string corp, string app);
+        Task PushAsync(TokenInfo tokenInfo);
+        Task<TokenInfo> GetAsync(string corp, string app);
+        Task ClearAsync(string corp, string app);
     }
 
     public class CachedTokenInfoRepository : ICachedTokenInfoRepository
@@ -19,23 +20,23 @@ namespace SimpleAuth.Repositories
             _memoryCachedRepository = memoryCachedRepository;
         }
 
-        public void Push(TokenInfo tokenInfo)
+        public Task PushAsync(TokenInfo tokenInfo)
         {
-            _memoryCachedRepository.Push(tokenInfo, BuildKey(tokenInfo), tokenInfo.Corp, tokenInfo.App);
+            return _memoryCachedRepository.PushAsync(tokenInfo, BuildKey(tokenInfo), tokenInfo.Corp, tokenInfo.App);
         }
 
-        public TokenInfo Get(string corp, string app)
+        public Task<TokenInfo> GetAsync(string corp, string app)
         {
-            return _memoryCachedRepository.Get(BuildKey(new TokenInfo
+            return _memoryCachedRepository.GetAsync(BuildKey(new TokenInfo
             {
                 Corp = corp,
                 App = app
             }), corp, app);
         }
 
-        public void Clear(string corp, string app)
+        public Task ClearAsync(string corp, string app)
         {
-            _memoryCachedRepository.Clear(corp, app);
+            return _memoryCachedRepository.ClearAsync(corp, app);
         }
 
         private string BuildKey(TokenInfo tokenInfo) => $"{tokenInfo.Corp}@{tokenInfo.App.Or(string.Empty)}";
