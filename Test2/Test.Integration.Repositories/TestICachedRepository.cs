@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SimpleAuth.Repositories;
 using Test.Shared;
@@ -8,7 +9,13 @@ namespace Test.Integration.Repositories
 {
     public class TestICachedRepository : BaseTestClass
     {
-        private ICachedRepository<string> Svc => new MemoryCachedRepository<string>();
+        protected override void RegisteredServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<ICachedRepository<string>, MemoryCachedRepository<string>>();
+            base.RegisteredServices(serviceCollection);
+        }
+
+        private ICachedRepository<string> Svc => Svc<ICachedRepository<string>>();
 
         private Task<T> Get<T>(string key, ICachedRepository<T> cachedRepository)
             where T : class => cachedRepository.GetAsync(key, "c", "a");
