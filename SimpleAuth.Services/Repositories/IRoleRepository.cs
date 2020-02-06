@@ -21,33 +21,28 @@ namespace SimpleAuth.Repositories
 
         public IEnumerable<Role> Search(string term, string corp, string app, FindOptions findOptions = null)
         {
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+
+            if (app.IsBlank())
+                throw new ArgumentNullException(nameof(app));
+
             term = term.NormalizeInput();
             corp = corp.NormalizeInput();
             app = app.NormalizeInput();
 
             findOptions ??= new FindOptions();
 
-            var policies = new List<Expression<Func<Role, bool>>>()
+            var policies = new List<Expression<Func<Role, bool>>>
             {
                 x => x.Corp == corp && x.App == app,
-                x => !x.Locked,
+                x => !x.Locked
             };
 
-            if (term.Contains(Constants.SplitterRoleParts))
-            {
+            if (term != null && term != Constants.WildCard)
                 policies.Add(x => x.Id.Contains(term));
-            }
-            else
-            {
-                policies.Add(x => x.Env.Contains(term)
-                                  || x.Tenant.Contains(term)
-                                  || x.Module.Contains(term)
-                                  || x.SubModules.Contains(term)
-                                  || x.Corp.Contains(term)
-                                  || x.App.Contains(term));
-            }
 
-            return FindManyOrdered(policies, findOptions, new OrderByOptions<Role,string>
+            return FindManyOrdered(policies, findOptions, new OrderByOptions<Role, string>
             {
                 Expression = x => x.Id,
                 Direction = OrderDirection.Asc

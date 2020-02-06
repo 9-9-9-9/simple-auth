@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Repositories;
@@ -23,10 +24,12 @@ namespace SimpleAuth.Server.Controllers
 
         [HttpGet, Route("clear/token-info")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public void ClearCacheTokenInfo()
+        public async Task<IActionResult> ClearCacheTokenInfo()
         {
-            _cachedTokenInfoRepository.Clear(RequestAppHeaders.Corp, RequestAppHeaders.App); // App token
-            _cachedTokenInfoRepository.Clear(RequestAppHeaders.Corp, string.Empty); // Corp token
+            await _cachedTokenInfoRepository.ClearAsync(RequestAppHeaders.Corp, RequestAppHeaders.App); // App token
+            await _cachedTokenInfoRepository.ClearAsync(RequestAppHeaders.Corp, string.Empty); // Corp token
+
+            return Ok();
         }
     }
 }

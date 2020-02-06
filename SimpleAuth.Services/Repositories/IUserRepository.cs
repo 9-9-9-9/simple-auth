@@ -46,6 +46,11 @@ namespace SimpleAuth.Repositories
 
         public async Task CreateUserAsync(User user, LocalUserInfo userInfo)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            if (userInfo == null)
+                throw new ArgumentNullException(nameof(userInfo));
+            
             var lookupUser = Find(user.Id);
 
             await using var ctx = OpenConnect();
@@ -90,6 +95,11 @@ namespace SimpleAuth.Repositories
 
         public async Task AssignUserToGroups(User user, RoleGroup[] roleGroups)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            if (roleGroups.IsEmpty())
+                throw new ArgumentNullException(nameof(roleGroups));
+            
             var targetGrIds = roleGroups.Select(rg => rg.Id);
             var lookupRoleGroups = _roleGroupRepository
                 .Find(x => targetGrIds.Contains(x.Id)
@@ -138,6 +148,11 @@ namespace SimpleAuth.Repositories
 
         public async Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            if (roleGroups.IsEmpty())
+                throw new ArgumentNullException(nameof(roleGroups));
+            
             var targetGrIds = roleGroups.Select(rg => rg.Id);
             var lookupRoleGroups = _roleGroupRepository
                 .Find(x => targetGrIds.Contains(x.Id)

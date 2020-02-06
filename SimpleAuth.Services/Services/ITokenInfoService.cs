@@ -47,8 +47,8 @@ namespace SimpleAuth.Services
                 await Repository.UpdateAsync(entity);
             }
 
-            _cachedTokenInfoRepository.Clear(tokenInfo.Corp, tokenInfo.App);
-            _cachedTokenInfoRepository.Push(entity);
+            await _cachedTokenInfoRepository.ClearAsync(tokenInfo.Corp, tokenInfo.App);
+            await _cachedTokenInfoRepository.PushAsync(entity);
             return entity.Version;
         }
 
@@ -56,7 +56,7 @@ namespace SimpleAuth.Services
         {
             if (!noCaching)
             {
-                var currentVersion = _cachedTokenInfoRepository.Get(tokenInfo.Corp, tokenInfo.App)?.Version ?? 0;
+                var currentVersion = (await _cachedTokenInfoRepository.GetAsync(tokenInfo.Corp, tokenInfo.App))?.Version ?? 0;
 
                 if (currentVersion > 0)
                     return currentVersion;
@@ -72,8 +72,8 @@ namespace SimpleAuth.Services
             if (entity == default)
                 return 0;
             
-            _cachedTokenInfoRepository.Clear(tokenInfo.Corp, tokenInfo.App);
-            _cachedTokenInfoRepository.Push(entity);
+            await _cachedTokenInfoRepository.ClearAsync(tokenInfo.Corp, tokenInfo.App);
+            await _cachedTokenInfoRepository.PushAsync(entity);
             return entity.Version;
         }
     }

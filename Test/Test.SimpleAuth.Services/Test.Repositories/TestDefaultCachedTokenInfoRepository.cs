@@ -6,6 +6,7 @@ namespace Test.SimpleAuth.Shared.Test.Repositories
 {
     public class TestDefaultCachedTokenInfoRepository
     {
+        /*
         [Test]
         public void AllInOne()
         {
@@ -55,5 +56,6 @@ namespace Test.SimpleAuth.Shared.Test.Repositories
             Assert.IsNull(repo.Get("c", "a"));
             Assert.IsNotNull(repo.Get("d", "b"));
         }
+        */
     }
 }

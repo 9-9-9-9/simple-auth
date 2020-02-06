@@ -32,9 +32,15 @@ namespace SimpleAuth.Repositories
 
         public IEnumerable<RoleGroup> Search(string term, string corp, string app, FindOptions findOptions = null)
         {
+            if (corp == null)
+                throw new ArgumentNullException(nameof(corp));
+            
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
+            
             corp = corp.NormalizeInput();
             app = app.NormalizeInput();
-            term = term?.NormalizeInput();
+            term = term?.Trim().NormalizeInput();
 
             findOptions ??= new FindOptions();
 
@@ -72,6 +78,7 @@ namespace SimpleAuth.Repositories
             {
                 newRoles.ForEach(r =>
                 {
+                    r.WithRandomId();
                     ctx.Entry(r).State = EntityState.Added;
                 });
                 await dbRecords.AddRangeAsync(newRoles);

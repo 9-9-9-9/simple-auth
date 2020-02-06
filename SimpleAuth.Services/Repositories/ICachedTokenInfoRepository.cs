@@ -1,30 +1,60 @@
+using System;
+using System.Threading.Tasks;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Services.Entities;
 
 namespace SimpleAuth.Repositories
 {
-    public interface ICachedTokenInfoRepository : ICachedRepository<TokenInfo>
+    public interface ICachedTokenInfoRepository
     {
-        void Push(TokenInfo tokenInfo);
-        TokenInfo Get(string corp, string app);
+        Task PushAsync(TokenInfo tokenInfo);
+        Task<TokenInfo> GetAsync(string corp, string app);
+        Task ClearAsync(string corp, string app);
     }
 
-    public class CachedTokenInfoRepository : MemoryCachedRepository<TokenInfo>, ICachedTokenInfoRepository
+    public class CachedTokenInfoRepository : ICachedTokenInfoRepository
     {
-        public void Push(TokenInfo tokenInfo)
+        private readonly ICachedRepository<TokenInfo> _memoryCachedRepository;
+
+        public CachedTokenInfoRepository(ICachedRepository<TokenInfo> memoryCachedRepository)
         {
-            Push(tokenInfo, BuildKey(tokenInfo), tokenInfo.Corp, tokenInfo.App);
+            _memoryCachedRepository = memoryCachedRepository;
         }
 
-        public TokenInfo Get(string corp, string app)
+        public Task PushAsync(TokenInfo tokenInfo)
         {
-            return Get(BuildKey(new TokenInfo
+            if (tokenInfo == null)
+                throw new ArgumentNullException(nameof(tokenInfo));
+            return _memoryCachedRepository.PushAsync(tokenInfo, BuildKey(tokenInfo), tokenInfo.Corp, tokenInfo.App);
+        }
+
+        public Task<TokenInfo> GetAsync(string corp, string app)
+        {
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
+            return _memoryCachedRepository.GetAsync(BuildKey(new TokenInfo
             {
                 Corp = corp,
                 App = app
             }), corp, app);
         }
 
-        private string BuildKey(TokenInfo tokenInfo) => $"{tokenInfo.Corp}@{tokenInfo.App.Or(string.Empty)}";
+        public Task ClearAsync(string corp, string app)
+        {
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
+            return _memoryCachedRepository.ClearAsync(corp, app);
+        }
+
+        private string BuildKey(TokenInfo tokenInfo)
+        {
+            if (tokenInfo.Corp.IsBlank())
+                throw new ArgumentException($"Property {nameof(TokenInfo.Corp)} of {nameof(tokenInfo)} is blank");
+            return $"{tokenInfo.Corp}@{tokenInfo.App.Or(string.Empty)}";
+        }
     }
 }

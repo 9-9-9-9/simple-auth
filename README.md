@@ -1,4 +1,5 @@
-Code coverage: 50%
+Code coverage: 98%
+of SimpleAuth.Core|Services|Shared the 3 projects brings core value of this solution
 
 #### I know 50% is too little, but the core part, the service one, is tested
 

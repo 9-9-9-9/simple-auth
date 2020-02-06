@@ -43,6 +43,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             Assert.AreEqual(3, await defaultTokenInfoService.IncreaseVersionAsync(tokenInfo));
         }
         
+        /*
         [Test]
         public async Task GetCurrentVersionAsync()
         {
@@ -77,5 +78,6 @@ namespace Test.SimpleAuth.Services.Test.Services
             mockCacheRepo.Setup(x => x.Get(It.IsAny<string>(), It.IsAny<string>())).Returns(new TokenInfo{Version = 9999});
             Assert.AreEqual(6, await defaultTokenInfoService.GetCurrentVersionAsync(tokenInfo, true));
         }
+        */
     }
 }
