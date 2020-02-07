@@ -48,7 +48,7 @@ namespace SimpleAuthServer
             services.RegisterModules<SimpleAuth.Postgres.ProjectRegistrableModules>();
             services.AddTransient<SimpleAuthDbContext, DbContext>();
 
-            services.AddSingleton<IGoogleService, DefaultGoogleService>();
+            services.RegisterModules<SimpleAuth.Server.Services.ServiceModules>();
 
             //
             services.AddSwaggerGen(c =>

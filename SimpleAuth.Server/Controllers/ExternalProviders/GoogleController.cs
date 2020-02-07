@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Middlewares;
@@ -79,34 +78,11 @@ namespace SimpleAuth.Server.Controllers
                     return StatusCodes.Status412PreconditionFailed.WithMessage(ex.Message);
                 }
 
-                if (!form.Email.EqualsIgnoreCase(ggToken.Email))
-                    throw new DataVerificationMismatchException(
-                        $"This token belong to {ggToken.Email} which is different than email provided in payload {form.Email}"
-                    );
-
-                if (!form.VerifyWithClientId.IsBlank())
-                    if (!form.VerifyWithClientId.EqualsIgnoreCase(ggToken.Aud))
-                        throw new DataVerificationMismatchException(
-                            $"This token is rejected, it's not belong to client id {form.VerifyWithClientId}"
-                        );
-
-                if (!form.VerifyWithGSuite.IsBlank())
-                    if (!form.VerifyWithGSuite.EqualsIgnoreCase(ggToken.Hd))
-                        throw new DataVerificationMismatchException(
-                            $"This token is rejected, it's not belong to GSuite domain {form.VerifyWithGSuite}"
-                        );
+                await _googleService.VerifyRequestAsync(RequestAppHeaders.Corp, form, ggToken);
 
                 var expiryDate = new DateTime(1970, 1, 1, 1, 1, 1, DateTimeKind.Utc);
-                expiryDate = expiryDate.AddSeconds(ggToken.Exp);
-
-                if (DateTime.UtcNow > expiryDate)
-                {
-                    _logger.LogWarning($"User {form.Email} provided an expired google token");
-                    throw new DataVerificationMismatchException(
-                        "Token already expired"
-                    );
-                }
-
+                expiryDate = expiryDate.AddSeconds(int.Parse(ggToken.Exp));
+                
                 var model = await GetBaseResponseUserModelAsync(form.Email, Service);
                 model.GoogleToken = ggToken;
                 model.ExpireAt(expiryDate);
