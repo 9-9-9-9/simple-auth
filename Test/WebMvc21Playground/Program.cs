@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace WebMvc21Playground
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -19,6 +13,23 @@ namespace WebMvc21Playground
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostBuilder, builder) =>
+                    {
+                        builder
+                            .AddJsonFiles()
+                            .AddEnvironmentVariables();
+                    }
+                )
                 .UseStartup<Startup>();
+    }
+
+    internal static class ConfigurationExtensions
+    {
+        public static IConfigurationBuilder AddJsonFiles(this IConfigurationBuilder builder)
+        {
+            builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            builder.AddJsonFile("/configmaps/test/wap/appsettings.json", optional: true, reloadOnChange: true);
+            return builder;
+        }
     }
 }
