@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\SimpleAuth.Client.AspNetCore\SimpleAuth.Client.AspNetCore.csproj" />
+      <ProjectReference Include="..\..\AspNetCore\SimpleAuth.Client.AspNetCore22\SimpleAuth.Client.AspNetCore22.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />

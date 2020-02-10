@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <AssemblyName>SimpleAuth.Client.AspNetCore</AssemblyName>
+        <RootNamespace>SimpleAuth.Client.AspNetCore</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.11" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\src\Attributes\SaModuleAttribute.cs">
+            <Link>Attributes\SaModuleAttribute.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Attributes\SaPermissionAttribute.cs">
+            <Link>Attributes\SaPermissionAttribute.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Extensions\AspNetCoreHttpAdditionalExtensions.cs">
+            <Link>Extensions\AspNetCoreHttpAdditionalExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Extensions\AspnetCoreIdentityExtensions.cs">
+            <Link>Extensions\AspnetCoreIdentityExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Extensions\SimpleAuthorizationClaimAdditionalExtensions.cs">
+            <Link>Extensions\SimpleAuthorizationClaimAdditionalExtensions.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Middlewares\ExposedApi\SaCheckRole.cs">
+            <Link>Middlewares\ExposedApi\SaCheckRole.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Middlewares\ExposedApi\SaGetRoles.cs">
+            <Link>Middlewares\ExposedApi\SaGetRoles.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Middlewares\Extensions.cs">
+            <Link>Middlewares\Extensions.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Middlewares\SaAuthorizationActionFilter.cs">
+          <Link>Middlewares\SaAuthorizationActionFilter.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Middlewares\SaPushClaimsToContextMiddleware.cs">
+            <Link>Middlewares\SaPushClaimsToContextMiddleware.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Models\ClaimsBuilder.cs">
+            <Link>Models\ClaimsBuilder.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Services\IAuthenticationInfoProvider.cs">
+            <Link>Services\IAuthenticationInfoProvider.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Services\IClaimTransformingService.cs">
+            <Link>Services\IClaimTransformingService.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Services\ITenantProvider.cs">
+            <Link>Services\ITenantProvider.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Services\JsonNetService.cs">
+            <Link>Services\JsonNetService.cs</Link>
+        </Compile>
+        <Compile Include="..\src\Services\ServiceModules.cs">
+            <Link>Services\ServiceModules.cs</Link>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
+        <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+        <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
+    </ItemGroup>
+
+</Project>
