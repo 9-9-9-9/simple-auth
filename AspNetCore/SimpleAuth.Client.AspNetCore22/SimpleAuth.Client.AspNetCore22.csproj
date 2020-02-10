@@ -2,18 +2,20 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
+        <AssemblyName>SimpleAuth.Client.AspNetCore</AssemblyName>
+        <RootNamespace>SimpleAuth.Client.AspNetCore</RootNamespace>
     </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
-      <ProjectReference Include="..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
-      <ProjectReference Include="..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
-    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
     </ItemGroup>
 
 </Project>
