@@ -18,4 +18,55 @@
       <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="..\src\Attributes\SaModuleAttribute.cs">
+        <Link>Attributes\SaModuleAttribute.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Attributes\SaPermissionAttribute.cs">
+        <Link>Attributes\SaPermissionAttribute.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Extensions\AspNetCoreHttpAdditionalExtensions.cs">
+        <Link>Extensions\AspNetCoreHttpAdditionalExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Extensions\AspnetCoreIdentityExtensions.cs">
+        <Link>Extensions\AspnetCoreIdentityExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Extensions\SimpleAuthorizationClaimAdditionalExtensions.cs">
+        <Link>Extensions\SimpleAuthorizationClaimAdditionalExtensions.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Middlewares\ExposedApi\SaCheckRole.cs">
+        <Link>Middlewares\ExposedApi\SaCheckRole.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Middlewares\ExposedApi\SaGetRoles.cs">
+        <Link>Middlewares\ExposedApi\SaGetRoles.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Middlewares\Extensions.cs">
+        <Link>Middlewares\Extensions.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Middlewares\SaAuthorizationMiddleware.cs">
+        <Link>Middlewares\SaAuthorizationMiddleware.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Middlewares\SaPushClaimsToContextMiddleware.cs">
+        <Link>Middlewares\SaPushClaimsToContextMiddleware.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Models\ClaimsBuilder.cs">
+        <Link>Models\ClaimsBuilder.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Services\IAuthenticationInfoProvider.cs">
+        <Link>Services\IAuthenticationInfoProvider.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Services\IClaimTransformingService.cs">
+        <Link>Services\IClaimTransformingService.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Services\ITenantProvider.cs">
+        <Link>Services\ITenantProvider.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Services\JsonNetService.cs">
+        <Link>Services\JsonNetService.cs</Link>
+      </Compile>
+      <Compile Include="..\src\Services\ServiceModules.cs">
+        <Link>Services\ServiceModules.cs</Link>
+      </Compile>
+    </ItemGroup>
+
 </Project>

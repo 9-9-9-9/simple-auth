@@ -30,8 +30,11 @@ namespace Microsoft.AspNetCore.Builder
         public static IApplicationBuilder UseSimpleAuth(this IApplicationBuilder app)
         {
             return app
-                .UseMiddleware<SaPushClaimsToContextMiddleware>()
-                .UseMiddleware<SaAuthorizationMiddleware>();
+                    .UseMiddleware<SaPushClaimsToContextMiddleware>()
+#if !NETCOREAPP2_1
+                .UseMiddleware<SaAuthorizationMiddleware>()
+#endif
+                ;
         }
 
         public static IApplicationBuilder UseSimpleAuthEndPoints(this IApplicationBuilder app)
@@ -40,7 +43,7 @@ namespace Microsoft.AspNetCore.Builder
             app.Map("/api/simple-auth/check-roles", builder => { builder.UseMiddleware<SaCheckRole>(); });
             return app;
         }
-        
+
         public static IServiceCollection UseSimpleAuthDefaultServices(this IServiceCollection services,
             IConfigurationSection simpleAuthSettingsConfiguration = null)
         {

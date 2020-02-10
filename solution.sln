@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Client.AspNetCor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Client.AspNetCore21", "AspNetCore\SimpleAuth.Client.AspNetCore21\SimpleAuth.Client.AspNetCore21.csproj", "{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebMvc21Playground", "Test\WebMvc21Playground\WebMvc21Playground.csproj", "{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -359,6 +361,18 @@ Global
 		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|x64.Build.0 = Release|Any CPU
 		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|x86.ActiveCfg = Release|Any CPU
 		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|x86.Build.0 = Release|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Debug|x64.Build.0 = Debug|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Debug|x86.Build.0 = Debug|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|x64.ActiveCfg = Release|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|x64.Build.0 = Release|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|x86.ActiveCfg = Release|Any CPU
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -383,6 +397,7 @@ Global
 		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A} = {F0CCBA31-4484-404D-AF49-769C97746857}
 		{DC0C339F-545B-4634-AD9D-48B61CC1122A} = {88CDF640-EADD-43A7-94FA-21B4D822337A}
 		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74} = {88CDF640-EADD-43A7-94FA-21B4D822337A}
+		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE} = {4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B53DD286-B6DE-4EBF-8E02-1081D86E57B1}

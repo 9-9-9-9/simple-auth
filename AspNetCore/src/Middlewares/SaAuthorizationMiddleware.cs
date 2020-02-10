@@ -97,7 +97,6 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                     // pass
                 }
             }
-
             await _next(httpContext);
         }
 
