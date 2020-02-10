@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Client.AspNetCore22", "AspNetCore\SimpleAuth.Client.AspNetCore22\SimpleAuth.Client.AspNetCore22.csproj", "{DC0C339F-545B-4634-AD9D-48B61CC1122A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Client.AspNetCore21", "AspNetCore\SimpleAuth.Client.AspNetCore21\SimpleAuth.Client.AspNetCore21.csproj", "{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -345,6 +347,18 @@ Global
 		{DC0C339F-545B-4634-AD9D-48B61CC1122A}.Release|x64.Build.0 = Release|Any CPU
 		{DC0C339F-545B-4634-AD9D-48B61CC1122A}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC0C339F-545B-4634-AD9D-48B61CC1122A}.Release|x86.Build.0 = Release|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Debug|x64.Build.0 = Debug|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Debug|x86.Build.0 = Debug|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|x64.ActiveCfg = Release|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|x64.Build.0 = Release|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|x86.ActiveCfg = Release|Any CPU
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -368,6 +382,7 @@ Global
 		{BFD440A2-630B-447A-ACFC-EB1BA1EAD3E8} = {F0CCBA31-4484-404D-AF49-769C97746857}
 		{67D5C541-D5CB-4A84-BA9F-CA0300CE213A} = {F0CCBA31-4484-404D-AF49-769C97746857}
 		{DC0C339F-545B-4634-AD9D-48B61CC1122A} = {88CDF640-EADD-43A7-94FA-21B4D822337A}
+		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74} = {88CDF640-EADD-43A7-94FA-21B4D822337A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B53DD286-B6DE-4EBF-8E02-1081D86E57B1}
