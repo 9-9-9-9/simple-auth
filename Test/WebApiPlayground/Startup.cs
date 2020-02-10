@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SimpleAuth.Client.AspNetCore.Middlewares;
 using SimpleAuth.Client.Models;
 
 namespace WebApiPlayground

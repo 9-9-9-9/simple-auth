@@ -41,10 +41,7 @@ namespace WebMvc21Playground
             
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-                .AddMvcOptions(options =>
-                {
-                    options.Filters.Add(new SaAuthorizationAsyncActionFilter());
-                });
+                .AddMvcOptions(options => { options.UseSimpleAuth(); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Middlewares;
@@ -35,6 +36,14 @@ namespace Microsoft.AspNetCore.Builder
                 .UseMiddleware<SaAuthorizationMiddleware>()
 #endif
                 ;
+        }
+
+        public static MvcOptions UseSimpleAuth(this MvcOptions options)
+        {
+#if NETCOREAPP2_1
+            options.Filters.Add(new SaAuthorizationAsyncActionFilter());
+#endif
+            return options;
         }
 
         public static IApplicationBuilder UseSimpleAuthEndPoints(this IApplicationBuilder app)
