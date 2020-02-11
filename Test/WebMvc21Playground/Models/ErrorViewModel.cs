@@ -1,5 +1,3 @@
-using System;
-
 namespace WebMvc21Playground.Models
 {
     public class ErrorViewModel

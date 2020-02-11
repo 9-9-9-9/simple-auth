@@ -82,13 +82,12 @@ namespace SimpleAuth.Client.AspNetCore.Services
             var packageSimpleAuthorizationClaim = httpContext.GetUserPackageSimpleAuthorizationClaimFromContext();
 
             if (_simpleAuthConfigurationProvider.LiveChecking)
-                await PerformLiveCheckingPermission(httpContext, packageSimpleAuthorizationClaim, requiredClaims);
+                await PerformLiveCheckingPermission(packageSimpleAuthorizationClaim, requiredClaims);
             else
-                await PerformLocalCheckingPermission(httpContext, packageSimpleAuthorizationClaim, requiredClaims);
+                await PerformLocalCheckingPermission(packageSimpleAuthorizationClaim, requiredClaims);
         }
 
-        private async Task PerformLocalCheckingPermission(HttpContext httpContext,
-            PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim,
+        private async Task PerformLocalCheckingPermission(PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim,
             ICollection<SimpleAuthorizationClaim> requiredClaims)
         {
             var userClaims = packageSimpleAuthorizationClaim.ClaimsOrEmpty;
@@ -106,8 +105,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
             await Task.CompletedTask;
         }
 
-        private async Task PerformLiveCheckingPermission(HttpContext httpContext,
-            PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim,
+        private async Task PerformLiveCheckingPermission(PackageSimpleAuthorizationClaim packageSimpleAuthorizationClaim,
             ICollection<SimpleAuthorizationClaim> requiredClaims)
         {
             if (packageSimpleAuthorizationClaim.UserId.IsBlank())

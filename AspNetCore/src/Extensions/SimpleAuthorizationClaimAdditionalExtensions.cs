@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Core.DependencyInjection;
 using SimpleAuth.Core.Extensions;

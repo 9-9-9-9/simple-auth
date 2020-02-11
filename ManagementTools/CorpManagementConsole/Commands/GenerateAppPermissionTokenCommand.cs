@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ConsoleApps.Shared.Commands;
@@ -6,7 +5,7 @@ using SimpleAuth.Client.Services;
 
 namespace CorpManagementConsole.Commands
 {
-    public class GenerateAppPermissionTokenCommand : AbstractCommand, ICommand
+    public class GenerateAppPermissionTokenCommand : AbstractCommand
     {
         private readonly IAdministrationService _administrationService;
 

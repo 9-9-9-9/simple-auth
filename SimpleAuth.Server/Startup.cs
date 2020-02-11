@@ -13,7 +13,6 @@ using SimpleAuth.Core.Utils;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server;
 using SimpleAuth.Server.Models;
-using SimpleAuth.Server.Services;
 using SimpleAuth.Server.Swagger;
 using Constants = SimpleAuth.Shared.Constants;
 #pragma warning disable 1591

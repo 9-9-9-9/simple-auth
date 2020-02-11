@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Validation;
 using Test.Shared;
 

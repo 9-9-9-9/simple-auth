@@ -74,7 +74,7 @@ namespace SimpleAuth.Server.Controllers
                 }
                 catch (SimpleAuthException ex)
                 {
-                    _logger.LogWarning(ex, $"Google token verification issue");
+                    _logger.LogWarning(ex, "Google token verification issue");
                     return StatusCodes.Status412PreconditionFailed.WithMessage(ex.Message);
                 }
 

@@ -275,7 +275,7 @@ namespace SimpleAuth.Server.Controllers
                 }
 
                 if (localUserInfo.EncryptedPassword.IsBlank())
-                    return StatusCodes.Status412PreconditionFailed.WithMessage($"User has no password defined");
+                    return StatusCodes.Status412PreconditionFailed.WithMessage("User has no password defined");
 
                 var pwdMatch = _encryptionService.Decrypt(localUserInfo.EncryptedPassword).Equals(password);
 

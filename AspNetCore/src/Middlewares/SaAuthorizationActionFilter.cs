@@ -7,12 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Models;
 using SimpleAuth.Client.AspNetCore.Services;
-using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Exceptions;
-using SimpleAuth.Shared.Models;
-using SimpleAuth.Shared.Utils;
 
 public class SaAuthorizationAsyncActionFilter : IAsyncActionFilter
 {
@@ -33,7 +30,7 @@ public class SaAuthorizationAsyncActionFilter : IAsyncActionFilter
 
         var authenticationInfoProvider = httpContext.RequestServices.GetService<IAuthenticationInfoProvider>();
 
-        var saP = methodInfoOfAction.GetCustomAttributes<SaPermissionAttribute>(false);
+        var saP = methodInfoOfAction.GetCustomAttributes<SaPermissionAttribute>(false).OrEmpty().ToList();
         var saM = methodInfoOfAction.GetCustomAttribute<SaModuleAttribute>(false) ?? controller.GetType().GetCustomAttribute<SaModuleAttribute>();
 
         if (

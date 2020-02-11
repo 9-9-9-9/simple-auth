@@ -18,7 +18,7 @@ namespace AppManagementConsole.Commands
 
         protected override Task DoMainJob(string[] args)
         {
-            var roleGroupName = args[0]; 
+            var roleGroupName = args[0];
             var @lock = args[1].Trim().EqualsIgnoreCase("lock");
             return _roleGroupManagementService.SetLockRoleGroup(roleGroupName, @lock);
         }
@@ -28,6 +28,8 @@ namespace AppManagementConsole.Commands
             return new[] {"Role Group name", "Lock or Unlock"};
         }
 
+        // ReSharper disable RedundantJumpStatement
+        // ReSharper disable RedundantIfElseBlock
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)
         {
             var state = args[1].Trim();
@@ -38,6 +40,8 @@ namespace AppManagementConsole.Commands
             else
                 yield return "Only Lock/Unlock are considered as valid value";
         }
+        // ReSharper restore RedundantIfElseBlock
+        // ReSharper restore RedundantJumpStatement
 
         protected override int[] IdxParametersCanNotBeBlank => new[] {0, 1};
     }

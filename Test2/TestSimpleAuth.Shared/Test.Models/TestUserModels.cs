@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Security.Cryptography;
 using NUnit.Framework;
 using SimpleAuth.Shared.Models;
 

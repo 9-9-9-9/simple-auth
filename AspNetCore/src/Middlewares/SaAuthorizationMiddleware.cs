@@ -7,12 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Models;
 using SimpleAuth.Client.AspNetCore.Services;
-using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
 using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Exceptions;
-using SimpleAuth.Shared.Models;
-using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares
 {

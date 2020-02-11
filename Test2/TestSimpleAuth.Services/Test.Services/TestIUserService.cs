@@ -818,8 +818,6 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp2 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
-            var env = RandomEnv();
-            var tenant = RandomTenant();
 
             #region Arguments validation
 
@@ -950,7 +948,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 ($"{corp1}.{app1}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
                 ($"{corp1}.{app1}.e.t.d", Permission.Edit), // expect
             }, corp1, app1);
-            
+
             Assert.AreEqual(2, missingRoles.Count);
             var ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp1}.{app1}.e.t.ae");
             Assert.NotNull(ae);
@@ -969,7 +967,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 ($"{corp2}.{app2}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
                 ($"{corp2}.{app2}.e.t.d", Permission.Edit), // expect
             }, corp2, app2);
-            
+
             Assert.AreEqual(2, missingRoles.Count);
             ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp2}.{app2}.e.t.ae");
             Assert.NotNull(ae);
@@ -996,8 +994,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             var svc = Prepare<ILocalUserInfoRepository, LocalUserInfo, Guid>(out var mockUserRepository,
                 out var mockLocalUserInfoRepository).GetRequiredService<IUserService>();
             BasicSetup<ILocalUserInfoRepository, LocalUserInfo, Guid>(mockLocalUserInfoRepository);
-
-
+            
             var userId = RandomUser();
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
@@ -1018,9 +1015,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             user.LocalUserInfos = new[]
             {
-                new global::SimpleAuth.Shared.Domains.LocalUserInfo
-                {
-                }
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo()
             };
 
             SetupFindReturns(null);
@@ -1125,7 +1120,6 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             var encryptionService = sp.GetRequiredService<IEncryptionService>();
             var pass1Enc = encryptionService.Encrypt(pass1);
-            var pass2Enc = encryptionService.Encrypt(pass2);
             var pass3Enc = encryptionService.Encrypt(pass3);
 
             var user = new global::SimpleAuth.Shared.Domains.User
@@ -1143,9 +1137,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             user.LocalUserInfos = new[]
             {
-                new global::SimpleAuth.Shared.Domains.LocalUserInfo
-                {
-                }
+                new global::SimpleAuth.Shared.Domains.LocalUserInfo()
             };
 
             SetupFindReturns(null);

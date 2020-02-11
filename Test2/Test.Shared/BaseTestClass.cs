@@ -253,8 +253,8 @@ namespace Test.Shared
         protected string RandomUser() => RandomText();
         protected string RandomEmail() => $"{RandomText()}@{RandomText(3)}.{RandomText(3)}";
 
-        private static readonly Random _rad = new Random();
-        protected bool RandomBool() => _rad.Next() % 2 == 0;
+        private static readonly Random Rad = new Random();
+        protected bool RandomBool() => Rad.Next() % 2 == 0;
 
         protected Mock<TRepo> BasicSetup<TRepo, TEntity, TEntityKey>(Mock<TRepo> mockRepo)
             where TRepo : class, IRepository<TEntity, TEntityKey>

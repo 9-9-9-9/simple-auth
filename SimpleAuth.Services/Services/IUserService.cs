@@ -117,7 +117,7 @@ namespace SimpleAuth.Services
                 throw new ArgumentException(nameof(roleGroups));
 
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
-                throw new InvalidOperationException($"Groups must belong to same application");
+                throw new InvalidOperationException("Groups must belong to same application");
 
             var corp = roleGroups.First().Corp;
             var app = roleGroups.First().App;
@@ -165,7 +165,7 @@ namespace SimpleAuth.Services
                 throw new ArgumentException(nameof(roleGroups));
 
             if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
-                throw new InvalidOperationException($"Groups must belong to same application");
+                throw new InvalidOperationException("Groups must belong to same application");
 
             var corp = roleGroups.First().Corp;
             var app = roleGroups.First().App;

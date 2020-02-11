@@ -5,7 +5,6 @@ using SimpleAuth.Core.Extensions;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
-using Test.Shared.Extensions;
 
 namespace Test.SimpleAuth.Shared.Test.Utils
 {
@@ -98,7 +97,7 @@ namespace Test.SimpleAuth.Shared.Test.Utils
         [TestCase("", "c.a.e.t.m.", true)]
         public void Parse(string expectedValue, string roleId, bool expectErr = false)
         {
-            var splExpected = expectedValue.Split("#", 6, StringSplitOptions.None);
+            var splExpected = expectedValue.Split("#", 6);
             var subModulesExpected = (splExpected.Skip(5).FirstOrDefault()?.Split("#")).OrEmpty().ToArray();
 
             ClientRoleModel clientRoleModel;

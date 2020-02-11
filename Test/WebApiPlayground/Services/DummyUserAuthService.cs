@@ -39,6 +39,7 @@ namespace WebApiPlayground.Services
             return Task.FromResult(new RoleModel[0]);
         }
 
+        // ReSharper disable once UnusedParameter.Local
         private ResponseUserModel GetDummyUser(string userId)
         {
             return new ResponseUserModel
