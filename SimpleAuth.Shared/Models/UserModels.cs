@@ -18,6 +18,7 @@ namespace SimpleAuth.Shared.Models
         public string Id { get; set; }
         public string Corp { get; set; }
         public string Email { get; set; }
+        public bool Locked { get; set; }
         public RoleModel[] ActiveRoles { get; set; }
         
         public GoogleTokenResponseResult GoogleToken { get; set; }
