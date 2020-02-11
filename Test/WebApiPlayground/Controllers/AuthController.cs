@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
+using SimpleAuth.Core.DependencyInjection;
 
 namespace WebApiPlayground.Controllers
 {
@@ -15,10 +16,11 @@ namespace WebApiPlayground.Controllers
     {
         public const string UserId = "theone";
         
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IServiceResolver _serviceProvider;
         private readonly IUserAuthService _userAuthService;
+        
 
-        public AuthController(IServiceProvider serviceProvider, IUserAuthService userAuthService)
+        public AuthController(IServiceResolver serviceProvider, IUserAuthService userAuthService)
         {
             _serviceProvider = serviceProvider;
             _userAuthService = userAuthService;

@@ -1,7 +1,7 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using SimpleAuth.Client.Models;
+using SimpleAuth.Core.DependencyInjection;
 using SimpleAuth.Shared.Models;
 
 namespace Microsoft.AspNetCore.Identity
@@ -10,7 +10,7 @@ namespace Microsoft.AspNetCore.Identity
     {
         public static async Task<IdentityResult> RefreshClaimByNameAsync<T>(this UserManager<T> userManager,
             string userName,
-            ResponseUserModel responseUserModel, IServiceProvider serviceProvider)
+            ResponseUserModel responseUserModel, IServiceResolver serviceProvider)
             where T : class
         {
             return await userManager.RefreshClaimByUserAsync(
@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Identity
 
         public static async Task<IdentityResult> RefreshClaimByIdAsync<T>(this UserManager<T> userManager,
             string userId,
-            ResponseUserModel responseUserModel, IServiceProvider serviceProvider)
+            ResponseUserModel responseUserModel, IServiceResolver serviceProvider)
             where T : class
         {
             return await userManager.RefreshClaimByUserAsync(
@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.Identity
 
         public static async Task<IdentityResult> RefreshClaimByEmailAsync<T>(this UserManager<T> userManager,
             string email,
-            ResponseUserModel responseUserModel, IServiceProvider serviceProvider)
+            ResponseUserModel responseUserModel, IServiceResolver serviceProvider)
             where T : class
         {
             return await userManager.RefreshClaimByUserAsync(
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.Identity
         }
 
         public static async Task<IdentityResult> RefreshClaimByUserAsync<T>(this UserManager<T> userManager,
-            T user, ResponseUserModel responseUserModel, IServiceProvider serviceProvider)
+            T user, ResponseUserModel responseUserModel, IServiceResolver serviceProvider)
             where T : class
         {
             if (user == default)
