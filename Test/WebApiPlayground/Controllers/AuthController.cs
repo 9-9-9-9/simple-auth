@@ -15,10 +15,9 @@ namespace WebApiPlayground.Controllers
     public class AuthController : ControllerBase
     {
         public const string UserId = "theone";
-        
+
         private readonly IServiceResolver _serviceProvider;
         private readonly IUserAuthService _userAuthService;
-        
 
         public AuthController(IServiceResolver serviceProvider, IUserAuthService userAuthService)
         {
@@ -35,10 +34,11 @@ namespace WebApiPlayground.Controllers
             var claim = await saUserModel.GenerateSimpleAuthClaimAsync(_serviceProvider);
             if (claim == default)
                 return NotFound();
-            
+
             var claimsIdentity = new ClaimsIdentity(
-                new[] { claim },
-                CookieAuthenticationDefaults.AuthenticationScheme);
+                new[] {claim},
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
 
             var authProperties = new AuthenticationProperties
             {
@@ -51,7 +51,8 @@ namespace WebApiPlayground.Controllers
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
-                authProperties);
+                authProperties
+            );
 
             return Ok();
         }
