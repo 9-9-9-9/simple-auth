@@ -9,7 +9,8 @@ namespace SimpleAuth.Shared
         public override void RegisterModules(IServiceCollection serviceCollection)
         {
             serviceCollection
-                .RegisterModules<ValidationModules>();
+                .RegisterModules<ValidationModules>()
+                .RegisterModules<DependencyInjectionModules>();
         }
     }
 }
