@@ -28,8 +28,8 @@
       <Compile Include="..\src\Extensions\AspNetCoreHttpAdditionalExtensions.cs">
         <Link>Extensions\AspNetCoreHttpAdditionalExtensions.cs</Link>
       </Compile>
-      <Compile Include="..\src\Extensions\AspnetCoreIdentityExtensions.cs">
-        <Link>Extensions\AspnetCoreIdentityExtensions.cs</Link>
+      <Compile Include="..\src\Extensions\AspNetCoreIdentityExtensions.cs">
+        <Link>Extensions\AspNetCoreIdentityExtensions.cs</Link>
       </Compile>
       <Compile Include="..\src\Extensions\SimpleAuthorizationClaimAdditionalExtensions.cs">
         <Link>Extensions\SimpleAuthorizationClaimAdditionalExtensions.cs</Link>

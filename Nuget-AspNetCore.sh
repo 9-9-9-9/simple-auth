@@ -27,6 +27,11 @@ fi
 
 
 dotnet build . -c Release
+if [ $? -ne 0 ]
+then
+    echo 'Build failure'
+    exit 1
+fi
 
 release_aspnetcore() {
 	PROJECT=$1
