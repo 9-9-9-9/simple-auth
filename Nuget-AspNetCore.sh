@@ -19,12 +19,7 @@ then
     exit 1
 fi
 
-if [ -z "$NUGET_ORG" ]
-then
-    echo 'NUGET_ORG must be set as environment variable'
-    exit 1
-fi
-
+NUGET_ORG="https://api.nuget.org/v3/index.json"
 
 dotnet build . -c Release
 if [ $? -ne 0 ]
