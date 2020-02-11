@@ -13,15 +13,15 @@ then
     PATCH="$PATCH-beta$BETA"
 fi
 
-if [ -z "$NUGET_SERVER" ]
+if [ -z "$NUGET_KEY" ]
 then
-    echo 'NUGET_SERVER must be set as environment variable'
+    echo 'NUGET_KEY must be set as environment variable'
     exit 1
 fi
 
-if [ -z "$NUGET_URL" ]
+if [ -z "$NUGET_ORG" ]
 then
-    echo 'NUGET_URL must be set as environment variable'
+    echo 'NUGET_ORG must be set as environment variable'
     exit 1
 fi
 
@@ -41,28 +41,28 @@ release_aspnetcore() {
 	dotnet pack SimpleAuth.Shared/SimpleAuth.Shared.csproj -c Release -p:PackageVersion=$VERSION -o .
 	dotnet pack SimpleAuth.Core/SimpleAuth.Core.csproj -c Release -p:PackageVersion=$VERSION -o .
 
-	dotnet nuget push SimpleAuth.Client.AspNetCore.$VERSION.nupkg -k $NUGET_SERVER -s $NUGET_URL
+	dotnet nuget push SimpleAuth.Client.AspNetCore.$VERSION.nupkg -k $NUGET_KEY -s $NUGET_ORG
 	if [ $? -ne 0 ]
 	then
 	    echo 'Failure pushing package SimpleAuth.Client.AspNetCore to nuget server'
 	    exit 2
 	fi
 
-	dotnet nuget push SimpleAuth.Client.$VERSION.nupkg -k $NUGET_SERVER -s $NUGET_URL
+	dotnet nuget push SimpleAuth.Client.$VERSION.nupkg -k $NUGET_KEY -s $NUGET_ORG
 	if [ $? -ne 0 ]
 	then
 	    echo 'Failure pushing package SimpleAuth.Client to nuget server'
 	    exit 2
 	fi
 
-	dotnet nuget push SimpleAuth.Shared.$VERSION.nupkg -k $NUGET_SERVER -s $NUGET_URL
+	dotnet nuget push SimpleAuth.Shared.$VERSION.nupkg -k $NUGET_KEY -s $NUGET_ORG
 	if [ $? -ne 0 ]
 	then
 	    echo 'Failure pushing package SimpleAuth.Shared to nuget server'
 	    exit 2
 	fi
 
-	dotnet nuget push SimpleAuth.Core.$VERSION.nupkg -k $NUGET_SERVER -s $NUGET_URL
+	dotnet nuget push SimpleAuth.Core.$VERSION.nupkg -k $NUGET_KEY -s $NUGET_ORG
 	if [ $? -ne 0 ]
 	then
 	    echo 'Failure pushing package SimpleAuth.Core to nuget server'
