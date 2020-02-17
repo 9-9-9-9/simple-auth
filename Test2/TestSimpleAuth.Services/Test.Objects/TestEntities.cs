@@ -80,14 +80,6 @@ namespace Test.SimpleAuth.Services.Test.Objects
 
     public class TestRoleExtensions
     {
-        [TestCase("s", "2", "3", ExpectedResult = "s|2|3")]
-        [TestCase("s", "2", ExpectedResult = "s|2")]
-        [TestCase("s", ExpectedResult = "s")]
-        [TestCase(ExpectedResult = null)]
-        public string JoinSubModules(params string[] subModules)
-        {
-            return subModules.JoinSubModules();
-        }
 
         [Test]
         public void JoinSubModules_Err()
@@ -95,6 +87,15 @@ namespace Test.SimpleAuth.Services.Test.Objects
             Assert.Catch<ArgumentNullException>(() => new[] {"a", string.Empty}.JoinSubModules());
             Assert.Catch<ArgumentNullException>(() => new[] {"a", string.Empty, "b"}.JoinSubModules());
             Assert.Catch<ArgumentNullException>(() => new[] {string.Empty, "b"}.JoinSubModules());
+        }
+        
+        [TestCase(ExpectedResult = null)]
+        [TestCase("s", "2", "3", ExpectedResult = "s|2|3")]
+        [TestCase("s", "2", ExpectedResult = "s|2")]
+        [TestCase("s", ExpectedResult = "s")]
+        public string JoinSubModules_NormalCase(params string[] subModules)
+        {
+            return subModules.JoinSubModules();
         }
 
         [Test]
