@@ -154,7 +154,7 @@ namespace SimpleAuth.Server.Controllers
         /// Get the current active roles of an user, but for the current corp and app only, another corp/app are excluded
         /// </summary>
         /// <param name="userId">The target user which should be checked</param>
-        /// <returns>Array of <see cref="SimpleAuth.Shared.Models.RoleModel"/></returns>
+        /// <returns>Array of <see cref="SimpleAuth.Shared.Models.PermissionModel"/></returns>
         /// <response code="200">Retrieve information without any problem</response>
         /// <response code="404">User id could not be found</response>
         [HttpGet("{userId}/roles")]

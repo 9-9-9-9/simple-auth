@@ -354,7 +354,7 @@ namespace Test.Integration.Repositories
             var sp = Prepare();
             var userRepo = sp.GetRequiredService<IUserRepository>();
             var groupRepo = sp.GetRequiredService<IPermissionGroupRepository>();
-            var roleGroupUserRepo = sp.GetRequiredService<IRoleGroupUserRepository>();
+            var roleGroupUserRepo = sp.GetRequiredService<IPermissionGroupUserRepository>();
             var userId = RandomUser();
             var corp = RandomCorp();
             var app = RandomApp();

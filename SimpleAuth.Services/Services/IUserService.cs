@@ -22,8 +22,8 @@ namespace SimpleAuth.Services
     {
         User GetUser(string userId, string corp);
         Task CreateUserAsync(User user, LocalUserInfo localUserInfo);
-        Task AssignUserToGroupsAsync(User user, PermissionGroup[] roleGroups);
-        Task UnAssignUserFromGroupsAsync(User user, PermissionGroup[] roleGroups);
+        Task AssignUserToGroupsAsync(User user, PermissionGroup[] permissionGroups);
+        Task UnAssignUserFromGroupsAsync(User user, PermissionGroup[] permissionGroups);
         Task UnAssignUserFromAllGroupsAsync(User user, string corp);
 
         Task<ICollection<Permission>> GetActiveRolesAsync(string user, string corp, string app, string env = null,
@@ -40,19 +40,19 @@ namespace SimpleAuth.Services
     {
         private readonly IEncryptionService _encryptionService;
         private readonly IPermissionGroupRepository _permissionGroupRepository;
-        private readonly IRoleGroupUserRepository _roleGroupUserRepository;
+        private readonly IPermissionGroupUserRepository _permissionGroupUserRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly ILocalUserInfoRepository _localUserInfoRepository;
 
         public DefaultUserService(IServiceProvider serviceProvider, IEncryptionService encryptionService,
-            IPermissionGroupRepository permissionGroupRepository, IRoleGroupUserRepository roleGroupUserRepository,
+            IPermissionGroupRepository permissionGroupRepository, IPermissionGroupUserRepository permissionGroupUserRepository,
             IRoleRepository roleRepository,
             ILocalUserInfoRepository localUserInfoRepository) :
             base(serviceProvider)
         {
             _encryptionService = encryptionService;
             _permissionGroupRepository = permissionGroupRepository;
-            _roleGroupUserRepository = roleGroupUserRepository;
+            _permissionGroupUserRepository = permissionGroupUserRepository;
             _roleRepository = roleRepository;
             _localUserInfoRepository = localUserInfoRepository;
         }
@@ -107,22 +107,22 @@ namespace SimpleAuth.Services
             }.WithRandomId());
         }
 
-        public async Task AssignUserToGroupsAsync(User user, PermissionGroup[] roleGroups)
+        public async Task AssignUserToGroupsAsync(User user, PermissionGroup[] permissionGroups)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            if (!roleGroups.IsAny() || roleGroups.Any(x => x == null))
-                throw new ArgumentException(nameof(roleGroups));
+            if (!permissionGroups.IsAny() || permissionGroups.Any(x => x == null))
+                throw new ArgumentException(nameof(permissionGroups));
 
-            if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
+            if (permissionGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException("Groups must belong to same application");
 
-            var corp = roleGroups.First().Corp;
-            var app = roleGroups.First().App;
+            var corp = permissionGroups.First().Corp;
+            var app = permissionGroups.First().App;
 
-            var lookupNames = roleGroups.Select(x => x.Name).ToList();
-            var lookupRoleGroups =
+            var lookupNames = permissionGroups.Select(x => x.Name).ToList();
+            var lookupPermissionGroups =
                 _permissionGroupRepository.FindMany(
                         new Expression<Func<Entities.PermissionGroup, bool>>[]
                         {
@@ -131,58 +131,58 @@ namespace SimpleAuth.Services
                         },
                         new FindOptions
                         {
-                            Take = roleGroups.Length
+                            Take = permissionGroups.Length
                         }
                     ).OrEmpty()
                     .ToArray();
 
-            var missingRoleGroups = roleGroups
+            var missingPermissionGroups = permissionGroups
                 .Select(x => (x.Name, x.Corp, x.App))
-                .Except(lookupRoleGroups.Select(x => (x.Name, x.Corp, x.App)))
+                .Except(lookupPermissionGroups.Select(x => (x.Name, x.Corp, x.App)))
                 .ToArray();
-            if (missingRoleGroups.Any())
-                throw new EntityNotExistsException(missingRoleGroups.Select(g => g.Name));
+            if (missingPermissionGroups.Any())
+                throw new EntityNotExistsException(missingPermissionGroups.Select(g => g.Name));
 
             await Repository.AssignUserToGroups(new Entities.User
             {
                 Id = user.Id
-            }, lookupRoleGroups);
+            }, lookupPermissionGroups);
         }
 
-        public async Task UnAssignUserFromGroupsAsync(User user, PermissionGroup[] roleGroups)
+        public async Task UnAssignUserFromGroupsAsync(User user, PermissionGroup[] permissionGroups)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            if (roleGroups == null)
-                throw new ArgumentNullException(nameof(roleGroups));
+            if (permissionGroups == null)
+                throw new ArgumentNullException(nameof(permissionGroups));
 
-            if (roleGroups.IsEmpty())
+            if (permissionGroups.IsEmpty())
                 return;
 
-            if (roleGroups.Any(x => x == null))
-                throw new ArgumentException(nameof(roleGroups));
+            if (permissionGroups.Any(x => x == null))
+                throw new ArgumentException(nameof(permissionGroups));
 
-            if (roleGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
+            if (permissionGroups.Select(g => $"{g.Corp}.{g.App}").Distinct().Count() > 1)
                 throw new InvalidOperationException("Groups must belong to same application");
 
-            var corp = roleGroups.First().Corp;
-            var app = roleGroups.First().App;
+            var corp = permissionGroups.First().Corp;
+            var app = permissionGroups.First().App;
 
-            var groupNames = roleGroups.Select(x => x.Name).ToList();
+            var groupNames = permissionGroups.Select(x => x.Name).ToList();
 
-            var tobeRemoved = _roleGroupUserRepository.FindMany(new Expression<Func<PermissionGroupUser, bool>>[]
+            var tobeRemoved = _permissionGroupUserRepository.FindMany(new Expression<Func<PermissionGroupUser, bool>>[]
             {
                 x => x.UserId == user.Id,
                 x => x.PermissionGroup.Corp == corp && x.PermissionGroup.App == app,
                 x => groupNames.Contains(x.PermissionGroup.Name)
             }, new FindOptions
             {
-                Take = roleGroups.Length
+                Take = permissionGroups.Length
             }).OrEmpty().ToArray();
 
-            if (tobeRemoved.Length != roleGroups.Length)
-                throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
+            if (tobeRemoved.Length != permissionGroups.Length)
+                throw new EntityNotExistsException(permissionGroups.Select(g => g.Name)
                     .Except(tobeRemoved.Select(g => g.PermissionGroup.Name)));
 
             await Repository.UnAssignUserFromGroups(new Entities.User
@@ -305,7 +305,7 @@ namespace SimpleAuth.Services
             if (localUserInfo == null)
                 throw new EntityNotExistsException($"{userId} at {corp}");
 
-            var roleGroups = user.PermissionGroupUsers
+            var permissionGroups = user.PermissionGroupUsers
                 .Where(x =>
                     x.PermissionGroup.Corp == corp
                     &&
@@ -316,16 +316,16 @@ namespace SimpleAuth.Services
                 .Select(x => x.PermissionGroup)
                 .ToList();
 
-            var roleRecords = roleGroups
+            var permissionRecords = permissionGroups
                 .SelectMany(x => x.PermissionRecords);
 
             if (!env.IsBlank())
-                roleRecords = roleRecords.Where(rr => rr.Env == Constants.WildCard || rr.Env == env);
+                permissionRecords = permissionRecords.Where(rr => rr.Env == Constants.WildCard || rr.Env == env);
 
             if (!tenant.IsBlank())
-                roleRecords = roleRecords.Where(rr => rr.Tenant == Constants.WildCard || rr.Tenant == tenant);
+                permissionRecords = permissionRecords.Where(rr => rr.Tenant == Constants.WildCard || rr.Tenant == tenant);
 
-            return roleRecords;
+            return permissionRecords;
         }
 
         public async Task UpdateLockStatusAsync(User user)

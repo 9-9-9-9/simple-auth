@@ -33,7 +33,7 @@ namespace SimpleAuth.Repositories
             RegisterIndex<User>(modelBuilder);
 
             modelBuilder.Entity<PermissionGroupUser>()
-                .HasKey(bc => new {bc.UserId, RoleGroupId = bc.PermissionGroupId});
+                .HasKey(bc => new {bc.UserId, bc.PermissionGroupId});
             modelBuilder.Entity<PermissionGroupUser>()
                 .HasOne(bc => bc.User)
                 .WithMany(b => b.PermissionGroupUsers)

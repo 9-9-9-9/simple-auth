@@ -3,12 +3,12 @@ using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Shared.Validation
 {
-    public interface IRoleGroupValidationService
+    public interface IPermissionGroupValidationService
     {
         ValidationResult IsValid(CreatePermissionGroupModel model);
     }
 
-    public class DefaultRoleGroupValidationService : IRoleGroupValidationService
+    public class DefaultPermissionGroupValidationService : IPermissionGroupValidationService
     {
         public ValidationResult IsValid(CreatePermissionGroupModel model)
         {

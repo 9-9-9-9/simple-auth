@@ -4,13 +4,13 @@ using SimpleAuth.Services.Entities;
 
 namespace SimpleAuth.Repositories
 {
-    public interface IRoleGroupUserRepository : IRepository<PermissionGroupUser>
+    public interface IPermissionGroupUserRepository : IRepository<PermissionGroupUser>
     {
     }
     
-    public class RoleGroupUserRepository : Repository<PermissionGroupUser>, IRoleGroupUserRepository
+    public class PermissionGroupUserRepository : Repository<PermissionGroupUser>, IPermissionGroupUserRepository
     {
-        public RoleGroupUserRepository(IDbContextFactory dbContextFactory) : base(dbContextFactory)
+        public PermissionGroupUserRepository(IDbContextFactory dbContextFactory) : base(dbContextFactory)
         {
         }
 

@@ -101,13 +101,13 @@ namespace SimpleAuth.Repositories
                 throw new ArgumentNullException(nameof(permissionGroups));
             
             var targetGrIds = permissionGroups.Select(rg => rg.Id);
-            var lookupRoleGroups = _permissionGroupRepository
+            var lookupPermissionGroups = _permissionGroupRepository
                 .Find(x => targetGrIds.Contains(x.Id)
                 ).ToArray();
 
-            if (lookupRoleGroups.Length != permissionGroups.Length)
+            if (lookupPermissionGroups.Length != permissionGroups.Length)
                 throw new EntityNotExistsException(permissionGroups.Select(g => g.Name)
-                    .Except(lookupRoleGroups.Select(g => g.Name)));
+                    .Except(lookupPermissionGroups.Select(g => g.Name)));
 
             await using var ctx = OpenConnect();
 
@@ -118,8 +118,8 @@ namespace SimpleAuth.Repositories
                 throw new EntityNotExistsException(user.Id);
 
             var toBeAdded = lookupUser.PermissionGroupUsers.IsEmpty()
-                ? lookupRoleGroups
-                : lookupRoleGroups
+                ? lookupPermissionGroups
+                : lookupPermissionGroups
                     .Where(g => lookupUser.PermissionGroupUsers.Any(x => x.PermissionGroupId != g.Id))
                     .ToArray();
 
@@ -154,13 +154,13 @@ namespace SimpleAuth.Repositories
                 throw new ArgumentNullException(nameof(permissionGroups));
             
             var targetGrIds = permissionGroups.Select(rg => rg.Id);
-            var lookupRoleGroups = _permissionGroupRepository
+            var lookupPermissionGroups = _permissionGroupRepository
                 .Find(x => targetGrIds.Contains(x.Id)
                 ).ToArray();
 
-            if (lookupRoleGroups.Length != permissionGroups.Length)
+            if (lookupPermissionGroups.Length != permissionGroups.Length)
                 throw new EntityNotExistsException(permissionGroups.Select(g => g.Name)
-                    .Except(lookupRoleGroups.Select(g => g.Name)));
+                    .Except(lookupPermissionGroups.Select(g => g.Name)));
 
             await using var ctx = OpenConnect();
 
@@ -174,7 +174,7 @@ namespace SimpleAuth.Repositories
                 return;
 
             var rguSet = ctx.Set<PermissionGroupUser>();
-            foreach (var gr in lookupRoleGroups)
+            foreach (var gr in lookupPermissionGroups)
             {
                 gr.PermissionGroupUsers.Remove(gr.PermissionGroupUsers.First(x =>
                     x.PermissionGroupId == gr.Id && x.UserId == lookupUser.Id));

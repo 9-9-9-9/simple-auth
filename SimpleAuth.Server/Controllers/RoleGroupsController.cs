@@ -27,17 +27,17 @@ namespace SimpleAuth.Server.Controllers
     [RequireAppToken]
     public class RoleGroupsController : BaseController<IPermissionGroupService, IPermissionGroupRepository, PermissionGroup>
     {
-        private readonly IRoleGroupValidationService _roleGroupValidation;
+        private readonly IPermissionGroupValidationService _permissionGroupValidation;
         private readonly ILogger<RoleGroupsController> _logger;
 
         /// <summary>
         /// DI constructor
         /// </summary>
         public RoleGroupsController(IServiceProvider serviceProvider,
-            IRoleGroupValidationService roleGroupValidation) :
+            IPermissionGroupValidationService permissionGroupValidation) :
             base(serviceProvider)
         {
-            _roleGroupValidation = roleGroupValidation;
+            _permissionGroupValidation = permissionGroupValidation;
             _logger = serviceProvider.ResolveLogger<RoleGroupsController>();
         }
 
@@ -64,7 +64,7 @@ namespace SimpleAuth.Server.Controllers
             if (model.Corp != RequestAppHeaders.Corp || model.App != RequestAppHeaders.App)
                 return CrossAppToken();
 
-            var vr = _roleGroupValidation.IsValid(model);
+            var vr = _permissionGroupValidation.IsValid(model);
             if (!vr.IsValid)
                 return BadRequest(vr.Message);
 

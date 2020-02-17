@@ -359,7 +359,7 @@ namespace Test.SimpleAuth.Services.Test.Services
         [Test]
         public async Task UnAssignUserFromGroupsAsync()
         {
-            var svc = Prepare<IRoleGroupUserRepository, PermissionGroupUser>(out var mockUserRepository,
+            var svc = Prepare<IPermissionGroupUserRepository, PermissionGroupUser>(out var mockUserRepository,
                 out var mockRoleGroupUserRepository).GetRequiredService<IUserService>();
 
             mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<PermissionGroup[]>()))

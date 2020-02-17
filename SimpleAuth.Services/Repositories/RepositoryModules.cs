@@ -25,8 +25,8 @@ namespace SimpleAuth.Repositories
             serviceCollection.AddTransient<ILocalUserInfoRepository, LocalUserInfoRepository>();
             serviceCollection.AddTransient<IRepository<LocalUserInfo>, LocalUserInfoRepository>();
 
-            serviceCollection.AddTransient<IRoleGroupUserRepository, RoleGroupUserRepository>();
-            serviceCollection.AddTransient<IRepository<PermissionGroupUser>, RoleGroupUserRepository>();
+            serviceCollection.AddTransient<IPermissionGroupUserRepository, PermissionGroupUserRepository>();
+            serviceCollection.AddTransient<IRepository<PermissionGroupUser>, PermissionGroupUserRepository>();
             
             serviceCollection.AddTransient<ITokenInfoRepository, TokenInfoRepository>();
             serviceCollection.AddTransient<IRepository<TokenInfo>, TokenInfoRepository>();
