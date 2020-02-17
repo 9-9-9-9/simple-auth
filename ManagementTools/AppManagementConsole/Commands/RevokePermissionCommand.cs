@@ -32,7 +32,7 @@ namespace AppManagementConsole.Commands
             if (!Enum.TryParse(typeof(Verb), strPermission, true, out var enumPermission))
                 throw new ArgumentException($"{strPermission} is not a valid permission");
 
-            return _permissionGroupManagementService.DeleteRolesAsync(roleGroupName, 
+            return _permissionGroupManagementService.RevokePermissionsAsync(roleGroupName, 
                 new PermissionModel
                 {
                     Role =

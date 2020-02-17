@@ -20,7 +20,7 @@ namespace AppManagementConsole.Commands
         {
             var roleGroupName = args[0];
             var @lock = args[1].Trim().EqualsIgnoreCase("lock");
-            return _permissionGroupManagementService.SetLockRoleGroup(roleGroupName, @lock);
+            return _permissionGroupManagementService.SetLockPermissionGroup(roleGroupName, @lock);
         }
 
         public override string[] GetParametersName()

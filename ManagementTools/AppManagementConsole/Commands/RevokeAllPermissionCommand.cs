@@ -19,7 +19,7 @@ namespace AppManagementConsole.Commands
         {
             var roleGroupName = args[0];
 
-            return _permissionGroupManagementService.DeleteAllRolesAsync(roleGroupName);
+            return _permissionGroupManagementService.RevokeAllPermissionsAsync(roleGroupName);
         }
 
         public override string[] GetParametersName()

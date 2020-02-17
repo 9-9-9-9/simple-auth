@@ -12,12 +12,12 @@ namespace SimpleAuth.Client.Services
 {
     public interface IPermissionGroupManagementService
     {
-        Task AddRoleGroupAsync(CreatePermissionGroupModel createPermissionGroupModel);
-        Task<PermissionGroup> GetPermissionGroupAsync(string roleGroupName);
-        Task AddRoleToGroupAsync(string roleGroupName, PermissionModels updatePermissionsModel);
-        Task DeleteRolesAsync(string roleGroupName, params PermissionModel[] roleModels);
-        Task DeleteAllRolesAsync(string roleGroupName);
-        Task SetLockRoleGroup(string roleGroupName, bool @lock);
+        Task AddPermissionGroupAsync(CreatePermissionGroupModel createPermissionGroupModel);
+        Task<PermissionGroup> GetPermissionGroupAsync(string permissionGroupName);
+        Task AddPermissionToGroupAsync(string permissionGroupName, PermissionModels updatePermissionsModel);
+        Task RevokePermissionsAsync(string permissionGroupName, params PermissionModel[] permissionModels);
+        Task RevokeAllPermissionsAsync(string permissionGroupName);
+        Task SetLockPermissionGroup(string permissionGroupName, bool @lock);
     }
 
     public class DefaultPermissionGroupManagementService : ClientService, IPermissionGroupManagementService
@@ -36,69 +36,69 @@ namespace SimpleAuth.Client.Services
                 .WithAppToken();
         }
 
-        public Task AddRoleGroupAsync(CreatePermissionGroupModel createPermissionGroupModel)
+        public Task AddPermissionGroupAsync(CreatePermissionGroupModel createPermissionGroupModel)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
-                    .Append(EndpointBuilder.RoleGroupManagement.AddRoleGroup)
+                    .Append(EndpointBuilder.PermissionGroupManagement.AddRoleGroup)
                     .Method(Constants.HttpMethods.POST),
                 createPermissionGroupModel.JsonSerialize()
             );
         }
 
-        public Task<PermissionGroup> GetPermissionGroupAsync(string roleGroupName)
+        public Task<PermissionGroup> GetPermissionGroupAsync(string permissionGroupName)
         {
             return _httpService.DoHttpRequestWithResponseContentAsync<PermissionGroup>(
                 NewRequest()
-                    .Append(EndpointBuilder.RoleGroupManagement.GetRoles(roleGroupName))
+                    .Append(EndpointBuilder.PermissionGroupManagement.GetPermissions(permissionGroupName))
                     .Method(Constants.HttpMethods.GET)
             );
         }
 
-        public Task AddRoleToGroupAsync(string roleGroupName, PermissionModels updatePermissionsModel)
+        public Task AddPermissionToGroupAsync(string permissionGroupName, PermissionModels updatePermissionsModel)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
-                    .Append(EndpointBuilder.RoleGroupManagement.AddRoleToGroup(roleGroupName))
+                    .Append(EndpointBuilder.PermissionGroupManagement.AddPermissionToGroup(permissionGroupName))
                     .Method(Constants.HttpMethods.POST),
                 updatePermissionsModel.JsonSerialize()
             );
         }
 
-        public Task DeleteRolesAsync(string roleGroupName, params PermissionModel[] roleModels)
+        public Task RevokePermissionsAsync(string permissionGroupName, params PermissionModel[] permissionModels)
         {
             var nameValueCollection = new NameValueCollection();
-            roleModels.ToList().ForEach(x => nameValueCollection["roles"] = RoleUtils.Merge(x.Role, x.Verb));
+            permissionModels.ToList().ForEach(x => nameValueCollection["roles"] = RoleUtils.Merge(x.Role, x.Verb));
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
                     .WithQuery(nameValueCollection)
                     .WithoutContentType()
-                    .Append(EndpointBuilder.RoleGroupManagement.DeleteRoles(roleGroupName))
+                    .Append(EndpointBuilder.PermissionGroupManagement.DeletePermissions(permissionGroupName))
                     .Method(Constants.HttpMethods.DELETE)
             );
         }
 
-        public Task DeleteAllRolesAsync(string roleGroupName)
+        public Task RevokeAllPermissionsAsync(string permissionGroupName)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
                     .WithQuery("all", true.ToString())
-                    .Append(EndpointBuilder.RoleGroupManagement.DeleteRoles(roleGroupName))
+                    .Append(EndpointBuilder.PermissionGroupManagement.DeletePermissions(permissionGroupName))
                     .Method(Constants.HttpMethods.DELETE)
             );
         }
 
-        public Task SetLockRoleGroup(string roleGroupName, bool @lock)
+        public Task SetLockPermissionGroup(string permissionGroupName, bool @lock)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
                     .WithoutContentType()
-                    .Append(EndpointBuilder.RoleGroupManagement.UpdateLock(roleGroupName))
+                    .Append(EndpointBuilder.PermissionGroupManagement.UpdateLock(permissionGroupName))
                     .Method(@lock ? Constants.HttpMethods.POST : Constants.HttpMethods.DELETE)
             );
         }

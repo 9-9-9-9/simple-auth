@@ -28,13 +28,13 @@ namespace SimpleAuth.Client.Utils
             public const string AddRole = "api/roles";
         }
 
-        public static class RoleGroupManagement
+        public static class PermissionGroupManagement
         {
-            public const string AddRoleGroup = "api/role-groups";
-            public static string GetRoles(string roleGroupName) => $"api/role-groups/{roleGroupName}";
-            public static string AddRoleToGroup(string roleGroupName) => $"api/role-groups/{roleGroupName}/roles";
-            public static string DeleteRoles(string roleGroupName) => $"api/role-groups/{roleGroupName}/roles";
-            public static string UpdateLock(string roleGroupName) => $"api/role-groups/{roleGroupName}/lock";
+            public const string AddRoleGroup = "api/permission-groups";
+            public static string GetPermissions(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}";
+            public static string AddPermissionToGroup(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/roles";
+            public static string DeletePermissions(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/roles";
+            public static string UpdateLock(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/lock";
         }
     }
 }

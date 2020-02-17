@@ -24,7 +24,7 @@ namespace AppManagementConsole.Commands
         {
             if (!TrySplittingRoleGroups(args[1], out var roleGroups, out var errMessage))
                 throw new InvalidOperationException(errMessage);
-            return _permissionGroupManagementService.AddRoleGroupAsync(new CreatePermissionGroupModel
+            return _permissionGroupManagementService.AddPermissionGroupAsync(new CreatePermissionGroupModel
             {
                 Name = args[0],
                 Corp = _simpleAuthConfigurationProvider.Corp,

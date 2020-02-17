@@ -56,7 +56,7 @@ namespace AppManagementConsole.Commands
                 return;
             }
 
-            await _permissionGroupManagementService.AddRoleToGroupAsync(args[0], new PermissionModels
+            await _permissionGroupManagementService.AddPermissionToGroupAsync(args[0], new PermissionModels
             {
                 Permissions = roleModels.ToArray()
             });
