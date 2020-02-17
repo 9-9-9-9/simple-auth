@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
     "ProductVersion" TEXT NOT NULL
 );
 
--- DROP TABLE "RoleGroups";
-CREATE TABLE "RoleGroups" (
-    "Id" uuid NOT NULL CONSTRAINT "PK_RoleGroups" PRIMARY KEY,
+-- DROP TABLE "PermissionGroups";
+CREATE TABLE "PermissionGroups" (
+    "Id" uuid NOT NULL CONSTRAINT "PK_PermissionGroups" PRIMARY KEY,
     "Name" TEXT NOT NULL,
     "Locked" BOOL NOT NULL,
     "Corp" TEXT NOT NULL,
@@ -39,15 +39,15 @@ CREATE TABLE "Users" (
     "NormalizedId" TEXT NOT NULL
 );
 
--- DROP TABLE "RoleRecords";
-CREATE TABLE "RoleRecords" (
-    "Id" UUID NOT NULL CONSTRAINT "PK_RoleRecords" PRIMARY KEY,
+-- DROP TABLE "PermissionRecords";
+CREATE TABLE "PermissionRecords" (
+    "Id" UUID NOT NULL CONSTRAINT "PK_PermissionRecords" PRIMARY KEY,
     "RoleId" TEXT NOT NULL,
     "Permission" INTEGER NOT NULL,
-    "RoleGroupId" uuid NULL,
+    "PermissionGroupId" uuid NULL,
     "Env" TEXT NOT NULL,
     "Tenant" TEXT NOT NULL,
-    CONSTRAINT "FK_RoleRecords_RoleGroups_RoleGroupId" FOREIGN KEY ("RoleGroupId") REFERENCES "RoleGroups" ("Id") ON DELETE RESTRICT
+    CONSTRAINT "FK_PermissionRecords_PermissionGroups_PermissionGroupId" FOREIGN KEY ("PermissionGroupId") REFERENCES "PermissionGroups" ("Id") ON DELETE RESTRICT
 );
 
 -- DROP TABLE "LocalUserInfo";
@@ -62,13 +62,13 @@ CREATE TABLE "LocalUserInfos" (
     CONSTRAINT "FK_LocalUserInfos_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
 );
 
--- DROP TABLE "RoleGroupUsers";
-CREATE TABLE "RoleGroupUsers" (
+-- DROP TABLE "PermissionGroupUsers";
+CREATE TABLE "PermissionGroupUsers" (
     "UserId" TEXT NOT NULL,
-    "RoleGroupId" UUID NOT NULL,
-    CONSTRAINT "PK_RoleGroupUsers" PRIMARY KEY ("UserId", "RoleGroupId"),
-    CONSTRAINT "FK_RoleGroupUsers_RoleGroups_RoleGroupId" FOREIGN KEY ("RoleGroupId") REFERENCES "RoleGroups" ("Id") ON DELETE CASCADE,
-    CONSTRAINT "FK_RoleGroupUsers_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+    "PermissionGroupId" UUID NOT NULL,
+    CONSTRAINT "PK_PermissionGroupUsers" PRIMARY KEY ("UserId", "PermissionGroupId"),
+    CONSTRAINT "FK_PermissionGroupUsers_PermissionGroups_PermissionGroupId" FOREIGN KEY ("PermissionGroupId") REFERENCES "PermissionGroups" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_PermissionGroupUsers_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX "IX_LocalUserInfos_Corp" ON "LocalUserInfos" ("Corp");
@@ -85,25 +85,25 @@ CREATE UNIQUE INDEX "IX_LocalUserInfos_NormalizedEmail_Corp" ON "LocalUserInfos"
 
 CREATE UNIQUE INDEX "IX_LocalUserInfos_UserId_Corp" ON "LocalUserInfos" ("UserId", "Corp");
 
-CREATE INDEX "IX_RoleGroups_App" ON "RoleGroups" ("App");
+CREATE INDEX "IX_PermissionGroups_App" ON "PermissionGroups" ("App");
 
-CREATE INDEX "IX_RoleGroups_Corp" ON "RoleGroups" ("Corp");
+CREATE INDEX "IX_PermissionGroups_Corp" ON "PermissionGroups" ("Corp");
 
-CREATE INDEX "IX_RoleGroups_Locked" ON "RoleGroups" ("Locked");
+CREATE INDEX "IX_PermissionGroups_Locked" ON "PermissionGroups" ("Locked");
 
-CREATE INDEX "IX_RoleGroups_Name" ON "RoleGroups" ("Name");
+CREATE INDEX "IX_PermissionGroups_Name" ON "PermissionGroups" ("Name");
 
-CREATE UNIQUE INDEX "IX_RoleGroups_Name_Corp_App" ON "RoleGroups" ("Name", "Corp", "App");
+CREATE UNIQUE INDEX "IX_PermissionGroups_Name_Corp_App" ON "PermissionGroups" ("Name", "Corp", "App");
 
-CREATE INDEX "IX_RoleGroupUsers_RoleGroupId" ON "RoleGroupUsers" ("RoleGroupId");
+CREATE INDEX "IX_PermissionGroupUsers_PermissionGroupId" ON "PermissionGroupUsers" ("PermissionGroupId");
 
-CREATE INDEX "IX_RoleGroupUsers_UserId" ON "RoleGroupUsers" ("UserId");
+CREATE INDEX "IX_PermissionGroupUsers_UserId" ON "PermissionGroupUsers" ("UserId");
 
-CREATE INDEX "IX_RoleRecords_Permission" ON "RoleRecords" ("Permission");
+CREATE INDEX "IX_PermissionRecords_Permission" ON "PermissionRecords" ("Permission");
 
-CREATE INDEX "IX_RoleRecords_RoleGroupId" ON "RoleRecords" ("RoleGroupId");
+CREATE INDEX "IX_PermissionRecords_PermissionGroupId" ON "PermissionRecords" ("PermissionGroupId");
 
-CREATE INDEX "IX_RoleRecords_RoleId" ON "RoleRecords" ("RoleId");
+CREATE INDEX "IX_PermissionRecords_RoleId" ON "PermissionRecords" ("RoleId");
 
 CREATE INDEX "IX_Roles_App" ON "Roles" ("App");
 
