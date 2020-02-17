@@ -251,7 +251,7 @@ namespace Test.Shared
         protected string RandomEnv() => RandomText();
         protected string RandomTenant() => RandomText();
         protected string RandomModule() => RandomText();
-        protected string RandomRoleGroup() => RandomText();
+        protected string RandomPermissionGroup() => RandomText();
         protected string RandomUser() => RandomText();
         protected string RandomEmail() => $"{RandomText()}@{RandomText(3)}.{RandomText(3)}";
 

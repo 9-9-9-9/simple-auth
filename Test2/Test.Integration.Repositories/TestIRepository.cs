@@ -349,16 +349,16 @@ namespace Test.Integration.Repositories
         }
 
         [Test]
-        public async Task RoleGroupUser()
+        public async Task PermissionGroupUser()
         {
             var sp = Prepare();
             var userRepo = sp.GetRequiredService<IUserRepository>();
             var groupRepo = sp.GetRequiredService<IPermissionGroupRepository>();
-            var roleGroupUserRepo = sp.GetRequiredService<IPermissionGroupUserRepository>();
+            var permissionGroupUserRepo = sp.GetRequiredService<IPermissionGroupUserRepository>();
             var userId = RandomUser();
             var corp = RandomCorp();
             var app = RandomApp();
-            var groupId = RandomRoleGroup();
+            var groupId = RandomPermissionGroup();
 
             await userRepo.CreateUserAsync(new User
             {
@@ -382,8 +382,8 @@ namespace Test.Integration.Repositories
             // Verify
             user = userRepo.Find(userId);
             Assert.AreEqual(1, user.PermissionGroupUsers.Count);
-            var roleGroupUsers = roleGroupUserRepo.Find(x => x.UserId == userId).ToList();
-            Assert.AreEqual(1, roleGroupUsers.Count);
+            var permissionGroupUsers = permissionGroupUserRepo.Find(x => x.UserId == userId).ToList();
+            Assert.AreEqual(1, permissionGroupUsers.Count);
         }
     }
 }

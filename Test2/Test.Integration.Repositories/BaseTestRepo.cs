@@ -70,10 +70,10 @@ namespace Test.Integration.Repositories
 
         protected async Task<(IPermissionGroupRepository, string)> GenerateGroupsAsync()
         {
-            var roleGroupRepository = Svc<IPermissionGroupRepository>();
+            var permissionGroupRepository = Svc<IPermissionGroupRepository>();
             var corp = RandomCorp();
 
-            await roleGroupRepository.CreateManyAsync(new[]
+            await permissionGroupRepository.CreateManyAsync(new[]
             {
                 new PermissionGroup
                 {
@@ -98,7 +98,7 @@ namespace Test.Integration.Repositories
                 }.WithRandomId(),
             });
 
-            return (roleGroupRepository, corp);
+            return (permissionGroupRepository, corp);
         }
 
         protected async Task<(ITokenInfoRepository, string)> GenerateTokensAsync()

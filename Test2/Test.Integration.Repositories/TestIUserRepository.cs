@@ -69,8 +69,8 @@ namespace Test.Integration.Repositories
             var userId = RandomUser();
             var gId1 = Guid.NewGuid();
             var gId2 = Guid.NewGuid();
-            var group1 = RandomRoleGroup();
-            var group2 = RandomRoleGroup();
+            var group1 = RandomPermissionGroup();
+            var group2 = RandomPermissionGroup();
             var corp = RandomCorp();
             var app = RandomApp();
 
@@ -185,8 +185,8 @@ namespace Test.Integration.Repositories
             var userId = RandomUser();
             var gId1 = Guid.NewGuid();
             var gId2 = Guid.NewGuid();
-            var group1 = RandomRoleGroup();
-            var group2 = RandomRoleGroup();
+            var group1 = RandomPermissionGroup();
+            var group2 = RandomPermissionGroup();
             var corp = RandomCorp();
             var app = RandomApp();
 

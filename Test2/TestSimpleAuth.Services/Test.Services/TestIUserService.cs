@@ -265,8 +265,8 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
-            var roleGroup2 = RandomRoleGroup();
+            var roleGroup1 = RandomPermissionGroup();
+            var roleGroup2 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -369,8 +369,8 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
-            var roleGroup2 = RandomRoleGroup();
+            var roleGroup1 = RandomPermissionGroup();
+            var roleGroup2 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -486,9 +486,9 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
             var corp3 = RandomCorp();
-            var roleGroup1 = RandomRoleGroup();
-            var roleGroup2 = RandomRoleGroup();
-            var roleGroup3 = RandomRoleGroup();
+            var roleGroup1 = RandomPermissionGroup();
+            var roleGroup2 = RandomPermissionGroup();
+            var roleGroup3 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {

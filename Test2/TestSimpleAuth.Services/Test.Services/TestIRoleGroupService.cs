@@ -32,7 +32,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 new PermissionGroup
                 {
                     Id = Guid.NewGuid(),
-                    Name = RandomRoleGroup(),
+                    Name = RandomPermissionGroup(),
                     Corp = RandomCorp(),
                     App = RandomApp(),
                     Locked = true,
@@ -46,7 +46,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 new PermissionGroup
                 {
                     Id = Guid.NewGuid(),
-                    Name = RandomRoleGroup(),
+                    Name = RandomPermissionGroup(),
                     Corp = RandomCorp(),
                     App = RandomApp(),
                     Locked = true,
@@ -92,7 +92,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 new PermissionGroup
                 {
                     Id = Guid.NewGuid(),
-                    Name = RandomRoleGroup(),
+                    Name = RandomPermissionGroup(),
                     Corp = RandomCorp(),
                     App = RandomApp(),
                     Locked = true,
@@ -190,7 +190,7 @@ namespace Test.SimpleAuth.Services.Test.Services
         {
             var svc = Prepare(out var mockRoleGroupRepo).GetRequiredService<IPermissionGroupService>();
 
-            var roleGroup = RandomRoleGroup();
+            var roleGroup = RandomPermissionGroup();
             var corp = RandomCorp();
             var app = RandomApp();
 
@@ -295,7 +295,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             var corp = RandomCorp();
             var app = RandomApp();
-            var roleGroup = RandomRoleGroup();
+            var roleGroup = RandomPermissionGroup();
             var @lock = RandomBool();
 
             // argument validation
@@ -360,7 +360,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
+            var roleGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {
@@ -502,7 +502,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
+            var roleGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {
@@ -717,7 +717,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             var corp1 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
+            var roleGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {
@@ -783,7 +783,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             var corp1 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
+            var roleGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {

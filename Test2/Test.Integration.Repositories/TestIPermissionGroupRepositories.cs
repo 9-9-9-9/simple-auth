@@ -12,7 +12,7 @@ using SimpleAuth.Shared.Exceptions;
 
 namespace Test.Integration.Repositories
 {
-    public class TestIRoleGroupRepositories : BaseTestRepo
+    public class TestIPermissionGroupRepositories : BaseTestRepo
     {
         [Test]
         public async Task Search()
@@ -51,15 +51,15 @@ namespace Test.Integration.Repositories
         public async Task UpdateRoleRecordsAsync()
         {
             var sp = Prepare();
-            var roleGroupRepository = sp.GetRequiredService<IPermissionGroupRepository>();
+            var permissionGroupRepository = sp.GetRequiredService<IPermissionGroupRepository>();
             var roleRepository = sp.GetRequiredService<IRoleRepository>();
             var corp = RandomCorp();
 
-            var roleGroupId = Guid.NewGuid();
+            var groupId = Guid.NewGuid();
 
-            await roleGroupRepository.CreateAsync(new PermissionGroup
+            await permissionGroupRepository.CreateAsync(new PermissionGroup
             {
-                Id = roleGroupId,
+                Id = groupId,
                 Corp = corp,
                 App = "a1",
                 Name = "g11",
@@ -69,9 +69,9 @@ namespace Test.Integration.Repositories
             await CreateRoles(1, 2, 3);
 
             //
-            await roleGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
+            await permissionGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
             {
-                Id = roleGroupId
+                Id = groupId
             }, new List<PermissionRecord>
             {
                 new PermissionRecord
@@ -85,9 +85,9 @@ namespace Test.Integration.Repositories
             Assert.AreEqual(1, GetGroup().PermissionRecords.Count());
 
             // this method should wipe all old records
-            await roleGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
+            await permissionGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
             {
-                Id = roleGroupId
+                Id = groupId
             }, new List<PermissionRecord>
             {
                 new PermissionRecord
@@ -108,9 +108,9 @@ namespace Test.Integration.Repositories
             Assert.AreEqual(2, GetGroup().PermissionRecords.Count());
 
             // this method override old permission if old exists
-            await roleGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
+            await permissionGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
             {
-                Id = roleGroupId
+                Id = groupId
             }, new List<PermissionRecord>
             {
                 new PermissionRecord
@@ -139,27 +139,27 @@ namespace Test.Integration.Repositories
                 );
             }
 
-            PermissionGroup GetGroup() => roleGroupRepository.Find(roleGroupId);
+            PermissionGroup GetGroup() => permissionGroupRepository.Find(groupId);
         }
 
         [Test]
         public async Task DeleteManyAsync()
         {
             var sp = Prepare();
-            var roleGroupRepository = sp.GetRequiredService<IPermissionGroupRepository>();
+            var permissionGroupRepository = sp.GetRequiredService<IPermissionGroupRepository>();
             var roleRepository = sp.GetRequiredService<IRoleRepository>();
-            var roleRecordRepository = sp.GetRequiredService<IRoleRecordRepository>();
+            var permissionRecordRepository = sp.GetRequiredService<IPermissionRecordRepository>();
             var userRepository = sp.GetRequiredService<IUserRepository>();
 
             var corp = RandomCorp();
             var env = RandomEnv();
             var tenant = RandomTenant();
-            var roleGroupId = Guid.NewGuid();
+            var groupId = Guid.NewGuid();
             var userId = RandomUser();
 
-            await roleGroupRepository.CreateAsync(new PermissionGroup
+            await permissionGroupRepository.CreateAsync(new PermissionGroup
             {
-                Id = roleGroupId,
+                Id = groupId,
                 Corp = corp,
                 App = "a1",
                 Name = "g11",
@@ -170,7 +170,7 @@ namespace Test.Integration.Repositories
             await AddRoles(1, 2, 3);
 
             // delete groups which does not exists
-            Assert.CatchAsync<EntityNotExistsException>(async () => await roleGroupRepository.DeleteManyAsync(new[]
+            Assert.CatchAsync<EntityNotExistsException>(async () => await permissionGroupRepository.DeleteManyAsync(new[]
             {
                 new PermissionGroup
                 {
@@ -184,20 +184,20 @@ namespace Test.Integration.Repositories
 
             // groups which are being used by any user should not be deleted
             await AddGroupToUser();
-            Assert.CatchAsync<SimpleAuthException>(async () => await roleGroupRepository.DeleteAsync(new PermissionGroup
+            Assert.CatchAsync<SimpleAuthException>(async () => await permissionGroupRepository.DeleteAsync(new PermissionGroup
             {
-                Id = roleGroupId
+                Id = groupId
             }));
             await RemoveUserFromGroup();
 
             // should wipe all related role records
             Assert.AreEqual(3, GetGroup().PermissionRecords.Count);
-            await roleGroupRepository.DeleteAsync(new PermissionGroup
+            await permissionGroupRepository.DeleteAsync(new PermissionGroup
             {
-                Id = roleGroupId
+                Id = groupId
             });
             Assert.IsNull(GetGroup());
-            Assert.IsEmpty(roleRecordRepository.Find(x => x.Env == env));
+            Assert.IsEmpty(permissionRecordRepository.Find(x => x.Env == env));
 
 
             #region Local functions
@@ -217,13 +217,13 @@ namespace Test.Integration.Repositories
                 );
             }
 
-            PermissionGroup GetGroup() => roleGroupRepository.Find(roleGroupId);
+            PermissionGroup GetGroup() => permissionGroupRepository.Find(groupId);
 
             Task AddRoles(params int[] ids)
             {
-                return roleGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
+                return permissionGroupRepository.UpdatePermissionRecordsAsync(new PermissionGroup
                 {
-                    Id = roleGroupId
+                    Id = groupId
                 }, ids.Select(x =>
                     new PermissionRecord
                     {
@@ -264,7 +264,7 @@ namespace Test.Integration.Repositories
                         {
                             Corp = corp,
                             App = "a1",
-                            Id = roleGroupId,
+                            Id = groupId,
                             Name = "g11"
                         }
                     });
@@ -280,7 +280,7 @@ namespace Test.Integration.Repositories
                 {
                     new PermissionGroup
                     {
-                        Id = roleGroupId,
+                        Id = groupId,
                         Name = "g11",
                         Corp = corp,
                         App = "a1"
