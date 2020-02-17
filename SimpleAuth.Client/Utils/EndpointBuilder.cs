@@ -10,7 +10,7 @@ namespace SimpleAuth.Client.Utils
             public static string CheckGoogleToken(string userId) => $"api/users/{userId}/roles";
             public static string CheckUserPermission(string userId, string roleId, string permission) => $"api/users/{userId}/roles/{roleId}/{permission}";
             public static string GetMissingPermissions(string userId) => $"api/users/{userId}/roles/_missing";
-            public static string AssignUserToRoleGroups(string userId) => $"api/users/{userId}/role-groups";
+            public static string AssignUserToPermissionGroups(string userId) => $"api/users/{userId}/permission-groups";
             public const string CreateUser = "api/users";
         }
 
@@ -30,7 +30,7 @@ namespace SimpleAuth.Client.Utils
 
         public static class PermissionGroupManagement
         {
-            public const string AddRoleGroup = "api/permission-groups";
+            public const string AddPermissionGroup = "api/permission-groups";
             public static string GetPermissions(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}";
             public static string AddPermissionToGroup(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/roles";
             public static string DeletePermissions(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/roles";

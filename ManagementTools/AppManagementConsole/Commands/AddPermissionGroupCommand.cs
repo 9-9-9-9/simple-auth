@@ -22,14 +22,14 @@ namespace AppManagementConsole.Commands
 
         protected override Task DoMainJob(string[] args)
         {
-            if (!TrySplittingRoleGroups(args[1], out var roleGroups, out var errMessage))
+            if (!TrySplittingPermissionGroups(args[1], out var permissionGroups, out var errMessage))
                 throw new InvalidOperationException(errMessage);
             return _permissionGroupManagementService.AddPermissionGroupAsync(new CreatePermissionGroupModel
             {
                 Name = args[0],
                 Corp = _simpleAuthConfigurationProvider.Corp,
                 App = _simpleAuthConfigurationProvider.App,
-                CopyFromPermissionGroups = roleGroups
+                CopyFromPermissionGroups = permissionGroups
             }).ContinueWith(_ => Print("Added"));
         }
 
@@ -40,21 +40,21 @@ namespace AppManagementConsole.Commands
 
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)
         {
-            if (!TrySplittingRoleGroups(args[1], out _, out var errMessage))
+            if (!TrySplittingPermissionGroups(args[1], out _, out var errMessage))
                 yield return errMessage;
         }
 
-        private bool TrySplittingRoleGroups(string data, out string[] roleGroups, out string errMessage)
+        private bool TrySplittingPermissionGroups(string data, out string[] permissionGroups, out string errMessage)
         {
             try
             {
-                roleGroups = data.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                permissionGroups = data.Split(',', StringSplitOptions.RemoveEmptyEntries);
                 errMessage = null;
                 return true;
             }
             catch (Exception e)
             {
-                roleGroups = default;
+                permissionGroups = default;
                 errMessage = e.Message;
                 return false;
             }

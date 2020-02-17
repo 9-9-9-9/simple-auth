@@ -6,7 +6,7 @@ using SimpleAuth.Shared.Models;
 
 namespace Test.SimpleAuth.Shared.Test.Models
 {
-    public class TestRoleGroupResponseModel
+    public class TestPermissionGroupResponseModel
     {
         [Test]
         public void Cast()

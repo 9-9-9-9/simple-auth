@@ -121,7 +121,7 @@ namespace Test.SimpleAuth.Services.Test.Objects
         }
     }
 
-    public class TestRoleGroup
+    public class TestPermissionGroup
     {
         [Test]
         public void ToDomainObject()

@@ -18,9 +18,9 @@ namespace AppManagementConsole.Commands
 
         protected override Task DoMainJob(string[] args)
         {
-            var roleGroupName = args[0];
+            var permissionGroupName = args[0];
             var @lock = args[1].Trim().EqualsIgnoreCase("lock");
-            return _permissionGroupManagementService.SetLockPermissionGroup(roleGroupName, @lock);
+            return _permissionGroupManagementService.SetLockPermissionGroup(permissionGroupName, @lock);
         }
 
         public override string[] GetParametersName()

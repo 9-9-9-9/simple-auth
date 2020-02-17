@@ -17,14 +17,14 @@ namespace AppManagementConsole.Commands
 
         protected override Task DoMainJob(string[] args)
         {
-            var roleGroupName = args[0];
+            var permissionGroupName = args[0];
 
-            return _permissionGroupManagementService.RevokeAllPermissionsAsync(roleGroupName);
+            return _permissionGroupManagementService.RevokeAllPermissionsAsync(permissionGroupName);
         }
 
         public override string[] GetParametersName()
         {
-            return new[] {"Role Group name"};
+            return new[] {"Permission Group name"};
         }
 
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)

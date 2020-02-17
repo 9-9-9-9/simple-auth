@@ -19,11 +19,11 @@ namespace AppManagementConsole.Commands
         protected override Task DoMainJob(string[] args)
         {
             var userId = args[0];
-            var roleGroup = args[1];
+            var permissionGroup = args[1];
 
             return _userManagementService.AssignUserToGroupsAsync(userId, new ModifyUserPermissionGroupsModel
             {
-                PermissionGroups = new[] {roleGroup}
+                PermissionGroups = new[] {permissionGroup}
             });
         }
 

@@ -16,18 +16,18 @@ using SimpleAuth.Shared.Models;
 
 namespace Test.SimpleAuth.Services.Test.Services
 {
-    public class TestIRoleGroupService : BaseTestService<IPermissionGroupRepository, PermissionGroup, Guid>
+    public class TestIPermissionGroupService : BaseTestService<IPermissionGroupRepository, PermissionGroup, Guid>
     {
         [Test]
-        public void SearchRoleGroups()
+        public void SearchPermissionGroups()
         {
-            var svc = Prepare(out var mockRoleGroupRepo).GetRequiredService<IPermissionGroupService>();
+            var svc = Prepare(out var mockPermissionGroupRepo).GetRequiredService<IPermissionGroupService>();
 
-            var roleGroups = SetupSearchReturns(null).ToList();
-            Assert.NotNull(roleGroups);
-            Assert.IsEmpty(roleGroups);
+            var permissionGroups = SetupSearchReturns(null).ToList();
+            Assert.NotNull(permissionGroups);
+            Assert.IsEmpty(permissionGroups);
 
-            roleGroups = SetupSearchReturns(new[]
+            permissionGroups = SetupSearchReturns(new[]
             {
                 new PermissionGroup
                 {
@@ -57,9 +57,9 @@ namespace Test.SimpleAuth.Services.Test.Services
                 },
             }).ToList();
 
-            Assert.AreEqual(2, roleGroups.Count);
-            VerifyObject(roleGroups.Skip(0).First(), 3);
-            VerifyObject(roleGroups.Skip(1).First(), 1);
+            Assert.AreEqual(2, permissionGroups.Count);
+            VerifyObject(permissionGroups.Skip(0).First(), 3);
+            VerifyObject(permissionGroups.Skip(1).First(), 1);
 
             void VerifyObject(global::SimpleAuth.Shared.Domains.PermissionGroup rg, int noOfRoles)
             {
@@ -73,7 +73,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             IEnumerable<global::SimpleAuth.Shared.Domains.PermissionGroup> SetupSearchReturns(IEnumerable<PermissionGroup> rg)
             {
-                mockRoleGroupRepo.Setup(x =>
+                mockPermissionGroupRepo.Setup(x =>
                         x.Search(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<FindOptions>()))
                     .Returns(rg);
                 return svc.SearchGroups(null, null, null);
@@ -81,14 +81,14 @@ namespace Test.SimpleAuth.Services.Test.Services
         }
 
         [Test]
-        public async Task GetRoleGroupByNameAsync()
+        public async Task GetPermissionGroupByNameAsync()
         {
-            var svc = Prepare(out var mockRoleGroupRepo).GetRequiredService<IPermissionGroupService>();
+            var svc = Prepare(out var mockPermissionGroupRepo).GetRequiredService<IPermissionGroupService>();
 
-            var roleGroup = SetupReturns(null).Result;
-            Assert.IsNull(roleGroup);
+            var permissionGroup = SetupReturns(null).Result;
+            Assert.IsNull(permissionGroup);
 
-            roleGroup = SetupReturns(
+            permissionGroup = SetupReturns(
                 new PermissionGroup
                 {
                     Id = Guid.NewGuid(),
@@ -104,7 +104,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     }
                 }).Result;
 
-            VerifyObject(roleGroup, 3);
+            VerifyObject(permissionGroup, 3);
 
             void VerifyObject(global::SimpleAuth.Shared.Domains.PermissionGroup rg, int noOfRoles)
             {
@@ -118,7 +118,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Task<global::SimpleAuth.Shared.Domains.PermissionGroup> SetupReturns(PermissionGroup rg)
             {
-                mockRoleGroupRepo.Setup(x =>
+                mockPermissionGroupRepo.Setup(x =>
                         x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
                     .ReturnsAsync(rg);
                 return svc.GetGroupByNameAsync(null, null, null);
@@ -132,9 +132,9 @@ namespace Test.SimpleAuth.Services.Test.Services
         [TestCase("c2", "a2", "g1", "g2", "g3")]
         public void FindByName(string corp, string app, params string[] nameList)
         {
-            var svc = Prepare(out var mockRoleGroupRepo).GetRequiredService<IPermissionGroupService>();
+            var svc = Prepare(out var mockPermissionGroupRepo).GetRequiredService<IPermissionGroupService>();
 
-            mockRoleGroupRepo.Setup(x =>
+            mockPermissionGroupRepo.Setup(x =>
                 x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(), It.IsAny<FindOptions>())
             ).Returns(nameList.Select(x => new PermissionGroup
             {
@@ -143,17 +143,17 @@ namespace Test.SimpleAuth.Services.Test.Services
                 App = app,
             }));
 
-            var roleGroups = svc.FindByName(nameList, corp, app)?.ToList();
+            var permissionGroups = svc.FindByName(nameList, corp, app)?.ToList();
 
-            mockRoleGroupRepo.Verify(m =>
+            mockPermissionGroupRepo.Verify(m =>
                 m.FindMany(It.Is<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(args => args.ToArray().Length == 2),
                     It.Is<FindOptions>(opt => true)));
 
-            Assert.NotNull(roleGroups);
-            Assert.AreEqual(nameList.Length, roleGroups.Count);
-            Assert.IsTrue(nameList.SequenceEqual(roleGroups.Select(x => x.Name).ToArray()));
-            Assert.IsTrue(roleGroups.All(x => x.Corp == corp));
-            Assert.IsTrue(roleGroups.All(x => x.App == app));
+            Assert.NotNull(permissionGroups);
+            Assert.AreEqual(nameList.Length, permissionGroups.Count);
+            Assert.IsTrue(nameList.SequenceEqual(permissionGroups.Select(x => x.Name).ToArray()));
+            Assert.IsTrue(permissionGroups.All(x => x.Corp == corp));
+            Assert.IsTrue(permissionGroups.All(x => x.App == app));
         }
 
         [Test]
@@ -162,9 +162,9 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp = RandomCorp();
             var app = RandomApp();
 
-            var svc = Prepare(out var mockRoleGroupRepo).GetRequiredService<IPermissionGroupService>();
+            var svc = Prepare(out var mockPermissionGroupRepo).GetRequiredService<IPermissionGroupService>();
 
-            mockRoleGroupRepo.Setup(x =>
+            mockPermissionGroupRepo.Setup(x =>
                 x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(), It.IsAny<FindOptions>())
             ).Returns(new[] {"1", "2", "3"}.Select(x => new PermissionGroup
             {
@@ -173,24 +173,24 @@ namespace Test.SimpleAuth.Services.Test.Services
                 App = app,
             }));
 
-            var roleGroups = svc.FindByName(null, corp, app)?.ToList();
+            var permissionGroups = svc.FindByName(null, corp, app)?.ToList();
 
-            mockRoleGroupRepo.Verify(m =>
+            mockPermissionGroupRepo.Verify(m =>
                 m.FindMany(It.Is<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(args => args.ToArray().Length == 1),
                     It.Is<FindOptions>(opt => true)));
 
-            Assert.NotNull(roleGroups);
-            Assert.AreEqual(3, roleGroups.Count);
-            Assert.IsTrue(roleGroups.All(x => x.Corp == corp));
-            Assert.IsTrue(roleGroups.All(x => x.App == app));
+            Assert.NotNull(permissionGroups);
+            Assert.AreEqual(3, permissionGroups.Count);
+            Assert.IsTrue(permissionGroups.All(x => x.Corp == corp));
+            Assert.IsTrue(permissionGroups.All(x => x.App == app));
         }
 
         [Test]
-        public async Task AddRoleGroupAsync()
+        public async Task AddPermissionGroupAsync()
         {
-            var svc = Prepare(out var mockRoleGroupRepo).GetRequiredService<IPermissionGroupService>();
+            var svc = Prepare(out var mockPermissionGroupRepo).GetRequiredService<IPermissionGroupService>();
 
-            var roleGroup = RandomPermissionGroup();
+            var permissionGroup = RandomPermissionGroup();
             var corp = RandomCorp();
             var app = RandomApp();
 
@@ -201,12 +201,12 @@ namespace Test.SimpleAuth.Services.Test.Services
             // If role group is not exists then new group would be created correctly
             // WITHOUT option copy from group
             SetupFindReturns(null);
-            mockRoleGroupRepo.Setup(x => x.CreateManyAsync(It.IsAny<IEnumerable<PermissionGroup>>())).ReturnsAsync(1);
+            mockPermissionGroupRepo.Setup(x => x.CreateManyAsync(It.IsAny<IEnumerable<PermissionGroup>>())).ReturnsAsync(1);
             await PerformAdd();
             // ReSharper disable PossibleMultipleEnumeration
-            mockRoleGroupRepo.Verify(m => m.CreateManyAsync(It.Is<IEnumerable<PermissionGroup>>(rgs =>
+            mockPermissionGroupRepo.Verify(m => m.CreateManyAsync(It.Is<IEnumerable<PermissionGroup>>(rgs =>
                 rgs.Count() == 1 && rgs.Any(x =>
-                    x.Id != Guid.Empty && x.Name == roleGroup && x.Corp == corp && x.App == app && !x.Locked))));
+                    x.Id != Guid.Empty && x.Name == permissionGroup && x.Corp == corp && x.App == app && !x.Locked))));
             // ReSharper restore PossibleMultipleEnumeration
 
             // If role group is not exists then new group would be created correctly
@@ -257,7 +257,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             });
             await PerformAdd(true);
             // ReSharper disable PossibleMultipleEnumeration
-            mockRoleGroupRepo.Verify(m => m.CreateManyAsync(It.Is<IEnumerable<PermissionGroup>>(rgs =>
+            mockPermissionGroupRepo.Verify(m => m.CreateManyAsync(It.Is<IEnumerable<PermissionGroup>>(rgs =>
                 rgs.Count() == 1 && rgs.First().PermissionRecords.Count == 5 &&
                 rgs.SelectMany(x => x.PermissionRecords).All(x => x.RoleId.EndsWith(".m")))));
             // ReSharper restore PossibleMultipleEnumeration
@@ -265,13 +265,13 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             #region Local functions
 
-            void SetupFindReturns(PermissionGroup rg) => mockRoleGroupRepo
+            void SetupFindReturns(PermissionGroup rg) => mockPermissionGroupRepo
                 .Setup(x =>
                     x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>())
                 )
                 .ReturnsAsync(rg);
 
-            void SetupFindManyReturns(IEnumerable<PermissionGroup> rgs2) => mockRoleGroupRepo
+            void SetupFindManyReturns(IEnumerable<PermissionGroup> rgs2) => mockPermissionGroupRepo
                 .Setup(x =>
                     x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(), It.IsAny<FindOptions>())
                 )
@@ -279,7 +279,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Task PerformAdd(bool specificGroupToBeCopiedFrom = false) => svc.AddGroupAsync(new CreatePermissionGroupModel
             {
-                Name = roleGroup,
+                Name = permissionGroup,
                 Corp = corp,
                 App = app,
                 CopyFromPermissionGroups = specificGroupToBeCopiedFrom ? new[] {"gr1", "gr2"} : null
@@ -291,11 +291,11 @@ namespace Test.SimpleAuth.Services.Test.Services
         [Test]
         public async Task UpdateLockStatusAsync()
         {
-            var svc = Prepare(out var mockRoleGroupRepo).GetRequiredService<IPermissionGroupService>();
+            var svc = Prepare(out var mockPermissionGroupRepo).GetRequiredService<IPermissionGroupService>();
 
             var corp = RandomCorp();
             var app = RandomApp();
-            var roleGroup = RandomPermissionGroup();
+            var permissionGroup = RandomPermissionGroup();
             var @lock = RandomBool();
 
             // argument validation
@@ -309,15 +309,15 @@ namespace Test.SimpleAuth.Services.Test.Services
             // if entity found then update correctly (when lock status should be changed)
             SetupFindSingleReturns(new PermissionGroup
             {
-                Name = roleGroup,
+                Name = permissionGroup,
                 Corp = corp,
                 App = app,
                 Locked = !@lock
             });
-            mockRoleGroupRepo.Setup(x => x.UpdateManyAsync(It.IsAny<IEnumerable<PermissionGroup>>())).ReturnsAsync(1);
+            mockPermissionGroupRepo.Setup(x => x.UpdateManyAsync(It.IsAny<IEnumerable<PermissionGroup>>())).ReturnsAsync(1);
             await PerformUpdate();
             // ReSharper disable PossibleMultipleEnumeration
-            mockRoleGroupRepo.Verify(
+            mockPermissionGroupRepo.Verify(
                 m => m.UpdateManyAsync(
                     It.Is<IEnumerable<PermissionGroup>>(rgs => rgs.Count() == 1 && rgs.First().Locked == @lock)
                 )
@@ -327,26 +327,26 @@ namespace Test.SimpleAuth.Services.Test.Services
             // if entity found, but lock status already the same then don't perform any other execution
             SetupFindSingleReturns(new PermissionGroup
             {
-                Name = roleGroup,
+                Name = permissionGroup,
                 Corp = corp,
                 App = app,
                 Locked = @lock
             });
             await PerformUpdate();
-            mockRoleGroupRepo.Verify(m =>
+            mockPermissionGroupRepo.Verify(m =>
                 m.FindSingleAsync(It.Is<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(args => true)));
-            mockRoleGroupRepo.VerifyNoOtherCalls();
+            mockPermissionGroupRepo.VerifyNoOtherCalls();
 
             Task PerformUpdate() => svc.UpdateLockStatusAsync(
                 new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup,
+                    Name = permissionGroup,
                     Corp = corp,
                     App = app,
                     Locked = @lock
                 });
 
-            void SetupFindSingleReturns(PermissionGroup rg) => mockRoleGroupRepo
+            void SetupFindSingleReturns(PermissionGroup rg) => mockPermissionGroupRepo
                 .Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
                 .ReturnsAsync(rg);
         }
@@ -354,17 +354,17 @@ namespace Test.SimpleAuth.Services.Test.Services
         [Test]
         public async Task AddRolesToGroupAsync()
         {
-            var svc = Prepare<IRoleRepository, Role, string>(out var mockRoleGroupRepo, out var mockRoleRepo)
+            var svc = Prepare<IRoleRepository, Role, string>(out var mockPermissionGroupRepo, out var mockRoleRepo)
                 .GetRequiredService<IPermissionGroupService>();
 
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomPermissionGroup();
+            var permissionGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
             };
@@ -402,11 +402,11 @@ namespace Test.SimpleAuth.Services.Test.Services
             // if role not found so throw EntityNotExistsException
             mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
                 .ReturnsAsync((Role) null);
-            mockRoleGroupRepo
+            mockPermissionGroupRepo
                 .Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
                 .ReturnsAsync(new PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1,
                 });
@@ -425,7 +425,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             }));
 
             // normal without any existing role
-            mockRoleGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
+            mockPermissionGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
                 .ReturnsAsync(1);
             mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
                 .ReturnsAsync(new Role
@@ -434,13 +434,13 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Tenant = "t"
                 });
             await SetupFindSingleReturnsAndThenUpdate();
-            mockRoleGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => true),
+            mockPermissionGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => true),
                 It.Is<List<PermissionRecord>>(rrs => rrs.Count == 2 && rrs.All(x =>
                                                    x.Verb != Verb.None && x.Id != Guid.Empty &&
                                                    !x.RoleId.IsBlank() && !x.Env.IsBlank() && !x.Tenant.IsBlank()))));
 
             // normal with some existing roles
-            mockRoleGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
+            mockPermissionGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
                 .ReturnsAsync(1);
             mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
                 .ReturnsAsync(new Role
@@ -456,17 +456,17 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Verb = Verb.Edit
                 }
             });
-            mockRoleGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => true),
+            mockPermissionGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => true),
                 It.Is<List<PermissionRecord>>(rrs => rrs.Count == 2 /*still 2*/)));
 
             Task SetupFindSingleReturnsAndThenUpdate(
                 ICollection<PermissionRecord> existingRoleRecords = null)
             {
-                mockRoleGroupRepo
+                mockPermissionGroupRepo
                     .Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
                     .ReturnsAsync(new PermissionGroup
                     {
-                        Name = roleGroup1,
+                        Name = permissionGroup1,
                         Corp = corp1,
                         App = app1,
                         PermissionRecords = existingRoleRecords
@@ -474,7 +474,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
                 return svc.AddPermissionsToGroupAsync(new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1
                 }, new[]
@@ -496,17 +496,17 @@ namespace Test.SimpleAuth.Services.Test.Services
         [Test]
         public async Task DeleteRolesFromGroupAsync()
         {
-            var svc = Prepare<IRoleRepository, Role, string>(out var mockRoleGroupRepo, out var mockRoleRepo)
+            var svc = Prepare<IRoleRepository, Role, string>(out var mockPermissionGroupRepo, out var mockRoleRepo)
                 .GetRequiredService<IPermissionGroupService>();
 
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomPermissionGroup();
+            var permissionGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
             };
@@ -548,9 +548,9 @@ namespace Test.SimpleAuth.Services.Test.Services
             // if role not found so throw EntityNotExistsException
             mockRoleRepo.Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<Role, bool>>>>()))
                 .ReturnsAsync((Role) null);
-            SetupFindSingleRoleGroup(new PermissionGroup
+            SetupFindSinglePermissionGroup(new PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
                 PermissionRecords = new List<PermissionRecord>
@@ -576,7 +576,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             }));
 
             // if role group not found so throw EntityNotExistsException
-            SetupFindSingleRoleGroup(null);
+            SetupFindSinglePermissionGroup(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeletePermissionsFromGroupAsync(rg1, new[]
             {
                 new PermissionModel
@@ -588,10 +588,10 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             // if role group does not contains any roles, so stop execution immediately
             ResetMocks();
-            SetupFindSingleRoleGroup(new PermissionGroup
+            SetupFindSinglePermissionGroup(new PermissionGroup
             {
                 Id = Guid.NewGuid(),
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
                 PermissionRecords = null
@@ -604,16 +604,16 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Verb = Verb.Add.Serialize()
                 }
             });
-            mockRoleGroupRepo.Verify(m =>
+            mockPermissionGroupRepo.Verify(m =>
                 m.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()));
-            mockRoleGroupRepo.VerifyNoOtherCalls();
+            mockPermissionGroupRepo.VerifyNoOtherCalls();
             mockRoleRepo.VerifyNoOtherCalls();
 
             // Normal
-            SetupFindSingleRoleGroup(new PermissionGroup
+            SetupFindSinglePermissionGroup(new PermissionGroup
             {
                 Id = Guid.NewGuid(),
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
                 PermissionRecords = new List<PermissionRecord>
@@ -624,7 +624,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             });
             SetupFindSingleRoleAsyncReturns(1, out var expectedEnv, out var expectedTenant);
-            mockRoleGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
+            mockPermissionGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
                 .ReturnsAsync(1);
             await svc.DeletePermissionsFromGroupAsync(rg1, new[]
             {
@@ -634,8 +634,8 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Verb = Verb.Add.Serialize()
                 }
             });
-            mockRoleGroupRepo.Verify(m =>
-                m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == roleGroup1),
+            mockPermissionGroupRepo.Verify(m =>
+                m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == permissionGroup1),
                     It.Is<List<PermissionRecord>>(rrs =>
                         rrs.Count == 3
                         && 1 == rrs.Count(x =>
@@ -655,8 +655,8 @@ namespace Test.SimpleAuth.Services.Test.Services
                     Verb = (Verb.Edit | Verb.Delete).Serialize()
                 }
             });
-            mockRoleGroupRepo.Verify(m =>
-                m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == roleGroup1),
+            mockPermissionGroupRepo.Verify(m =>
+                m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == permissionGroup1),
                     It.Is<List<PermissionRecord>>(rrs =>
                         rrs.Count == 3
                         && 1 == rrs.Count(x =>
@@ -669,13 +669,13 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             #region Local methods
 
-            void SetupFindSingleRoleGroup(PermissionGroup rg) => mockRoleGroupRepo.Setup(x =>
+            void SetupFindSinglePermissionGroup(PermissionGroup rg) => mockPermissionGroupRepo.Setup(x =>
                     x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
                 .ReturnsAsync(rg);
 
             void ResetMocks()
             {
-                mockRoleGroupRepo.Reset();
+                mockPermissionGroupRepo.Reset();
                 mockRoleRepo.Reset();
             }
 
@@ -712,16 +712,16 @@ namespace Test.SimpleAuth.Services.Test.Services
         [Test]
         public async Task DeleteAllRolesFromGroupAsync()
         {
-            var svc = Prepare(out var mockRoleGroupRepo)
+            var svc = Prepare(out var mockPermissionGroupRepo)
                 .GetRequiredService<IPermissionGroupService>();
 
             var corp1 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomPermissionGroup();
+            var permissionGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
             };
@@ -730,27 +730,27 @@ namespace Test.SimpleAuth.Services.Test.Services
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteAllPermissionsFromGroupAsync(null));
 
             // if role group does not exists, so throwing EntityNotExistsException
-            SetupFindSingleRoleGroup(null);
+            SetupFindSinglePermissionGroup(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteAllPermissionsFromGroupAsync(rg1));
 
             // if role group does not have any RoleRecord, so stop execution, nothing more to do
-            SetupFindSingleRoleGroup(new PermissionGroup
+            SetupFindSinglePermissionGroup(new PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
                 PermissionRecords = null
             });
             await svc.DeleteAllPermissionsFromGroupAsync(rg1);
-            mockRoleGroupRepo.Verify(x =>
+            mockPermissionGroupRepo.Verify(x =>
                 x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()));
-            mockRoleGroupRepo.VerifyNoOtherCalls();
+            mockPermissionGroupRepo.VerifyNoOtherCalls();
 
-            // if role group contains RoleRecord(s), check if Repository.UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles) receives an empty `newRoles`
-            mockRoleGroupRepo.Reset();
-            SetupFindSingleRoleGroup(new PermissionGroup
+            // if role group contains RoleRecord(s), check if Repository.UpdateRoleRecordsAsync(PermissionGroup permissionGroup, List<RoleRecord> newRoles) receives an empty `newRoles`
+            mockPermissionGroupRepo.Reset();
+            SetupFindSinglePermissionGroup(new PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
                 PermissionRecords = new List<PermissionRecord>
@@ -758,17 +758,17 @@ namespace Test.SimpleAuth.Services.Test.Services
                     new PermissionRecord()
                 }
             });
-            mockRoleGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
+            mockPermissionGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
                 .ReturnsAsync(1);
             await svc.DeleteAllPermissionsFromGroupAsync(rg1);
-            mockRoleGroupRepo.Verify(m =>
+            mockPermissionGroupRepo.Verify(m =>
                 m.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()));
-            mockRoleGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == roleGroup1), It.Is<List<PermissionRecord>>(rrs => !rrs.IsAny())));
-            mockRoleGroupRepo.VerifyNoOtherCalls();
+            mockPermissionGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == permissionGroup1), It.Is<List<PermissionRecord>>(rrs => !rrs.IsAny())));
+            mockPermissionGroupRepo.VerifyNoOtherCalls();
 
             #region Local methods
 
-            void SetupFindSingleRoleGroup(PermissionGroup rg) => mockRoleGroupRepo.Setup(x =>
+            void SetupFindSinglePermissionGroup(PermissionGroup rg) => mockPermissionGroupRepo.Setup(x =>
                     x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
                 .ReturnsAsync(rg);
 
@@ -776,18 +776,18 @@ namespace Test.SimpleAuth.Services.Test.Services
         }
 
         [Test]
-        public async Task DeleteRoleGroupAsync()
+        public async Task DeletePermissionGroupAsync()
         {
-            var svc = Prepare(out var mockRoleGroupRepo)
+            var svc = Prepare(out var mockPermissionGroupRepo)
                 .GetRequiredService<IPermissionGroupService>();
 
             var corp1 = RandomCorp();
             var app1 = RandomApp();
-            var roleGroup1 = RandomPermissionGroup();
+            var permissionGroup1 = RandomPermissionGroup();
 
             var rg1 = new global::SimpleAuth.Shared.Domains.PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
             };
@@ -796,30 +796,30 @@ namespace Test.SimpleAuth.Services.Test.Services
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteGroupAsync(null));
 
             // if role group does not exists, so throwing EntityNotExistsException
-            SetupFindSingleRoleGroup(null);
+            SetupFindSinglePermissionGroup(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteGroupAsync(rg1));
 
             // Normal
-            SetupFindSingleRoleGroup(new PermissionGroup
+            SetupFindSinglePermissionGroup(new PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
             });
-            mockRoleGroupRepo.Setup(x => x.DeleteManyAsync(It.IsAny<IEnumerable<PermissionGroup>>())).ReturnsAsync(1);
+            mockPermissionGroupRepo.Setup(x => x.DeleteManyAsync(It.IsAny<IEnumerable<PermissionGroup>>())).ReturnsAsync(1);
             await svc.DeleteGroupAsync(rg1);
-            mockRoleGroupRepo.Verify(m =>
+            mockPermissionGroupRepo.Verify(m =>
                 m.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()));
             // ReSharper disable PossibleMultipleEnumeration
-            mockRoleGroupRepo.Verify(m => m.DeleteManyAsync(It.Is<IEnumerable<PermissionGroup>>(rgs => rgs.Count() == 1 && rgs.Count(x => x.Name == rg1.Name && x.Corp == rg1.Corp && x.App == rg1.App) == 1)));
+            mockPermissionGroupRepo.Verify(m => m.DeleteManyAsync(It.Is<IEnumerable<PermissionGroup>>(rgs => rgs.Count() == 1 && rgs.Count(x => x.Name == rg1.Name && x.Corp == rg1.Corp && x.App == rg1.App) == 1)));
             // ReSharper restore PossibleMultipleEnumeration
-            mockRoleGroupRepo.VerifyNoOtherCalls();
+            mockPermissionGroupRepo.VerifyNoOtherCalls();
 
-            // if role group contains RoleRecord(s), check if Repository.UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles) receives an empty `newRoles`
-            mockRoleGroupRepo.Reset();
-            SetupFindSingleRoleGroup(new PermissionGroup
+            // if role group contains RoleRecord(s), check if Repository.UpdateRoleRecordsAsync(PermissionGroup permissionGroup, List<RoleRecord> newRoles) receives an empty `newRoles`
+            mockPermissionGroupRepo.Reset();
+            SetupFindSinglePermissionGroup(new PermissionGroup
             {
-                Name = roleGroup1,
+                Name = permissionGroup1,
                 Corp = corp1,
                 App = app1,
                 PermissionRecords = new List<PermissionRecord>
@@ -827,17 +827,17 @@ namespace Test.SimpleAuth.Services.Test.Services
                     new PermissionRecord()
                 }
             });
-            mockRoleGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
+            mockPermissionGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))
                 .ReturnsAsync(1);
             await svc.DeleteAllPermissionsFromGroupAsync(rg1);
-            mockRoleGroupRepo.Verify(m =>
+            mockPermissionGroupRepo.Verify(m =>
                 m.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()));
-            mockRoleGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == roleGroup1), It.Is<List<PermissionRecord>>(rrs => !rrs.IsAny())));
-            mockRoleGroupRepo.VerifyNoOtherCalls();
+            mockPermissionGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => rg.Name == permissionGroup1), It.Is<List<PermissionRecord>>(rrs => !rrs.IsAny())));
+            mockPermissionGroupRepo.VerifyNoOtherCalls();
 
             #region Local methods
 
-            void SetupFindSingleRoleGroup(PermissionGroup rg) => mockRoleGroupRepo.Setup(x =>
+            void SetupFindSinglePermissionGroup(PermissionGroup rg) => mockPermissionGroupRepo.Setup(x =>
                     x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
                 .ReturnsAsync(rg);
 

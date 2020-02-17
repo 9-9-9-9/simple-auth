@@ -25,14 +25,14 @@ namespace AppManagementConsole.Commands
 
         protected override Task DoMainJob(string[] args)
         {
-            var roleGroupName = args[0];
+            var permissionGroupName = args[0];
             var roleIdWithoutCorpAndApp = args[1];
             var strPermission = args[2];
 
             if (!Enum.TryParse(typeof(Verb), strPermission, true, out var enumPermission))
                 throw new ArgumentException($"{strPermission} is not a valid permission");
 
-            return _permissionGroupManagementService.RevokePermissionsAsync(roleGroupName, 
+            return _permissionGroupManagementService.RevokePermissionsAsync(permissionGroupName, 
                 new PermissionModel
                 {
                     Role =
@@ -49,7 +49,7 @@ namespace AppManagementConsole.Commands
         {
             return new[]
             {
-                "Role Group name", "Role Id without Corp and App parts",
+                "Permission Group name", "Role Id without Corp and App parts",
                 $"Permission (accepted values: {ValidPermissionInput}"
             };
         }

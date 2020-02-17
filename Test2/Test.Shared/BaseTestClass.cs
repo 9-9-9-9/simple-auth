@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,17 +9,14 @@ using SimpleAuth.Core.DependencyInjection;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
-using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Models;
 using Test.SimpleAuth.Shared.Mock.Repositories;
 using Test.SimpleAuth.Shared.Mock.Services;
 using PermissionGroup = SimpleAuth.Shared.Domains.PermissionGroup;
-using Role = SimpleAuth.Services.Entities.Role;
 using Shared_ProjectRegistrableModules = SimpleAuth.Shared.ProjectRegistrableModules;
 using Services_ProjectRegistrableModules = SimpleAuth.Services.ProjectRegistrableModules;
 //using Sql_ProjectRegistrableModules = SimpleAuth.Sqlite.ProjectRegistrableModules;
 using Sql_ProjectRegistrableModules = SimpleAuth.InMemoryDb.ProjectRegistrableModules;
-using User = SimpleAuth.Shared.Domains.User;
 
 namespace Test.Shared
 {
@@ -170,63 +166,6 @@ namespace Test.Shared
                 Module = module,
                 SubModules = subModules
             });
-        }
-
-        protected async Task AddRoleGroupAsync(IPermissionGroupService svc, string name, string corp, string app,
-            params string[] copyFrom)
-        {
-            await svc.AddGroupAsync(new CreatePermissionGroupModel
-            {
-                Name = name,
-                Corp = corp,
-                App = app,
-                CopyFromPermissionGroups = copyFrom
-            });
-        }
-
-        protected IEnumerable<Role> YieldRoles(int from, int to)
-        {
-            for (var i = from; i <= to; i++)
-            {
-                var role = new Role
-                {
-                    Corp = "c",
-                    App = "a",
-                    Env = "e",
-                    Tenant = "t",
-                    Module = $"m{i}",
-                };
-                role.ComputeId();
-                yield return role;
-            }
-        }
-
-        protected async Task AssignUserToGroup(IUserService svc, string userId, string name, string corp, string app)
-        {
-            await svc.AssignUserToGroupsAsync(new User
-                {
-                    Id = userId,
-                },
-                new[]
-                {
-                    new PermissionGroup
-                    {
-                        Name = name,
-                        Corp = corp,
-                        App = app
-                    }
-                }.ToArray());
-        }
-
-        protected async Task AssignUserToGroups(IUserService svc, string userId, params string[] groupIdentities)
-        {
-            await svc.AssignUserToGroupsAsync(new User
-                {
-                    Id = userId,
-                },
-                YieldGroup(groupIdentities)
-                    .ToArray()
-            );
         }
 
         protected IEnumerable<PermissionGroup> YieldGroup(params string[] groupIdentities)

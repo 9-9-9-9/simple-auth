@@ -33,7 +33,7 @@ namespace SimpleAuth.Client.Services
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
-                    .Append(EndpointBuilder.User.AssignUserToRoleGroups(userId))
+                    .Append(EndpointBuilder.User.AssignUserToPermissionGroups(userId))
                     .Method(Constants.HttpMethods.POST),
                 modifyUserPermissionGroupsModel.JsonSerialize()
             );

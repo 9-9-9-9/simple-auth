@@ -110,15 +110,15 @@ namespace SimpleAuth.Server.Controllers
         }
 
         /// <summary>
-        /// Assign user to specific Role Group of the same Corp, same App.
-        /// In order to grant permission for user, manager has to set permissions for role group and then assign user to that group if user is not belong to it.
+        /// Assign user to specific Permission Group of the same Corp, same App.
+        /// In order to grant permission for user, manager has to set permissions for permission group and then assign user to that group if user is not belong to it.
         /// </summary>
         /// <param name="userId">The target user which should be granted permission</param>
-        /// <param name="modifyUserPermissionGroupsModel">The target role groups which should take the user</param>
-        /// <response code="200">Assign user to the specific role groups completed</response>
+        /// <param name="modifyUserPermissionGroupsModel">The target permission groups which should take the user</param>
+        /// <response code="200">Assign user to the specific permission groups completed</response>
         /// <response code="400">Request model is invalid</response>
-        /// <response code="404">Target user id or role group not found</response>
-        [HttpPost, Route("{userId}/role-groups")]
+        /// <response code="404">Target user id or permission group not found</response>
+        [HttpPost, Route("{userId}/permission-groups")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

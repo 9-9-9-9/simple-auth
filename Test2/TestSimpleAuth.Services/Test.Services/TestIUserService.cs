@@ -256,7 +256,7 @@ namespace Test.SimpleAuth.Services.Test.Services
         public async Task AssignUserToGroupsAsync()
         {
             var svc = Prepare<IPermissionGroupRepository, PermissionGroup, Guid>(out var mockUserRepository,
-                out var mockRoleGroupRepository).GetRequiredService<IUserService>();
+                out var mockPermissionGroupRepo).GetRequiredService<IUserService>();
 
             mockUserRepository.Setup(x => x.AssignUserToGroups(It.IsAny<User>(), It.IsAny<PermissionGroup[]>()))
                 .Returns(Task.CompletedTask);
@@ -265,8 +265,8 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
-            var roleGroup1 = RandomPermissionGroup();
-            var roleGroup2 = RandomPermissionGroup();
+            var permissionGroup1 = RandomPermissionGroup();
+            var permissionGroup2 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -307,7 +307,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             }));
 
-            mockRoleGroupRepository.Setup(x =>
+            mockPermissionGroupRepo.Setup(x =>
                     x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(), It.IsAny<FindOptions>()))
                 .Returns((IEnumerable<PermissionGroup>) null);
 
@@ -320,13 +320,13 @@ namespace Test.SimpleAuth.Services.Test.Services
                 },
             }));
 
-            mockRoleGroupRepository.Setup(x =>
+            mockPermissionGroupRepo.Setup(x =>
                     x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(), It.IsAny<FindOptions>()))
                 .Returns(new[]
                 {
                     new PermissionGroup
                     {
-                        Name = roleGroup1,
+                        Name = permissionGroup1,
                         Corp = corp1,
                         App = app1
                     }
@@ -336,7 +336,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             {
                 new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup2,
+                    Name = permissionGroup2,
                     Corp = corp1,
                     App = app1
                 },
@@ -346,21 +346,21 @@ namespace Test.SimpleAuth.Services.Test.Services
             {
                 new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1
                 },
             });
 
             mockUserRepository.Verify(m => m.AssignUserToGroups(It.Is<User>(u => u.Id == userId),
-                It.Is<PermissionGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == roleGroup1)));
+                It.Is<PermissionGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == permissionGroup1)));
         }
 
         [Test]
         public async Task UnAssignUserFromGroupsAsync()
         {
             var svc = Prepare<IPermissionGroupUserRepository, PermissionGroupUser>(out var mockUserRepository,
-                out var mockRoleGroupUserRepository).GetRequiredService<IUserService>();
+                out var mockPermissionGroupUserRepository).GetRequiredService<IUserService>();
 
             mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<PermissionGroup[]>()))
                 .Returns(Task.CompletedTask);
@@ -369,8 +369,8 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
-            var roleGroup1 = RandomPermissionGroup();
-            var roleGroup2 = RandomPermissionGroup();
+            var permissionGroup1 = RandomPermissionGroup();
+            var permissionGroup2 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -388,7 +388,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromGroupsAsync(user, null));
 
             await svc.UnAssignUserFromGroupsAsync(user, new global::SimpleAuth.Shared.Domains.PermissionGroup[0]);
-            mockRoleGroupUserRepository.VerifyNoOtherCalls();
+            mockPermissionGroupUserRepository.VerifyNoOtherCalls();
 
             Assert.CatchAsync<ArgumentException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
@@ -431,7 +431,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     UserId = userId,
                     PermissionGroup = new PermissionGroup
                     {
-                        Name = roleGroup1,
+                        Name = permissionGroup1,
                         Corp = corp1,
                         App = app1
                     }
@@ -442,13 +442,13 @@ namespace Test.SimpleAuth.Services.Test.Services
             {
                 new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1
                 },
                 new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup2,
+                    Name = permissionGroup2,
                     Corp = corp1,
                     App = app1
                 },
@@ -458,20 +458,20 @@ namespace Test.SimpleAuth.Services.Test.Services
             {
                 new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1
                 },
             });
 
             mockUserRepository.Verify(m => m.UnAssignUserFromGroups(It.Is<User>(u => u.Id == userId),
-                It.Is<PermissionGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == roleGroup1)));
+                It.Is<PermissionGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == permissionGroup1)));
 
-            void SetupFindManyReturns(IEnumerable<PermissionGroupUser> roleGroupUsers) =>
-                mockRoleGroupUserRepository.Setup(x =>
+            void SetupFindManyReturns(IEnumerable<PermissionGroupUser> permissionGroupUsers) =>
+                mockPermissionGroupUserRepository.Setup(x =>
                         x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroupUser, bool>>>>(),
                             It.IsAny<FindOptions>()))
-                    .Returns(roleGroupUsers);
+                    .Returns(permissionGroupUsers);
         }
 
         [Test]
@@ -486,9 +486,9 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
             var corp3 = RandomCorp();
-            var roleGroup1 = RandomPermissionGroup();
-            var roleGroup2 = RandomPermissionGroup();
-            var roleGroup3 = RandomPermissionGroup();
+            var permissionGroup1 = RandomPermissionGroup();
+            var permissionGroup2 = RandomPermissionGroup();
+            var permissionGroup3 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -519,7 +519,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     {
                         PermissionGroup = new PermissionGroup
                         {
-                            Name = roleGroup1,
+                            Name = permissionGroup1,
                             Corp = corp1
                         },
                     },
@@ -527,7 +527,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     {
                         PermissionGroup = new PermissionGroup
                         {
-                            Name = roleGroup2,
+                            Name = permissionGroup2,
                             Corp = corp1
                         },
                     },
@@ -535,7 +535,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     {
                         PermissionGroup = new PermissionGroup
                         {
-                            Name = roleGroup3,
+                            Name = permissionGroup3,
                             Corp = corp3
                         },
                     }
@@ -549,7 +549,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             mockUserRepository.Verify(m => m.UnAssignUserFromGroups(It.Is<User>(u => u.Id == userId),
                 It.Is<PermissionGroup[]>(rgs =>
-                    rgs.Length == 2 && rgs[0].Name == roleGroup1 && rgs.All(x => x.Corp == corp1))));
+                    rgs.Length == 2 && rgs[0].Name == permissionGroup1 && rgs.All(x => x.Corp == corp1))));
 
             void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
         }
@@ -593,7 +593,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             // normal
 
-            #region SetupFindUserReturns 3 RoleGroupUsers of groups named g11, g12, g21
+            #region SetupFindUserReturns 3 PermissionGroupUsers of groups named g11, g12, g21
 
             SetupFindUserReturns(new User
             {
