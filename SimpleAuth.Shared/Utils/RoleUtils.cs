@@ -97,10 +97,10 @@ namespace SimpleAuth.Shared.Utils
             };
         }
 
-        public static void Parse(string roleId, string permission, out ClientPermissionModel clientPermissionModel)
+        public static void Parse(string roleId, string verb, out ClientPermissionModel clientPermissionModel)
         {
             Parse(roleId, out var tmpClientPermissionModel);
-            tmpClientPermissionModel.Verb = permission.Deserialize();
+            tmpClientPermissionModel.Verb = verb.Deserialize();
             clientPermissionModel = tmpClientPermissionModel;
         }
 

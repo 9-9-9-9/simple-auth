@@ -36,15 +36,15 @@ namespace SimpleAuth.Shared.Domains
         {
             foreach (var sameRoles in source.OrEmpty().GroupBy(r => r.RoleId))
             {
-                var permission = Verb.None.Grant(sameRoles.Select(r => r.Verb).ToArray());
+                var verb = Verb.None.Grant(sameRoles.Select(r => r.Verb).ToArray());
                 
-                if (permission == Verb.None)
+                if (verb == Verb.None)
                     continue;
 
                 yield return new Permission
                 {
                     RoleId = sameRoles.Key,
-                    Verb = permission
+                    Verb = verb
                 };
             }
         }

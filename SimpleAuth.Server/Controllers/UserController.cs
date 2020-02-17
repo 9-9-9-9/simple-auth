@@ -180,25 +180,25 @@ namespace SimpleAuth.Server.Controllers
         /// </summary>
         /// <param name="userId">User to be checked</param>
         /// <param name="roleId">Role to be checked, with full parts, example: corp.app.env.tenant.module.subModules</param>
-        /// <param name="permission">Serialized permission (byte value)</param>
+        /// <param name="verb">Serialized permission (byte value)</param>
         /// <returns>No content but status code is 200 if user has permission, 406 if user doesn't have that permission</returns>
         /// <response code="200">User HAS the required permission</response>
         /// <response code="406">User DOES NOT HAVE the required permission</response>
         /// <response code="404">User is not exists</response>
-        [HttpGet, Route("{userId}/roles/{roleId}/{permission}")]
+        [HttpGet, Route("{userId}/roles/{roleId}/{verb}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
+        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string verb)
         {
             return await ProcedureDefaultResponseIfError(() =>
                 {
-                    var ePermission = permission.Deserialize();
-                    _logger.LogInformation($"Checking permission [{roleId}, {ePermission}] for user {userId}");
+                    var eVerb = verb.Deserialize();
+                    _logger.LogInformation($"Checking permission [{roleId}, {eVerb}] for user {userId}");
 
-                    return Service.GetMissingRolesAsync(
+                    return Service.GetMissingPermissionsAsync(
                         userId,
-                        new[] {(roleId, ePermission)},
+                        new[] {(roleId, eVerb)},
                         RequestAppHeaders.Corp, RequestAppHeaders.App
                     ).ContinueWith(
                         x => (x.Result.IsAny()
@@ -234,7 +234,7 @@ namespace SimpleAuth.Server.Controllers
                     _logger.LogInformation(
                         $"Checking permissions [{string.Join(",", roles.Select(x => $"{x.Role},{x.Item2}"))}] for user {userId}");
 
-                    return Service.GetMissingRolesAsync(
+                    return Service.GetMissingPermissionsAsync(
                         userId,
                         roles,
                         RequestAppHeaders.Corp, RequestAppHeaders.App

@@ -122,17 +122,17 @@ namespace SimpleAuth.Shared.Models
             return RoleUtils.ComputeRoleId(Corp, App, Env, Tenant, Module, SubModules);
         }
 
-        public static ClientPermissionModel From(string roleId, string permission)
+        public static ClientPermissionModel From(string roleId, string verb)
         {
-            RoleUtils.Parse(roleId, permission, out var clientRoleModel);
+            RoleUtils.Parse(roleId, verb, out var clientRoleModel);
             return clientRoleModel;
         }
 
         public static ClientPermissionModel From(string roleId, Verb verb)
         {
-            RoleUtils.Parse(roleId, out var clientRoleModel);
-            clientRoleModel.Verb = verb;
-            return clientRoleModel;
+            RoleUtils.Parse(roleId, out var clientPermissionModel);
+            clientPermissionModel.Verb = verb;
+            return clientPermissionModel;
         }
     }
 

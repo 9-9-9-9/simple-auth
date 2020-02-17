@@ -823,15 +823,15 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             // catch null arg
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(string.Empty, new (string, Verb)[0], corp1, app1));
+                await svc.GetMissingPermissionsAsync(string.Empty, new (string, Verb)[0], corp1, app1));
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Verb)[0], string.Empty, app1));
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[0], string.Empty, app1));
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Verb)[0], corp1, string.Empty));
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[0], corp1, string.Empty));
 
             // not allow arg contains permission None
             Assert.CatchAsync<ArgumentException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Verb)[]
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[]
                 {
                     ("any", Verb.None)
                 }, corp1, app1)
@@ -842,7 +842,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             // catch user not found
             SetupFindUserReturns(null);
             Assert.CatchAsync<EntityNotExistsException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Verb)[]
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[]
                 {
                     ("any", Verb.Add)
                 }, corp1, app1)
@@ -942,7 +942,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             #region corp1
 
-            var missingRoles = await svc.GetMissingRolesAsync(userId, new[]
+            var missingRoles = await svc.GetMissingPermissionsAsync(userId, new[]
             {
                 ($"{corp1}.{app1}.e.t.crud", Verb.Edit), // usr has
                 ($"{corp1}.{app1}.e.t.ae", Verb.Add | Verb.View), // usr has Add but not View
@@ -961,7 +961,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             #region corp2
 
-            missingRoles = await svc.GetMissingRolesAsync(userId, new[]
+            missingRoles = await svc.GetMissingPermissionsAsync(userId, new[]
             {
                 ($"{corp2}.{app2}.e.t.crud", Verb.Edit), // usr has
                 ($"{corp2}.{app2}.e.t.ae", Verb.Add | Verb.View), // usr has Add but not View

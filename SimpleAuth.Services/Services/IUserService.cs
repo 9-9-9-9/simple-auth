@@ -29,7 +29,7 @@ namespace SimpleAuth.Services
         Task<ICollection<Permission>> GetActiveRolesAsync(string user, string corp, string app, string env = null,
             string tenant = null);
 
-        Task<ICollection<Permission>> GetMissingRolesAsync(string userId, (string, Verb)[] permissions, string corp,
+        Task<ICollection<Permission>> GetMissingPermissionsAsync(string userId, (string, Verb)[] permissions, string corp,
             string app);
 
         Task UpdateLockStatusAsync(User user);
@@ -256,7 +256,7 @@ namespace SimpleAuth.Services
             return roles;
         }
 
-        public async Task<ICollection<Permission>> GetMissingRolesAsync(string userId, (string, Verb)[] permissions,
+        public async Task<ICollection<Permission>> GetMissingPermissionsAsync(string userId, (string, Verb)[] permissions,
             string corp, string app)
         {
             if (permissions.Any(x => x.Item2 == Verb.None))
