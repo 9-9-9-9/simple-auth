@@ -11,7 +11,7 @@ namespace Test.SimpleAuth.Shared.Test.Models
         [Test]
         public void Cast()
         {
-            var role = new Role
+            var role = new Permission
             {
                 RoleId = "c.a.e.t.m",
                 Verb = Verb.Delete

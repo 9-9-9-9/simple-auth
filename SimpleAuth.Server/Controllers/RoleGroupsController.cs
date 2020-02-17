@@ -16,6 +16,7 @@ using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
 using SimpleAuth.Shared.Validation;
+using PermissionGroup = SimpleAuth.Services.Entities.PermissionGroup;
 
 namespace SimpleAuth.Server.Controllers
 {
@@ -24,7 +25,7 @@ namespace SimpleAuth.Server.Controllers
     /// </summary>
     [Route("api/role-groups")]
     [RequireAppToken]
-    public class RoleGroupsController : BaseController<IPermissionGroupService, IRoleGroupRepository, RoleGroup>
+    public class RoleGroupsController : BaseController<IPermissionGroupService, IPermissionGroupRepository, PermissionGroup>
     {
         private readonly IRoleGroupValidationService _roleGroupValidation;
         private readonly ILogger<RoleGroupsController> _logger;
@@ -76,7 +77,7 @@ namespace SimpleAuth.Server.Controllers
         /// Get specific role group information
         /// </summary>
         /// <param name="name">Name of the role group</param>
-        /// <returns>Information of the role group, refer domain model <see cref="PermissionGroup"/></returns>
+        /// <returns>Information of the role group, refer domain model <see cref="Shared.Domains.PermissionGroup"/></returns>
         /// <response code="200">Role Group information retrieved successfully</response>
         /// <response code="404">Role Group could not be found</response>
         [HttpGet("{name}")]
@@ -104,7 +105,7 @@ namespace SimpleAuth.Server.Controllers
             return await ProcedureResponseForArrayLookUp(() =>
                 FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
                     .ContinueWith(x =>
-                        x.Result.Roles.OrEmpty().Select(PermissionModel.Cast)
+                        x.Result.Permissions.OrEmpty().Select(PermissionModel.Cast)
                     )
             );
         }

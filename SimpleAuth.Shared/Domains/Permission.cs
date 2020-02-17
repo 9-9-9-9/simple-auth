@@ -7,7 +7,7 @@ using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Shared.Domains
 {
-    public class Role : BaseDomain, IPermissionRelated
+    public class Permission : BaseDomain, IPermissionRelated
     {
         public string RoleId { get; set; }
         public bool Locked { get; set; }
@@ -30,9 +30,9 @@ namespace SimpleAuth.Shared.Domains
         }
     }
     
-    public static class RoleExtensions
+    public static class PermissionExtensions
     {
-        public static IEnumerable<Role> DistinctRoles(this IEnumerable<Role> source)
+        public static IEnumerable<Permission> DistinctRoles(this IEnumerable<Permission> source)
         {
             foreach (var sameRoles in source.OrEmpty().GroupBy(r => r.RoleId))
             {
@@ -41,7 +41,7 @@ namespace SimpleAuth.Shared.Domains
                 if (permission == Verb.None)
                     continue;
 
-                yield return new Role
+                yield return new Permission
                 {
                     RoleId = sameRoles.Key,
                     Verb = permission

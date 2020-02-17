@@ -13,7 +13,7 @@ namespace Test.SimpleAuth.Services.Test.Objects
         [Test]
         public void WithRandomId()
         {
-            var gr = new RoleGroup();
+            var gr = new PermissionGroup();
             Assert.IsTrue(Guid.Empty.Equals(gr.Id));
             gr.WithRandomId();
             Assert.IsFalse(Guid.Empty.Equals(gr.Id));
@@ -126,16 +126,16 @@ namespace Test.SimpleAuth.Services.Test.Objects
         [Test]
         public void ToDomainObject()
         {
-            var eRg = new RoleGroup
+            var eRg = new PermissionGroup
             {
                 Name = "rg",
                 Corp = "c",
                 App = "a",
                 Locked = true,
-                RoleGroupUsers = Enumerable.Empty<RoleGroupUser>().ToList(),
-                RoleRecords = new List<RoleRecord>
+                PermissionGroupUsers = Enumerable.Empty<PermissionGroupUser>().ToList(),
+                PermissionRecords = new List<PermissionRecord>
                 {
-                    new RoleRecord
+                    new PermissionRecord
                     {
                         Id = Guid.NewGuid(),
                         RoleId = "c.a.e.t.m",
@@ -152,7 +152,7 @@ namespace Test.SimpleAuth.Services.Test.Objects
             Assert.AreEqual(eRg.Corp, dRg.Corp);
             Assert.AreEqual(eRg.App, dRg.App);
             Assert.AreEqual(eRg.Locked, dRg.Locked);
-            Assert.AreEqual(eRg.RoleRecords.Count, dRg.Roles.Length);
+            Assert.AreEqual(eRg.PermissionRecords.Count, dRg.Permissions.Length);
         }
     }
 
@@ -161,7 +161,7 @@ namespace Test.SimpleAuth.Services.Test.Objects
         [Test]
         public void ToEntityObject()
         {
-            var role = new global::SimpleAuth.Shared.Domains.Role
+            var role = new global::SimpleAuth.Shared.Domains.Permission
             {
                 RoleId = "c.a.e.t.m",
                 Verb = Verb.View

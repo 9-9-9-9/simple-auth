@@ -10,7 +10,7 @@ namespace Test.SimpleAuth.Shared.Test.Objects
         [Test]
         public void ToClientRoleModel()
         {
-            var role = new Role
+            var role = new Permission
             {
                 RoleId = "c.a.e.t.m.s",
                 Verb = Verb.Add
@@ -30,7 +30,7 @@ namespace Test.SimpleAuth.Shared.Test.Objects
         [Test]
         public void Cast()
         {
-            var role = new Role
+            var role = new Permission
             {
                 RoleId = "c.a.e.t.m.s",
                 Verb = Verb.Add
@@ -78,9 +78,9 @@ namespace Test.SimpleAuth.Shared.Test.Objects
             arr = arr.DistinctRoles().ToArray();
             Assert.AreEqual(0, arr.Length);
 
-            Role[] ArrS(string roleId, params Verb[] permissions)
+            Permission[] ArrS(string roleId, params Verb[] permissions)
             {
-                return permissions.Select(x => new Role
+                return permissions.Select(x => new Permission
                 {
                     RoleId = roleId,
                     Verb = x

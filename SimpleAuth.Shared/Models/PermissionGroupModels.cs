@@ -26,7 +26,7 @@ namespace SimpleAuth.Shared.Models
             return new PermissionGroupResponseModel
             {
                 Name = group.Name,
-                Roles = (group.Roles?.Select(PermissionModel.Cast)).OrEmpty().ToArray()
+                Roles = (group.Permissions?.Select(PermissionModel.Cast)).OrEmpty().ToArray()
             };
         }
     }

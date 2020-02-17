@@ -64,7 +64,7 @@ namespace Test.Integration.Repositories
         {
             var sp = Prepare();
             var userRepo = sp.GetRequiredService<IUserRepository>();
-            var groupRepo = sp.GetRequiredService<IRoleGroupRepository>();
+            var groupRepo = sp.GetRequiredService<IPermissionGroupRepository>();
 
             var userId = RandomUser();
             var gId1 = Guid.NewGuid();
@@ -76,7 +76,7 @@ namespace Test.Integration.Repositories
 
             // Validate params
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await userRepo.AssignUserToGroups(null, new[] {new RoleGroup()}));
+                await userRepo.AssignUserToGroups(null, new[] {new PermissionGroup()}));
             Assert.CatchAsync<ArgumentNullException>(async () =>
                 await userRepo.AssignUserToGroups(new User(), null));
 
@@ -88,11 +88,11 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId1,
                 },
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId2,
                 }
@@ -117,7 +117,7 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = Guid.NewGuid()
                 }
@@ -129,12 +129,12 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId1
                 }
             });
-            Assert.AreEqual(1, userRepo.Find(userId).RoleGroupUsers.Count);
+            Assert.AreEqual(1, userRepo.Find(userId).PermissionGroupUsers.Count);
 
             // add user to gr 1 AGAIN, still success
             await userRepo.AssignUserToGroups(new User
@@ -142,12 +142,12 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId1
                 }
             });
-            Assert.AreEqual(1, userRepo.Find(userId).RoleGroupUsers.Count);
+            Assert.AreEqual(1, userRepo.Find(userId).PermissionGroupUsers.Count);
 
             #region Local methods
 
@@ -155,14 +155,14 @@ namespace Test.Integration.Repositories
             {
                 return groupRepo.CreateManyAsync(new[]
                 {
-                    new RoleGroup
+                    new PermissionGroup
                     {
                         Id = gId1,
                         Name = group1,
                         Corp = corp,
                         App = app,
                     },
-                    new RoleGroup
+                    new PermissionGroup
                     {
                         Id = gId2,
                         Name = group2,
@@ -180,7 +180,7 @@ namespace Test.Integration.Repositories
         {
             var sp = Prepare();
             var userRepo = sp.GetRequiredService<IUserRepository>();
-            var groupRepo = sp.GetRequiredService<IRoleGroupRepository>();
+            var groupRepo = sp.GetRequiredService<IPermissionGroupRepository>();
 
             var userId = RandomUser();
             var gId1 = Guid.NewGuid();
@@ -192,7 +192,7 @@ namespace Test.Integration.Repositories
 
             // Validate params
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await userRepo.UnAssignUserFromGroups(null, new[] {new RoleGroup()}));
+                await userRepo.UnAssignUserFromGroups(null, new[] {new PermissionGroup()}));
             Assert.CatchAsync<ArgumentNullException>(async () =>
                 await userRepo.UnAssignUserFromGroups(new User(), null));
 
@@ -204,11 +204,11 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId1,
                 },
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId2,
                 }
@@ -233,7 +233,7 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = Guid.NewGuid()
                 }
@@ -245,7 +245,7 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId1
                 }
@@ -257,12 +257,12 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId1
                 }
             });
-            Assert.AreEqual(1, userRepo.Find(userId).RoleGroupUsers.Count);
+            Assert.AreEqual(1, userRepo.Find(userId).PermissionGroupUsers.Count);
 
             // Un-assign success
             await userRepo.UnAssignUserFromGroups(new User
@@ -270,12 +270,12 @@ namespace Test.Integration.Repositories
                 Id = userId
             }, new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Id = gId1
                 }
             });
-            Assert.AreEqual(0, userRepo.Find(userId).RoleGroupUsers.Count);
+            Assert.AreEqual(0, userRepo.Find(userId).PermissionGroupUsers.Count);
 
             #region Local methods
 
@@ -283,14 +283,14 @@ namespace Test.Integration.Repositories
             {
                 return groupRepo.CreateManyAsync(new[]
                 {
-                    new RoleGroup
+                    new PermissionGroup
                     {
                         Id = gId1,
                         Name = group1,
                         Corp = corp,
                         App = app,
                     },
-                    new RoleGroup
+                    new PermissionGroup
                     {
                         Id = gId2,
                         Name = group2,

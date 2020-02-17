@@ -112,7 +112,7 @@ namespace SimpleAuth.Server.Controllers
             
             return await ProcedureDefaultResponse(async () =>
                 {
-                    await Service.UpdateLockStatus(new Shared.Domains.Role
+                    await Service.UpdateLockStatus(new Shared.Domains.Permission
                     {
                         RoleId = roleId,
                         Locked = true
@@ -140,7 +140,7 @@ namespace SimpleAuth.Server.Controllers
             
             return await ProcedureDefaultResponse(async () =>
                 {
-                    await Service.UpdateLockStatus(new Shared.Domains.Role
+                    await Service.UpdateLockStatus(new Shared.Domains.Permission
                     {
                         RoleId = roleId,
                         Locked = false

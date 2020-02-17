@@ -8,40 +8,40 @@ namespace SimpleAuth.Repositories
     public abstract class SimpleAuthDbContext : DbContext
     {
         public DbSet<Role> Roles { get; set; }
-        public DbSet<RoleGroup> RoleGroups { get; set; }
-        public DbSet<RoleRecord> RoleRecords { get; set; }
+        public DbSet<PermissionGroup> RoleGroups { get; set; }
+        public DbSet<PermissionRecord> RoleRecords { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<LocalUserInfo> LocalUserInfos { get; set; }
-        public DbSet<RoleGroupUser> RoleGroupUsers { get; set; }
+        public DbSet<PermissionGroupUser> RoleGroupUsers { get; set; }
         public DbSet<TokenInfo> TokenInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.BuildIndexesFromAnnotations();
-            modelBuilder.Entity<RoleGroup>().HasIndex(rg => new {rg.Name, rg.Corp, rg.App}).IsUnique();
+            modelBuilder.Entity<PermissionGroup>().HasIndex(rg => new {rg.Name, rg.Corp, rg.App}).IsUnique();
             modelBuilder.Entity<LocalUserInfo>().HasIndex(info => new {info.UserId, info.Corp}).IsUnique();
             modelBuilder.Entity<LocalUserInfo>().HasIndex(info => new {info.NormalizedEmail, info.Corp}).IsUnique();
             modelBuilder.Entity<TokenInfo>().HasIndex(info => new {info.Corp, info.App}).IsUnique();
 
             RegisterIndex<LocalUserInfo>(modelBuilder);
             RegisterIndex<Role>(modelBuilder);
-            RegisterIndex<RoleGroup>(modelBuilder);
-            RegisterIndex<RoleGroupUser>(modelBuilder);
-            RegisterIndex<RoleRecord>(modelBuilder);
+            RegisterIndex<PermissionGroup>(modelBuilder);
+            RegisterIndex<PermissionGroupUser>(modelBuilder);
+            RegisterIndex<PermissionRecord>(modelBuilder);
             RegisterIndex<TokenInfo>(modelBuilder);
             RegisterIndex<User>(modelBuilder);
 
-            modelBuilder.Entity<RoleGroupUser>()
-                .HasKey(bc => new {bc.UserId, bc.RoleGroupId});
-            modelBuilder.Entity<RoleGroupUser>()
+            modelBuilder.Entity<PermissionGroupUser>()
+                .HasKey(bc => new {bc.UserId, RoleGroupId = bc.PermissionGroupId});
+            modelBuilder.Entity<PermissionGroupUser>()
                 .HasOne(bc => bc.User)
-                .WithMany(b => b.RoleGroupUsers)
+                .WithMany(b => b.PermissionGroupUsers)
                 .HasForeignKey(bc => bc.UserId);
-            modelBuilder.Entity<RoleGroupUser>()
-                .HasOne(bc => bc.RoleGroup)
-                .WithMany(c => c.RoleGroupUsers)
-                .HasForeignKey(bc => bc.RoleGroupId);
+            modelBuilder.Entity<PermissionGroupUser>()
+                .HasOne(bc => bc.PermissionGroup)
+                .WithMany(c => c.PermissionGroupUsers)
+                .HasForeignKey(bc => bc.PermissionGroupId);
         }
 
         private void RegisterIndex<T>(ModelBuilder modelBuilder) where T : class

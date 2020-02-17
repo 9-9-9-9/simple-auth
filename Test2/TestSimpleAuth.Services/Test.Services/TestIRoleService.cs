@@ -60,7 +60,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             mockRoleRepository = BasicSetup<IRoleRepository, Role, string>(mockRoleRepository);
             
-            var role = new global::SimpleAuth.Shared.Domains.Role
+            var role = new global::SimpleAuth.Shared.Domains.Permission
             {
                 RoleId = "c.a.e.t.m",
                 Locked = true

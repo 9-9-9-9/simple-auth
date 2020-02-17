@@ -10,8 +10,8 @@ namespace SimpleAuth.Repositories
         {
             serviceCollection.AddTransient<IDbContextFactory, DefaultDbContextFactory>();
 
-            serviceCollection.AddTransient<IRoleGroupRepository, RoleGroupRepository>();
-            serviceCollection.AddTransient<IRepository<RoleGroup>, RoleGroupRepository>();
+            serviceCollection.AddTransient<IPermissionGroupRepository, PermissionGroupRepository>();
+            serviceCollection.AddTransient<IRepository<PermissionGroup>, PermissionGroupRepository>();
 
             serviceCollection.AddTransient<IRoleRepository, RoleRepository>();
             serviceCollection.AddTransient<IRepository<Role>, RoleRepository>();
@@ -20,13 +20,13 @@ namespace SimpleAuth.Repositories
             serviceCollection.AddTransient<IRepository<User>, UserRepository>();
 
             serviceCollection.AddTransient<IRoleRecordRepository, RoleRecordRepository>();
-            serviceCollection.AddTransient<IRepository<RoleRecord>, RoleRecordRepository>();
+            serviceCollection.AddTransient<IRepository<PermissionRecord>, RoleRecordRepository>();
 
             serviceCollection.AddTransient<ILocalUserInfoRepository, LocalUserInfoRepository>();
             serviceCollection.AddTransient<IRepository<LocalUserInfo>, LocalUserInfoRepository>();
 
             serviceCollection.AddTransient<IRoleGroupUserRepository, RoleGroupUserRepository>();
-            serviceCollection.AddTransient<IRepository<RoleGroupUser>, RoleGroupUserRepository>();
+            serviceCollection.AddTransient<IRepository<PermissionGroupUser>, RoleGroupUserRepository>();
             
             serviceCollection.AddTransient<ITokenInfoRepository, TokenInfoRepository>();
             serviceCollection.AddTransient<IRepository<TokenInfo>, TokenInfoRepository>();

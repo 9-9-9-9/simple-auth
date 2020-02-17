@@ -37,12 +37,12 @@ namespace SimpleAuth.Shared.Models
         public string Role { get; set; }
         public string Verb { get; set; }
 
-        public static PermissionModel Cast(Role role)
+        public static PermissionModel Cast(Permission permission)
         {
             return new PermissionModel
             {
-                Role = role.RoleId,
-                Verb = role.Verb.Serialize()
+                Role = permission.RoleId,
+                Verb = permission.Verb.Serialize()
             };
         }
     }
@@ -75,9 +75,9 @@ namespace SimpleAuth.Shared.Models
             return sb.ToString();
         }
 
-        public Role ToRole()
+        public Permission ToRole()
         {
-            return new Role
+            return new Permission
             {
                 RoleId = RoleUtils.ComputeRoleId(Corp, App, Env, Tenant, Module, SubModules),
                 Verb = Verb

@@ -11,7 +11,7 @@ using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
-using Role = SimpleAuth.Shared.Domains.Role;
+using PermissionGroup = SimpleAuth.Shared.Domains.PermissionGroup;
 
 namespace SimpleAuth.Services
 {
@@ -28,7 +28,7 @@ namespace SimpleAuth.Services
         Task DeleteGroupAsync(PermissionGroup permissionGroup);
     }
 
-    public class DefaultPermissionGroupService : DomainService<IRoleGroupRepository, Entities.RoleGroup>,
+    public class DefaultPermissionGroupService : DomainService<IPermissionGroupRepository, Entities.PermissionGroup>,
         IPermissionGroupService
     {
         private readonly IRoleRepository _roleRepository;
@@ -64,7 +64,7 @@ namespace SimpleAuth.Services
 
         public IEnumerable<PermissionGroup> FindByName(string[] nameList, string corp, string app)
         {
-            var expressions = new List<Expression<Func<Entities.RoleGroup, bool>>>
+            var expressions = new List<Expression<Func<Entities.PermissionGroup, bool>>>
             {
                 x =>
                     x.Corp == corp
@@ -93,7 +93,7 @@ namespace SimpleAuth.Services
             if (findSingleAsync != default)
                 throw new EntityAlreadyExistsException(newPermissionGroup.Name);
 
-            Role[] initRoles = new Role[0];
+            Permission[] initRoles = new Permission[0];
             if (newPermissionGroup.CopyFromPermissionGroups.IsAny())
             {
                 var groupsToCopyFrom = FindByName(newPermissionGroup.CopyFromPermissionGroups, newPermissionGroup.Corp, newPermissionGroup.App)
@@ -104,17 +104,17 @@ namespace SimpleAuth.Services
                 if (missingGroups.Any())
                     throw new EntityNotExistsException(missingGroups);
 
-                initRoles = groupsToCopyFrom.SelectMany(x => x.Roles).ToArray();
+                initRoles = groupsToCopyFrom.SelectMany(x => x.Permissions).ToArray();
             }
 
-            await Repository.CreateAsync(new Entities.RoleGroup
+            await Repository.CreateAsync(new Entities.PermissionGroup
             {
                 Id = Guid.NewGuid(),
                 Name = newPermissionGroup.Name,
                 Corp = newPermissionGroup.Corp,
                 App = newPermissionGroup.App,
                 Locked = false,
-                RoleRecords = initRoles
+                PermissionRecords = initRoles
                     .Select(r => r.ToEntityObject().WithRandomId())
                     .ToList()
             });
@@ -141,9 +141,9 @@ namespace SimpleAuth.Services
                 throw new ArgumentNullException(nameof(permissionModels));
             if (permissionModels.IsEmpty() || permissionModels.Any(x => x == null))
                 throw new ArgumentException(nameof(permissionModels));
-            if (permissionGroup.Roles.IsAny())
+            if (permissionGroup.Permissions.IsAny())
                 throw new InvalidOperationException(
-                    $"Domain object {nameof(permissionGroup)} should not contains value in property {nameof(permissionGroup.Roles)} to prevent un-expected operation");
+                    $"Domain object {nameof(permissionGroup)} should not contains value in property {nameof(permissionGroup.Permissions)} to prevent un-expected operation");
 
             var acceptRolePrefix =
                 string.Join(Constants.SplitterRoleParts, permissionGroup.Corp, permissionGroup.App, string.Empty);
@@ -153,7 +153,7 @@ namespace SimpleAuth.Services
                 throw new SimpleAuthSecurityException(string.Join(',', crossAppRoleModels.Select(x => x.Role)));
 
             var newRoles =
-                permissionModels.Select(r => new Role
+                permissionModels.Select(r => new Permission
                     {
                         RoleId = r.Role,
                         Verb = r.Verb.Deserialize()
@@ -173,9 +173,9 @@ namespace SimpleAuth.Services
                 throw new ArgumentNullException(nameof(permissionModels));
             if (permissionModels.IsEmpty() || permissionModels.Any(x => x == null))
                 throw new ArgumentException(nameof(permissionModels));
-            if (permissionGroup.Roles.IsAny())
+            if (permissionGroup.Permissions.IsAny())
                 throw new InvalidOperationException(
-                    $"Domain object {nameof(permissionGroup)} should not contains value in property {nameof(permissionGroup.Roles)} to prevent un-expected operation");
+                    $"Domain object {nameof(permissionGroup)} should not contains value in property {nameof(permissionGroup.Permissions)} to prevent un-expected operation");
 
             var acceptRolePrefix =
                 string.Join(Constants.SplitterRoleParts, permissionGroup.Corp, permissionGroup.App, string.Empty);
@@ -189,18 +189,18 @@ namespace SimpleAuth.Services
             if (domainGroup == default)
                 throw new EntityNotExistsException($"{permissionGroup.Name}");
 
-            if (domainGroup.Roles.IsEmpty())
+            if (domainGroup.Permissions.IsEmpty())
                 return;
 
             foreach (var permissionModel in permissionModels)
             {
-                var matchingRole = domainGroup.Roles.FirstOrDefault(x => x.RoleId == permissionModel.Role);
+                var matchingRole = domainGroup.Permissions.FirstOrDefault(x => x.RoleId == permissionModel.Role);
                 if (matchingRole == default)
                     continue;
                 matchingRole.Verb = matchingRole.Verb.Revoke(permissionModel.Verb.Deserialize());
             }
 
-            await UpdateRolesAsync(domainGroup, domainGroup.Roles
+            await UpdateRolesAsync(domainGroup, domainGroup.Permissions
                 .Select(r => r.ToEntityObject().WithRandomId())
                 .ToList()
             );
@@ -216,7 +216,7 @@ namespace SimpleAuth.Services
             if (domain == default)
                 throw new EntityNotExistsException($"{permissionGroup.Name}");
 
-            if (domain.Roles.IsEmpty())
+            if (domain.Permissions.IsEmpty())
                 return;
 
             await UpdateRolesAsync(domain, null);
@@ -240,7 +240,7 @@ namespace SimpleAuth.Services
             await Repository.DeleteAsync(g);
         }
 
-        private async Task UpdateRolesAsync(PermissionGroup permissionGroup, List<RoleRecord> newRoles)
+        private async Task UpdateRolesAsync(PermissionGroup permissionGroup, List<PermissionRecord> newRoles)
         {
             newRoles = newRoles.OrEmpty().ToList();
 
@@ -253,12 +253,12 @@ namespace SimpleAuth.Services
                 newRole.Tenant = role.Tenant;
             }
 
-            await Repository.UpdateRoleRecordsAsync(await GetEntity(permissionGroup), newRoles);
+            await Repository.UpdatePermissionRecordsAsync(await GetEntity(permissionGroup), newRoles);
 
-            permissionGroup.Roles = newRoles.Select(r => r.ToDomainObject()).ToArray();
+            permissionGroup.Permissions = newRoles.Select(r => r.ToDomainObject()).ToArray();
         }
 
-        private async Task<Entities.RoleGroup> GetEntity(PermissionGroup permissionGroup)
+        private async Task<Entities.PermissionGroup> GetEntity(PermissionGroup permissionGroup)
         {
             var entity = await Repository.FindSingleAsync(x =>
                 x.Name == permissionGroup.Name

@@ -6,7 +6,7 @@ using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAuth.Services.Entities
 {
-    public partial class RoleRecord : BaseEntity<Guid>, IEnvRelated, ITenantRelated, IPermissionRelated
+    public partial class PermissionRecord : BaseEntity<Guid>, IEnvRelated, ITenantRelated, IPermissionRelated
     {
         [Index, Required] public string RoleId { get; set; }
         [Index, Required] public string Env { get; set; }
@@ -14,11 +14,11 @@ namespace SimpleAuth.Services.Entities
         public Verb Verb { get; set; }
     }
 
-    public partial class RoleRecord
+    public partial class PermissionRecord
     {
-        public Shared.Domains.Role ToDomainObject()
+        public Shared.Domains.Permission ToDomainObject()
         {
-            return new Shared.Domains.Role
+            return new Shared.Domains.Permission
             {
                 RoleId = RoleId,
                 Verb = Verb
@@ -28,12 +28,12 @@ namespace SimpleAuth.Services.Entities
 
     public static class RoleRecordExtensions
     {
-        public static RoleRecord ToEntityObject(this Shared.Domains.Role role)
+        public static PermissionRecord ToEntityObject(this Shared.Domains.Permission permission)
         {
-            return new RoleRecord
+            return new PermissionRecord
             {
-                RoleId = role.RoleId,
-                Verb = role.Verb
+                RoleId = permission.RoleId,
+                Verb = permission.Verb
             };
         }
     }

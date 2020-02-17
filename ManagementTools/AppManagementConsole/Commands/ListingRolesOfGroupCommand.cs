@@ -26,8 +26,8 @@ namespace AppManagementConsole.Commands
                     var roleGroup = x.Result;
                     var sb = new StringBuilder();
 
-                    if (roleGroup.Roles.IsAny())
-                        roleGroup.Roles.ToList().ForEach(rm => { sb.AppendLine($"<{rm.Verb,20}> {rm.RoleId}"); });
+                    if (roleGroup.Permissions.IsAny())
+                        roleGroup.Permissions.ToList().ForEach(rm => { sb.AppendLine($"<{rm.Verb,20}> {rm.RoleId}"); });
                     else
                         sb.AppendLine("Group doesn't have any role");
                     if (roleGroup.Locked)

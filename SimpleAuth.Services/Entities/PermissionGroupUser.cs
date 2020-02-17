@@ -4,12 +4,12 @@ using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAuth.Services.Entities
 {
-    public class RoleGroupUser : BaseEntity
+    public class PermissionGroupUser : BaseEntity
     {
         [Index, Required] public string UserId { get; set; }
         public User User { get; set; }
 
-        [Index, Required] public Guid RoleGroupId { get; set; }
-        public RoleGroup RoleGroup { get; set; }
+        [Index, Required] public Guid PermissionGroupId { get; set; }
+        public PermissionGroup PermissionGroup { get; set; }
     }
 }

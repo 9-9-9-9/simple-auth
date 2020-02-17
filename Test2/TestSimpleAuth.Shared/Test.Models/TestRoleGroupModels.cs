@@ -14,7 +14,7 @@ namespace Test.SimpleAuth.Shared.Test.Models
             var rg = new PermissionGroup
             {
                 Name = "rg",
-                Roles = null,
+                Permissions = null,
                 Corp = "c",
                 App = "a",
                 Locked = false
@@ -28,15 +28,15 @@ namespace Test.SimpleAuth.Shared.Test.Models
 
             rg = new PermissionGroup
             {
-                Roles = new[]
+                Permissions = new[]
                 {
-                    new Role
+                    new Permission
                     {
                         RoleId = "c.a.e.t.m1",
                         Verb = Verb.Add | Verb.Delete
                     },
                     
-                    new Role
+                    new Permission
                     {
                         RoleId = "c.a.e.t.m2",
                         Verb = Verb.View | Verb.Edit
@@ -48,10 +48,10 @@ namespace Test.SimpleAuth.Shared.Test.Models
             Assert.NotNull(res);
             Assert.IsNotNull(res.Roles);
             Assert.AreEqual(2, res.Roles.Length);
-            Assert.AreEqual(rg.Roles.First().RoleId, res.Roles.First().Role);
-            Assert.AreEqual(rg.Roles.First().Verb.Serialize(), res.Roles.First().Verb);
-            Assert.AreEqual(rg.Roles.Skip(1).First().RoleId, res.Roles.Skip(1).First().Role);
-            Assert.AreEqual(rg.Roles.Skip(1).First().Verb.Serialize(), res.Roles.Skip(1).First().Verb);
+            Assert.AreEqual(rg.Permissions.First().RoleId, res.Roles.First().Role);
+            Assert.AreEqual(rg.Permissions.First().Verb.Serialize(), res.Roles.First().Verb);
+            Assert.AreEqual(rg.Permissions.Skip(1).First().RoleId, res.Roles.Skip(1).First().Role);
+            Assert.AreEqual(rg.Permissions.Skip(1).First().Verb.Serialize(), res.Roles.Skip(1).First().Verb);
         }
     }
 }

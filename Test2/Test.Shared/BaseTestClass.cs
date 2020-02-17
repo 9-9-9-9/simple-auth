@@ -14,6 +14,7 @@ using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Models;
 using Test.SimpleAuth.Shared.Mock.Repositories;
 using Test.SimpleAuth.Shared.Mock.Services;
+using PermissionGroup = SimpleAuth.Shared.Domains.PermissionGroup;
 using Role = SimpleAuth.Services.Entities.Role;
 using Shared_ProjectRegistrableModules = SimpleAuth.Shared.ProjectRegistrableModules;
 using Services_ProjectRegistrableModules = SimpleAuth.Services.ProjectRegistrableModules;

@@ -353,7 +353,7 @@ namespace Test.Integration.Repositories
         {
             var sp = Prepare();
             var userRepo = sp.GetRequiredService<IUserRepository>();
-            var groupRepo = sp.GetRequiredService<IRoleGroupRepository>();
+            var groupRepo = sp.GetRequiredService<IPermissionGroupRepository>();
             var roleGroupUserRepo = sp.GetRequiredService<IRoleGroupUserRepository>();
             var userId = RandomUser();
             var corp = RandomCorp();
@@ -370,7 +370,7 @@ namespace Test.Integration.Repositories
             });
 
             var user = userRepo.Find(userId);
-            await groupRepo.CreateAsync(new RoleGroup
+            await groupRepo.CreateAsync(new PermissionGroup
             {
                 Name = groupId,
                 Corp = corp,
@@ -381,7 +381,7 @@ namespace Test.Integration.Repositories
             
             // Verify
             user = userRepo.Find(userId);
-            Assert.AreEqual(1, user.RoleGroupUsers.Count);
+            Assert.AreEqual(1, user.PermissionGroupUsers.Count);
             var roleGroupUsers = roleGroupUserRepo.Find(x => x.UserId == userId).ToList();
             Assert.AreEqual(1, roleGroupUsers.Count);
         }
