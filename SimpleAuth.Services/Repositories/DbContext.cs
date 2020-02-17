@@ -8,11 +8,11 @@ namespace SimpleAuth.Repositories
     public abstract class SimpleAuthDbContext : DbContext
     {
         public DbSet<Role> Roles { get; set; }
-        public DbSet<PermissionGroup> RoleGroups { get; set; }
-        public DbSet<PermissionRecord> RoleRecords { get; set; }
+        public DbSet<PermissionGroup> PermissionGroups { get; set; }
+        public DbSet<PermissionRecord> PermissionRecords { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<LocalUserInfo> LocalUserInfos { get; set; }
-        public DbSet<PermissionGroupUser> RoleGroupUsers { get; set; }
+        public DbSet<PermissionGroupUser> PermissionGroupUsers { get; set; }
         public DbSet<TokenInfo> TokenInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
