@@ -8,18 +8,18 @@ namespace AppManagementConsole.Commands
     // ReSharper disable once ClassNeverInstantiated.Global
     public class RevokeAllPermissionCommand : AbstractCommand
     {
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public RevokeAllPermissionCommand(IRoleGroupManagementService roleGroupManagementService)
+        public RevokeAllPermissionCommand(IPermissionGroupManagementService permissionGroupManagementService)
         {
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
         }
 
         protected override Task DoMainJob(string[] args)
         {
             var roleGroupName = args[0];
 
-            return _roleGroupManagementService.DeleteAllRolesAsync(roleGroupName);
+            return _permissionGroupManagementService.DeleteAllRolesAsync(roleGroupName);
         }
 
         public override string[] GetParametersName()

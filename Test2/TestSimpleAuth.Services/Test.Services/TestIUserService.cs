@@ -156,19 +156,19 @@ namespace Test.SimpleAuth.Services.Test.Services
             Assert.NotNull(user);
             Assert.AreEqual(1, user.LocalUserInfos.Length);
             Assert.AreEqual(corp1, user.LocalUserInfos.First().Corp);
-            Assert.AreEqual(2, user.RoleGroups.Length);
-            Assert.AreEqual("g11", user.RoleGroups[0].Name);
-            Assert.AreEqual("g12", user.RoleGroups[1].Name);
-            Assert.AreEqual(2, user.RoleGroups[0].Permissions.Length);
-            Assert.AreEqual(2, user.RoleGroups[1].Permissions.Length);
-            Assert.AreEqual(corp1, user.RoleGroups[0].Corp);
-            Assert.AreEqual("a", user.RoleGroups[0].App);
-            Assert.AreEqual(true, user.RoleGroups[0].Locked);
-            Assert.AreEqual(false, user.RoleGroups[1].Locked);
-            Assert.AreEqual($"{corp1}.a.e.t.m1", user.RoleGroups[0].Permissions[0].RoleId);
-            Assert.AreEqual(Verb.View, user.RoleGroups[0].Permissions[0].Verb);
-            Assert.AreEqual($"{corp1}.a.e.t.m2", user.RoleGroups[0].Permissions[1].RoleId);
-            Assert.AreEqual(Verb.Edit, user.RoleGroups[0].Permissions[1].Verb);
+            Assert.AreEqual(2, user.PermissionGroups.Length);
+            Assert.AreEqual("g11", user.PermissionGroups[0].Name);
+            Assert.AreEqual("g12", user.PermissionGroups[1].Name);
+            Assert.AreEqual(2, user.PermissionGroups[0].Permissions.Length);
+            Assert.AreEqual(2, user.PermissionGroups[1].Permissions.Length);
+            Assert.AreEqual(corp1, user.PermissionGroups[0].Corp);
+            Assert.AreEqual("a", user.PermissionGroups[0].App);
+            Assert.AreEqual(true, user.PermissionGroups[0].Locked);
+            Assert.AreEqual(false, user.PermissionGroups[1].Locked);
+            Assert.AreEqual($"{corp1}.a.e.t.m1", user.PermissionGroups[0].Permissions[0].RoleId);
+            Assert.AreEqual(Verb.View, user.PermissionGroups[0].Permissions[0].Verb);
+            Assert.AreEqual($"{corp1}.a.e.t.m2", user.PermissionGroups[0].Permissions[1].RoleId);
+            Assert.AreEqual(Verb.Edit, user.PermissionGroups[0].Permissions[1].Verb);
 
             ISetup<IUserRepository, User> SetupUser() => mockUserRepository.Setup(x => x.Find(userId));
 

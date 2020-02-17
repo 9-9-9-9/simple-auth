@@ -12,15 +12,15 @@ using SimpleAuth.Shared.Models;
 namespace AppManagementConsole.Commands
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class AddRoleToGroupCommand : AbstractCommand
+    public class AddPermissionToGroupCommand : AbstractCommand
     {
         private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public AddRoleToGroupCommand(IRoleGroupManagementService roleGroupManagementService,
+        public AddPermissionToGroupCommand(IPermissionGroupManagementService permissionGroupManagementService,
             ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider)
         {
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
             _simpleAuthConfigurationProvider = simpleAuthConfigurationProvider;
         }
 
@@ -56,7 +56,7 @@ namespace AppManagementConsole.Commands
                 return;
             }
 
-            await _roleGroupManagementService.AddRoleToGroupAsync(args[0], new PermissionModels
+            await _permissionGroupManagementService.AddRoleToGroupAsync(args[0], new PermissionModels
             {
                 Permissions = roleModels.ToArray()
             });

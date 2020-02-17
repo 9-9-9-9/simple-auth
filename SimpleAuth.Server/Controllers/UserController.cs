@@ -114,7 +114,7 @@ namespace SimpleAuth.Server.Controllers
         /// In order to grant permission for user, manager has to set permissions for role group and then assign user to that group if user is not belong to it.
         /// </summary>
         /// <param name="userId">The target user which should be granted permission</param>
-        /// <param name="modifyUserRoleGroupsModel">The target role groups which should take the user</param>
+        /// <param name="modifyUserPermissionGroupsModel">The target role groups which should take the user</param>
         /// <response code="200">Assign user to the specific role groups completed</response>
         /// <response code="400">Request model is invalid</response>
         /// <response code="404">Target user id or role group not found</response>
@@ -123,9 +123,9 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> AssignUserToGroupsAsync(string userId,
-            [FromBody] ModifyUserRoleGroupsModel modifyUserRoleGroupsModel)
+            [FromBody] ModifyUserPermissionGroupsModel modifyUserPermissionGroupsModel)
         {
-            if ((modifyUserRoleGroupsModel?.RoleGroups?.Length ?? 0) == 0)
+            if ((modifyUserPermissionGroupsModel?.PermissionGroups?.Length ?? 0) == 0)
                 return BadRequest();
 
             return await ProcedureDefaultResponse(async () =>
@@ -137,14 +137,14 @@ namespace SimpleAuth.Server.Controllers
                     await Service.AssignUserToGroupsAsync(new Shared.Domains.User
                     {
                         Id = userId
-                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new PermissionGroup
+                    }, modifyUserPermissionGroupsModel.PermissionGroups.Select(x => new PermissionGroup
                     {
                         Name = x,
                         Corp = RequestAppHeaders.Corp,
                         App = RequestAppHeaders.App
                     }).ToArray());
                     _logger.LogInformation(
-                        $"Assigned user {userId} to groups {string.Join(',', modifyUserRoleGroupsModel.RoleGroups)} ({RequestAppHeaders.Corp}.{RequestAppHeaders.App})"
+                        $"Assigned user {userId} to groups {string.Join(',', modifyUserPermissionGroupsModel.PermissionGroups)} ({RequestAppHeaders.Corp}.{RequestAppHeaders.App})"
                     );
                 }
             );

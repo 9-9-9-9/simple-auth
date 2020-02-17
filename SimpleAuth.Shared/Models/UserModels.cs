@@ -64,8 +64,8 @@ namespace SimpleAuth.Shared.Models
         [DataMember(Name = "typ", IsRequired = false)] public string Typ { get; set; }
     }
 
-    public class ModifyUserRoleGroupsModel
+    public class ModifyUserPermissionGroupsModel
     {
-        public string[] RoleGroups { get; set; }
+        public string[] PermissionGroups { get; set; }
     }
 }

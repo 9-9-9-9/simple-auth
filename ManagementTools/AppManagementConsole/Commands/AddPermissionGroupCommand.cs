@@ -8,23 +8,23 @@ using SimpleAuth.Shared.Models;
 namespace AppManagementConsole.Commands
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class AddRoleGroupCommand : AbstractCommand
+    public class AddPermissionGroupCommand : AbstractCommand
     {
         private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public AddRoleGroupCommand(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
-            IRoleGroupManagementService roleGroupManagementService)
+        public AddPermissionGroupCommand(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
+            IPermissionGroupManagementService permissionGroupManagementService)
         {
             _simpleAuthConfigurationProvider = simpleAuthConfigurationProvider;
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
         }
 
         protected override Task DoMainJob(string[] args)
         {
             if (!TrySplittingRoleGroups(args[1], out var roleGroups, out var errMessage))
                 throw new InvalidOperationException(errMessage);
-            return _roleGroupManagementService.AddRoleGroupAsync(new CreatePermissionGroupModel
+            return _permissionGroupManagementService.AddRoleGroupAsync(new CreatePermissionGroupModel
             {
                 Name = args[0],
                 Corp = _simpleAuthConfigurationProvider.Corp,

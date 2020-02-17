@@ -76,7 +76,7 @@ namespace SimpleAuth.Services
                 {
                     localUserInfo.ToDomainObject()
                 },
-                RoleGroups = user.PermissionGroupUsers.OrEmpty()
+                PermissionGroups = user.PermissionGroupUsers.OrEmpty()
                     .Where(x => x.PermissionGroup.Corp == corp)
                     .Select(x => new PermissionGroup
                     {

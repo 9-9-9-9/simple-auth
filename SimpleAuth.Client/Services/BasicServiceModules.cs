@@ -11,7 +11,7 @@ namespace SimpleAuth.Client.Services
             
             serviceCollection.AddSingleton<IRoleManagementService, DefaultRoleManagementService>();
             
-            serviceCollection.AddSingleton<IRoleGroupManagementService, DefaultRoleGroupManagementService>();
+            serviceCollection.AddSingleton<IPermissionGroupManagementService, DefaultPermissionGroupManagementService>();
             
             serviceCollection.AddSingleton<IUserManagementService, DefaultUserManagementService>();
             

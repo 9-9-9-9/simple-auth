@@ -10,21 +10,21 @@ using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Client.Services
 {
-    public interface IRoleGroupManagementService
+    public interface IPermissionGroupManagementService
     {
         Task AddRoleGroupAsync(CreatePermissionGroupModel createPermissionGroupModel);
-        Task<PermissionGroup> GetRoleGroupAsync(string roleGroupName);
+        Task<PermissionGroup> GetPermissionGroupAsync(string roleGroupName);
         Task AddRoleToGroupAsync(string roleGroupName, PermissionModels updatePermissionsModel);
         Task DeleteRolesAsync(string roleGroupName, params PermissionModel[] roleModels);
         Task DeleteAllRolesAsync(string roleGroupName);
         Task SetLockRoleGroup(string roleGroupName, bool @lock);
     }
 
-    public class DefaultRoleGroupManagementService : ClientService, IRoleGroupManagementService
+    public class DefaultPermissionGroupManagementService : ClientService, IPermissionGroupManagementService
     {
         private readonly IHttpService _httpService;
 
-        public DefaultRoleGroupManagementService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
+        public DefaultPermissionGroupManagementService(ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider,
             IHttpService httpService) : base(simpleAuthConfigurationProvider)
         {
             _httpService = httpService;
@@ -47,7 +47,7 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public Task<PermissionGroup> GetRoleGroupAsync(string roleGroupName)
+        public Task<PermissionGroup> GetPermissionGroupAsync(string roleGroupName)
         {
             return _httpService.DoHttpRequestWithResponseContentAsync<PermissionGroup>(
                 NewRequest()

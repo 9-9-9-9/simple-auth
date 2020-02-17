@@ -14,12 +14,12 @@ namespace AppManagementConsole.Commands
     public class RevokePermissionCommand : AbstractCommand
     {
         private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public RevokePermissionCommand(IRoleGroupManagementService roleGroupManagementService,
+        public RevokePermissionCommand(IPermissionGroupManagementService permissionGroupManagementService,
             ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider)
         {
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
             _simpleAuthConfigurationProvider = simpleAuthConfigurationProvider;
         }
 
@@ -32,7 +32,7 @@ namespace AppManagementConsole.Commands
             if (!Enum.TryParse(typeof(Verb), strPermission, true, out var enumPermission))
                 throw new ArgumentException($"{strPermission} is not a valid permission");
 
-            return _roleGroupManagementService.DeleteRolesAsync(roleGroupName, 
+            return _permissionGroupManagementService.DeleteRolesAsync(roleGroupName, 
                 new PermissionModel
                 {
                     Role =
