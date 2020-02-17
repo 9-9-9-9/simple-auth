@@ -25,9 +25,9 @@ namespace SimpleAuth.Services.Entities
 
     public partial class RoleGroup
     {
-        public Shared.Domains.RoleGroup ToDomainObject()
+        public Shared.Domains.PermissionGroup ToDomainObject()
         {
-            return new Shared.Domains.RoleGroup
+            return new Shared.Domains.PermissionGroup
             {
                 Name = Name,
                 Corp = Corp,

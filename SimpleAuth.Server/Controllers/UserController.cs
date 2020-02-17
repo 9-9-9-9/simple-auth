@@ -9,13 +9,13 @@ using SimpleAuth.Repositories;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Services;
-using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Validation;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
-using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
+using User = SimpleAuth.Services.Entities.User;
 
 namespace SimpleAuth.Server.Controllers
 {
@@ -137,7 +137,7 @@ namespace SimpleAuth.Server.Controllers
                     await Service.AssignUserToGroupsAsync(new Shared.Domains.User
                     {
                         Id = userId
-                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new RoleGroup
+                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new PermissionGroup
                     {
                         Name = x,
                         Corp = RequestAppHeaders.Corp,

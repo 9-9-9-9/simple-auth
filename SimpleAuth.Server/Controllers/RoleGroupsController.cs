@@ -10,6 +10,7 @@ using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
@@ -23,7 +24,7 @@ namespace SimpleAuth.Server.Controllers
     /// </summary>
     [Route("api/role-groups")]
     [RequireAppToken]
-    public class RoleGroupsController : BaseController<IRoleGroupService, IRoleGroupRepository, RoleGroup>
+    public class RoleGroupsController : BaseController<IPermissionGroupService, IRoleGroupRepository, RoleGroup>
     {
         private readonly IRoleGroupValidationService _roleGroupValidation;
         private readonly ILogger<RoleGroupsController> _logger;
@@ -50,7 +51,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> AddRoleGroup([FromBody] CreateRoleGroupModel model)
+        public async Task<IActionResult> AddRoleGroup([FromBody] CreatePermissionGroupModel model)
         {
             if (model.Name.IsBlank())
                 model.Name = $"{model.Corp}-{model.App}-{Guid.NewGuid().ToString().Replace("-", "").Substring(0, 8)}"
@@ -67,7 +68,7 @@ namespace SimpleAuth.Server.Controllers
                 return BadRequest(vr.Message);
 
             return await ProcedureResponseForPersistAction(async () =>
-                await Service.AddRoleGroupAsync(model)
+                await Service.AddGroupAsync(model)
             );
         }
 
@@ -75,7 +76,7 @@ namespace SimpleAuth.Server.Controllers
         /// Get specific role group information
         /// </summary>
         /// <param name="name">Name of the role group</param>
-        /// <returns>Information of the role group, refer domain model <see cref="SimpleAuth.Shared.Domains.RoleGroup"/></returns>
+        /// <returns>Information of the role group, refer domain model <see cref="PermissionGroup"/></returns>
         /// <response code="200">Role Group information retrieved successfully</response>
         /// <response code="404">Role Group could not be found</response>
         [HttpGet("{name}")]
@@ -130,7 +131,7 @@ namespace SimpleAuth.Server.Controllers
             return await ProcedureDefaultResponse(async () =>
             {
                 var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
-                await Service.AddRolesToGroupAsync(group, model.Permissions);
+                await Service.AddPermissionsToGroupAsync(group, model.Permissions);
             });
         }
 
@@ -160,16 +161,16 @@ namespace SimpleAuth.Server.Controllers
 
             return await ProcedureDefaultResponse(async () =>
             {
-                var group = new Shared.Domains.RoleGroup
+                var group = new Shared.Domains.PermissionGroup
                 {
                     Name = groupName,
                     Corp = RequestAppHeaders.Corp,
                     App = RequestAppHeaders.App
                 };
                 if (all)
-                    await Service.DeleteAllRolesFromGroupAsync(group);
+                    await Service.DeleteAllPermissionsFromGroupAsync(group);
                 else
-                    await Service.DeleteRolesFromGroupAsync(group, roles.Select(RoleUtils.UnMerge)
+                    await Service.DeletePermissionsFromGroupAsync(group, roles.Select(RoleUtils.UnMerge)
                         .Select(tp => new PermissionModel
                         {
                             Role = tp.Item1,
@@ -202,7 +203,7 @@ namespace SimpleAuth.Server.Controllers
                 findOptions =>
                     Task.FromResult(
                         Service
-                            .SearchRoleGroups(term, RequestAppHeaders.Corp, RequestAppHeaders.App, findOptions)
+                            .SearchGroups(term, RequestAppHeaders.Corp, RequestAppHeaders.App, findOptions)
                             .Select(x => x.Name)
                     )
             );
@@ -223,7 +224,7 @@ namespace SimpleAuth.Server.Controllers
             
             return await ProcedureDefaultResponse(async () =>
                 {
-                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.PermissionGroup
                     {
                         Name = groupName,
                         Corp = RequestAppHeaders.Corp,
@@ -249,7 +250,7 @@ namespace SimpleAuth.Server.Controllers
             
             return await ProcedureDefaultResponse(async () =>
                 {
-                    await Service.UpdateLockStatusAsync(new Shared.Domains.RoleGroup
+                    await Service.UpdateLockStatusAsync(new Shared.Domains.PermissionGroup
                     {
                         Name = groupName,
                         Corp = RequestAppHeaders.Corp,
@@ -260,9 +261,9 @@ namespace SimpleAuth.Server.Controllers
             );
         }
 
-        private async Task<Shared.Domains.RoleGroup> FindRoleGroupAsync(string name, string corp, string app)
+        private async Task<Shared.Domains.PermissionGroup> FindRoleGroupAsync(string name, string corp, string app)
         {
-            var group = await Service.GetRoleGroupByNameAsync(name, corp, app);
+            var group = await Service.GetGroupByNameAsync(name, corp, app);
             if (group == null)
                 throw new EntityNotExistsException(name);
             return group;

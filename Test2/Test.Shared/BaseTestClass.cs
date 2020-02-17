@@ -10,14 +10,15 @@ using SimpleAuth.Core.DependencyInjection;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Models;
 using Test.SimpleAuth.Shared.Mock.Repositories;
 using Test.SimpleAuth.Shared.Mock.Services;
+using Role = SimpleAuth.Services.Entities.Role;
 using Shared_ProjectRegistrableModules = SimpleAuth.Shared.ProjectRegistrableModules;
 using Services_ProjectRegistrableModules = SimpleAuth.Services.ProjectRegistrableModules;
 //using Sql_ProjectRegistrableModules = SimpleAuth.Sqlite.ProjectRegistrableModules;
 using Sql_ProjectRegistrableModules = SimpleAuth.InMemoryDb.ProjectRegistrableModules;
-using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
 using User = SimpleAuth.Shared.Domains.User;
 
 namespace Test.Shared
@@ -170,15 +171,15 @@ namespace Test.Shared
             });
         }
 
-        protected async Task AddRoleGroupAsync(IRoleGroupService svc, string name, string corp, string app,
+        protected async Task AddRoleGroupAsync(IPermissionGroupService svc, string name, string corp, string app,
             params string[] copyFrom)
         {
-            await svc.AddRoleGroupAsync(new CreateRoleGroupModel
+            await svc.AddGroupAsync(new CreatePermissionGroupModel
             {
                 Name = name,
                 Corp = corp,
                 App = app,
-                CopyFromRoleGroups = copyFrom
+                CopyFromPermissionGroups = copyFrom
             });
         }
 
@@ -207,7 +208,7 @@ namespace Test.Shared
                 },
                 new[]
                 {
-                    new RoleGroup
+                    new PermissionGroup
                     {
                         Name = name,
                         Corp = corp,
@@ -227,14 +228,14 @@ namespace Test.Shared
             );
         }
 
-        protected IEnumerable<RoleGroup> YieldGroup(params string[] groupIdentities)
+        protected IEnumerable<PermissionGroup> YieldGroup(params string[] groupIdentities)
         {
             foreach (var tp in groupIdentities)
             {
                 var spl = tp.Split('.', 3);
 
                 Assert.AreEqual(3, spl.Length);
-                yield return new RoleGroup
+                yield return new PermissionGroup
                 {
                     Name = spl[0],
                     Corp = spl[1],

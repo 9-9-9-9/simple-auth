@@ -12,8 +12,8 @@ namespace SimpleAuth.Client.Services
 {
     public interface IRoleGroupManagementService
     {
-        Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel);
-        Task<RoleGroup> GetRoleGroupAsync(string roleGroupName);
+        Task AddRoleGroupAsync(CreatePermissionGroupModel createPermissionGroupModel);
+        Task<PermissionGroup> GetRoleGroupAsync(string roleGroupName);
         Task AddRoleToGroupAsync(string roleGroupName, PermissionModels updatePermissionsModel);
         Task DeleteRolesAsync(string roleGroupName, params PermissionModel[] roleModels);
         Task DeleteAllRolesAsync(string roleGroupName);
@@ -36,20 +36,20 @@ namespace SimpleAuth.Client.Services
                 .WithAppToken();
         }
 
-        public Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel)
+        public Task AddRoleGroupAsync(CreatePermissionGroupModel createPermissionGroupModel)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
                     .Append(EndpointBuilder.RoleGroupManagement.AddRoleGroup)
                     .Method(Constants.HttpMethods.POST),
-                createRoleGroupModel.JsonSerialize()
+                createPermissionGroupModel.JsonSerialize()
             );
         }
 
-        public Task<RoleGroup> GetRoleGroupAsync(string roleGroupName)
+        public Task<PermissionGroup> GetRoleGroupAsync(string roleGroupName)
         {
-            return _httpService.DoHttpRequestWithResponseContentAsync<RoleGroup>(
+            return _httpService.DoHttpRequestWithResponseContentAsync<PermissionGroup>(
                 NewRequest()
                     .Append(EndpointBuilder.RoleGroupManagement.GetRoles(roleGroupName))
                     .Method(Constants.HttpMethods.GET)

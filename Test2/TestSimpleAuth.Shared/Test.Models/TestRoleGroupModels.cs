@@ -11,7 +11,7 @@ namespace Test.SimpleAuth.Shared.Test.Models
         [Test]
         public void Cast()
         {
-            var rg = new RoleGroup
+            var rg = new PermissionGroup
             {
                 Name = "rg",
                 Roles = null,
@@ -20,13 +20,13 @@ namespace Test.SimpleAuth.Shared.Test.Models
                 Locked = false
             };
 
-            var res = RoleGroupResponseModel.Cast(rg);
+            var res = PermissionGroupResponseModel.Cast(rg);
             Assert.NotNull(res);
             Assert.AreEqual(rg.Name, res.Name);
             Assert.IsNotNull(res.Roles);
             Assert.AreEqual(0, res.Roles.Length);
 
-            rg = new RoleGroup
+            rg = new PermissionGroup
             {
                 Roles = new[]
                 {
@@ -44,7 +44,7 @@ namespace Test.SimpleAuth.Shared.Test.Models
                 }
             };
             
-            res = RoleGroupResponseModel.Cast(rg);
+            res = PermissionGroupResponseModel.Cast(rg);
             Assert.NotNull(res);
             Assert.IsNotNull(res.Roles);
             Assert.AreEqual(2, res.Roles.Length);

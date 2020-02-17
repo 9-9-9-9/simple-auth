@@ -275,18 +275,18 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.AssignUserToGroupsAsync(null, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 }
             }));
 
             Assert.CatchAsync<ArgumentException>(async () =>
-                await svc.AssignUserToGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]));
+                await svc.AssignUserToGroupsAsync(user, new global::SimpleAuth.Shared.Domains.PermissionGroup[0]));
 
             Assert.CatchAsync<ArgumentException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 },
@@ -295,12 +295,12 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<InvalidOperationException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
                 },
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app2
@@ -313,7 +313,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
@@ -334,7 +334,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Name = roleGroup2,
                     Corp = corp1,
@@ -344,7 +344,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Name = roleGroup1,
                     Corp = corp1,
@@ -379,7 +379,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromGroupsAsync(null, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 }
@@ -387,12 +387,12 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromGroupsAsync(user, null));
 
-            await svc.UnAssignUserFromGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]);
+            await svc.UnAssignUserFromGroupsAsync(user, new global::SimpleAuth.Shared.Domains.PermissionGroup[0]);
             mockRoleGroupUserRepository.VerifyNoOtherCalls();
 
             Assert.CatchAsync<ArgumentException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 },
@@ -401,12 +401,12 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<InvalidOperationException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
                 },
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app2
@@ -417,7 +417,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
@@ -440,13 +440,13 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Name = roleGroup1,
                     Corp = corp1,
                     App = app1
                 },
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Name = roleGroup2,
                     Corp = corp1,
@@ -456,7 +456,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Name = roleGroup1,
                     Corp = corp1,

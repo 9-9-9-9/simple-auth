@@ -27,12 +27,12 @@ namespace Test.SimpleAuth.Shared.Test.Validation
                 copyFrom = theGroupsToCopyFrom.Split('\'');
             }
             //CreateRoleGroupModel
-            return Svc<IRoleGroupValidationService>().IsValid(new CreateRoleGroupModel
+            return Svc<IRoleGroupValidationService>().IsValid(new CreatePermissionGroupModel
             {
                 Name = name,
                 Corp = corp,
                 App = app,
-                CopyFromRoleGroups = copyFrom
+                CopyFromPermissionGroups = copyFrom
             }).IsValid;
         }
     }

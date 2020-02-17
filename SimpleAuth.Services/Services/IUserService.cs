@@ -14,7 +14,6 @@ using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
 using Role = SimpleAuth.Shared.Domains.Role;
-using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
 using User = SimpleAuth.Shared.Domains.User;
 
 namespace SimpleAuth.Services
@@ -23,8 +22,8 @@ namespace SimpleAuth.Services
     {
         User GetUser(string userId, string corp);
         Task CreateUserAsync(User user, LocalUserInfo localUserInfo);
-        Task AssignUserToGroupsAsync(User user, RoleGroup[] roleGroups);
-        Task UnAssignUserFromGroupsAsync(User user, RoleGroup[] roleGroups);
+        Task AssignUserToGroupsAsync(User user, PermissionGroup[] roleGroups);
+        Task UnAssignUserFromGroupsAsync(User user, PermissionGroup[] roleGroups);
         Task UnAssignUserFromAllGroupsAsync(User user, string corp);
 
         Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null,
@@ -79,7 +78,7 @@ namespace SimpleAuth.Services
                 },
                 RoleGroups = user.RoleGroupUsers.OrEmpty()
                     .Where(x => x.RoleGroup.Corp == corp)
-                    .Select(x => new RoleGroup
+                    .Select(x => new PermissionGroup
                     {
                         Name = x.RoleGroup.Name,
                         Corp = corp,
@@ -108,7 +107,7 @@ namespace SimpleAuth.Services
             }.WithRandomId());
         }
 
-        public async Task AssignUserToGroupsAsync(User user, RoleGroup[] roleGroups)
+        public async Task AssignUserToGroupsAsync(User user, PermissionGroup[] roleGroups)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -150,7 +149,7 @@ namespace SimpleAuth.Services
             }, lookupRoleGroups);
         }
 
-        public async Task UnAssignUserFromGroupsAsync(User user, RoleGroup[] roleGroups)
+        public async Task UnAssignUserFromGroupsAsync(User user, PermissionGroup[] roleGroups)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));

@@ -24,12 +24,12 @@ namespace AppManagementConsole.Commands
         {
             if (!TrySplittingRoleGroups(args[1], out var roleGroups, out var errMessage))
                 throw new InvalidOperationException(errMessage);
-            return _roleGroupManagementService.AddRoleGroupAsync(new CreateRoleGroupModel
+            return _roleGroupManagementService.AddRoleGroupAsync(new CreatePermissionGroupModel
             {
                 Name = args[0],
                 Corp = _simpleAuthConfigurationProvider.Corp,
                 App = _simpleAuthConfigurationProvider.App,
-                CopyFromRoleGroups = roleGroups
+                CopyFromPermissionGroups = roleGroups
             }).ContinueWith(_ => Print("Added"));
         }
 
