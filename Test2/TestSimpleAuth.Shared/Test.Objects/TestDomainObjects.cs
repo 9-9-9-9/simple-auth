@@ -16,7 +16,7 @@ namespace Test.SimpleAuth.Shared.Test.Objects
                 Verb = Verb.Add
             };
 
-            var crm = role.ToClientRoleModel();
+            var crm = role.ToClientPermissionModel();
             Assert.NotNull(crm);
             Assert.AreEqual("c", crm.Corp);
             Assert.AreEqual("a", crm.App);

@@ -65,7 +65,7 @@ namespace AppManagementConsole.Commands
 
         public override string[] GetParametersName()
         {
-            return new[] {"Role Group name"};
+            return new[] {"Permissions Group name"};
         }
 
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)

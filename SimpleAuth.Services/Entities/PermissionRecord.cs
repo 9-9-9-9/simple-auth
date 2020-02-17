@@ -26,7 +26,7 @@ namespace SimpleAuth.Services.Entities
         }
     }
 
-    public static class RoleRecordExtensions
+    public static class PermissionRecordExtensions
     {
         public static PermissionRecord ToEntityObject(this Shared.Domains.Permission permission)
         {

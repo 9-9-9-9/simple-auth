@@ -194,11 +194,11 @@ namespace Test.SimpleAuth.Services.Test.Services
             var corp = RandomCorp();
             var app = RandomApp();
 
-            // If role group already exists, then throwing EntityAlreadyExistsException
+            // If permission group already exists, then throwing EntityAlreadyExistsException
             SetupFindReturns(new PermissionGroup());
             Assert.CatchAsync<EntityAlreadyExistsException>(async () => await PerformAdd());
 
-            // If role group is not exists then new group would be created correctly
+            // If permission group is not exists then new group would be created correctly
             // WITHOUT option copy from group
             SetupFindReturns(null);
             mockPermissionGroupRepo.Setup(x => x.CreateManyAsync(It.IsAny<IEnumerable<PermissionGroup>>())).ReturnsAsync(1);
@@ -209,13 +209,13 @@ namespace Test.SimpleAuth.Services.Test.Services
                     x.Id != Guid.Empty && x.Name == permissionGroup && x.Corp == corp && x.App == app && !x.Locked))));
             // ReSharper restore PossibleMultipleEnumeration
 
-            // If role group is not exists then new group would be created correctly
+            // If permission group is not exists then new group would be created correctly
             // When specify group to be copied from, but group does not exists then EntityNotExistsException is expected
             SetupFindReturns(null);
             SetupFindManyReturns(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await PerformAdd(true));
 
-            // If role group is not exists then new group would be created correctly
+            // If permission group is not exists then new group would be created correctly
             // When specify group to be copied from, AND group exists then should be executed without problem
             SetupFindReturns(null);
             SetupFindManyReturns(new[]
@@ -380,7 +380,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             {
                 new PermissionModel(), null
             }));
-            // RoleIds must from corp and app of the provided domain role group
+            // RoleIds must from corp and app of the provided domain permission group
             Assert.CatchAsync<SimpleAuthSecurityException>(async () => await svc.AddPermissionsToGroupAsync(rg1, new[]
             {
                 new PermissionModel
@@ -460,7 +460,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 It.Is<List<PermissionRecord>>(rrs => rrs.Count == 2 /*still 2*/)));
 
             Task SetupFindSingleReturnsAndThenUpdate(
-                ICollection<PermissionRecord> existingRoleRecords = null)
+                ICollection<PermissionRecord> existingPermissionRecords = null)
             {
                 mockPermissionGroupRepo
                     .Setup(x => x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()))
@@ -469,7 +469,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                         Name = permissionGroup1,
                         Corp = corp1,
                         App = app1,
-                        PermissionRecords = existingRoleRecords
+                        PermissionRecords = existingPermissionRecords
                     });
 
                 return svc.AddPermissionsToGroupAsync(new global::SimpleAuth.Shared.Domains.PermissionGroup
@@ -523,7 +523,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             {
                 new PermissionModel(), null
             }));
-            // RoleIds must from corp and app of the provided domain role group
+            // RoleIds must from corp and app of the provided domain permission group
             Assert.CatchAsync<SimpleAuthSecurityException>(async () => await svc.DeletePermissionsFromGroupAsync(rg1, new[]
             {
                 new PermissionModel
@@ -542,7 +542,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             }));
             rg1.Permissions = null;
 
-            // if role group does not exists, so throwing EntityNotExistsException
+            // if permission group does not exists, so throwing EntityNotExistsException
 //TODO
 
             // if role not found so throw EntityNotExistsException
@@ -575,7 +575,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             }));
 
-            // if role group not found so throw EntityNotExistsException
+            // if permission group not found so throw EntityNotExistsException
             SetupFindSinglePermissionGroup(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeletePermissionsFromGroupAsync(rg1, new[]
             {
@@ -586,7 +586,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 }
             }));
 
-            // if role group does not contains any roles, so stop execution immediately
+            // if permission group does not contains any roles, so stop execution immediately
             ResetMocks();
             SetupFindSinglePermissionGroup(new PermissionGroup
             {
@@ -618,9 +618,9 @@ namespace Test.SimpleAuth.Services.Test.Services
                 App = app1,
                 PermissionRecords = new List<PermissionRecord>
                 {
-                    RoleRecord(1, corp1, app1, Verb.Add),
-                    RoleRecord(2, corp1, app1, Verb.Add, Verb.Edit),
-                    RoleRecord(3, corp1, app1, Verb.Crud),
+                    PermissionRecord(1, corp1, app1, Verb.Add),
+                    PermissionRecord(2, corp1, app1, Verb.Add, Verb.Edit),
+                    PermissionRecord(3, corp1, app1, Verb.Crud),
                 }
             });
             SetupFindSingleRoleAsyncReturns(1, out var expectedEnv, out var expectedTenant);
@@ -679,7 +679,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 mockRoleRepo.Reset();
             }
 
-            PermissionRecord RoleRecord(int moduleNo, string corp, string app, params Verb[] permissions)
+            PermissionRecord PermissionRecord(int moduleNo, string corp, string app, params Verb[] permissions)
             {
                 return new PermissionRecord
                 {
@@ -729,11 +729,11 @@ namespace Test.SimpleAuth.Services.Test.Services
             // Argument verification
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteAllPermissionsFromGroupAsync(null));
 
-            // if role group does not exists, so throwing EntityNotExistsException
+            // if permission group does not exists, so throwing EntityNotExistsException
             SetupFindSinglePermissionGroup(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteAllPermissionsFromGroupAsync(rg1));
 
-            // if role group does not have any RoleRecord, so stop execution, nothing more to do
+            // if permission group does not have any PermissionRecord, so stop execution, nothing more to do
             SetupFindSinglePermissionGroup(new PermissionGroup
             {
                 Name = permissionGroup1,
@@ -746,7 +746,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 x.FindSingleAsync(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>()));
             mockPermissionGroupRepo.VerifyNoOtherCalls();
 
-            // if role group contains RoleRecord(s), check if Repository.UpdateRoleRecordsAsync(PermissionGroup permissionGroup, List<RoleRecord> newRoles) receives an empty `newRoles`
+            // if permission group contains PermissionRecord(s), check if Repository.UpdatePermissionRecordsAsync(PermissionGroup permissionGroup, List<PermissionRecord> newPermissions) receives an empty `newRoles`
             mockPermissionGroupRepo.Reset();
             SetupFindSinglePermissionGroup(new PermissionGroup
             {
@@ -795,7 +795,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             // Argument verification
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteGroupAsync(null));
 
-            // if role group does not exists, so throwing EntityNotExistsException
+            // if permission group does not exists, so throwing EntityNotExistsException
             SetupFindSinglePermissionGroup(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteGroupAsync(rg1));
 
@@ -815,7 +815,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             // ReSharper restore PossibleMultipleEnumeration
             mockPermissionGroupRepo.VerifyNoOtherCalls();
 
-            // if role group contains RoleRecord(s), check if Repository.UpdateRoleRecordsAsync(PermissionGroup permissionGroup, List<RoleRecord> newRoles) receives an empty `newRoles`
+            // if permission group contains PermissionRecord(s), check if Repository.UpdatePermissionRecordsAsync(PermissionGroup permissionGroup, List<PermissionRecord> newPermissions) receives an empty `newPermissions`
             mockPermissionGroupRepo.Reset();
             SetupFindSinglePermissionGroup(new PermissionGroup
             {

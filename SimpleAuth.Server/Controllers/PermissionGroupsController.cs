@@ -237,7 +237,7 @@ namespace SimpleAuth.Server.Controllers
         /// <summary>
         /// UnLock specific permission group
         /// </summary>
-        /// <param name="groupName">Name of the role group which should be unlocked</param>
+        /// <param name="groupName">Name of the permission group which should be unlocked</param>
         /// <response code="200">Operation had been completed successfully</response>
         /// <response code="404">Permission Group could not be found</response>
         [HttpDelete("{groupName}/lock")]

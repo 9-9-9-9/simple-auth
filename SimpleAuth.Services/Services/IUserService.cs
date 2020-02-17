@@ -225,9 +225,9 @@ namespace SimpleAuth.Services
             string env = null,
             string tenant = null)
         {
-            var roleRecords = await FindRoleRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
+            var permissionRecords = await FindPermissionRecordsBasedOnFilterAsync(userId, corp, app, env, tenant);
 
-            var roles = roleRecords
+            var roles = permissionRecords
                 .Select(x => x.ToDomainObject())
                 .ToList();
 
@@ -248,7 +248,7 @@ namespace SimpleAuth.Services
             roles = roles.Where(x => !lockedRoles.Contains(x.RoleId)).ToList();
             roles = roles.DistinctRoles().ToList();
             roles = roles
-                .Select(x => x.ToClientRoleModel())
+                .Select(x => x.ToClientPermissionModel())
                 .DistinctPermissions()
                 .Select(x => x.ToRole())
                 .ToList();
@@ -263,7 +263,7 @@ namespace SimpleAuth.Services
                 throw new ArgumentException("Permission None is not a valid option");
 
             var activeRoles = await GetActiveRolesAsync(userId, corp, app);
-            var userActiveClientRoleModels = activeRoles.Select(x => x.ToClientRoleModel());
+            var userActiveClientRoleModels = activeRoles.Select(x => x.ToClientPermissionModel());
 
             var requireClientRoleModels = permissions
                 .SelectMany(x => RoleUtils.ParseToMinimum(x.Item1, x.Item2))
@@ -282,7 +282,7 @@ namespace SimpleAuth.Services
             return missing.Select(x => x.ToRole()).ToList();
         }
 
-        private async Task<IEnumerable<PermissionRecord>> FindRoleRecordsBasedOnFilterAsync(string userId, string corp,
+        private async Task<IEnumerable<PermissionRecord>> FindPermissionRecordsBasedOnFilterAsync(string userId, string corp,
             string app, string env, string tenant)
         {
             if (userId.IsBlank())

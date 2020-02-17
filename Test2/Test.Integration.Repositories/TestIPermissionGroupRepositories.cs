@@ -48,7 +48,7 @@ namespace Test.Integration.Repositories
         }
 
         [Test]
-        public async Task UpdateRoleRecordsAsync()
+        public async Task UpdatePermissionRecordsAsync()
         {
             var sp = Prepare();
             var permissionGroupRepository = sp.GetRequiredService<IPermissionGroupRepository>();
@@ -190,7 +190,7 @@ namespace Test.Integration.Repositories
             }));
             await RemoveUserFromGroup();
 
-            // should wipe all related role records
+            // should wipe all related permission records
             Assert.AreEqual(3, GetGroup().PermissionRecords.Count);
             await permissionGroupRepository.DeleteAsync(new PermissionGroup
             {

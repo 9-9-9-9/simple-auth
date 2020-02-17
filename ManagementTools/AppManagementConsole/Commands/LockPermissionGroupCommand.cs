@@ -25,7 +25,7 @@ namespace AppManagementConsole.Commands
 
         public override string[] GetParametersName()
         {
-            return new[] {"Role Group name", "Lock or Unlock"};
+            return new[] {"Permission Group name", "Lock or Unlock"};
         }
 
         // ReSharper disable RedundantJumpStatement

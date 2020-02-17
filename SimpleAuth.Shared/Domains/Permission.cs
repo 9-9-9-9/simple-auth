@@ -13,11 +13,11 @@ namespace SimpleAuth.Shared.Domains
         public bool Locked { get; set; }
         public Verb Verb { get; set; }
 
-        public ClientPermissionModel ToClientRoleModel()
+        public ClientPermissionModel ToClientPermissionModel()
         {
-            RoleUtils.Parse(RoleId, out var clientRoleModel);
-            clientRoleModel.Verb = Verb;
-            return clientRoleModel;
+            RoleUtils.Parse(RoleId, out var clientPermissionModel);
+            clientPermissionModel.Verb = Verb;
+            return clientPermissionModel;
         }
 
         public PermissionModel Cast()

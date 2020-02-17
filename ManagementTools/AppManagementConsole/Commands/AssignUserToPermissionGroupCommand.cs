@@ -29,7 +29,7 @@ namespace AppManagementConsole.Commands
 
         public override string[] GetParametersName()
         {
-            return new[] {"User Id", "Role Group name"};
+            return new[] {"User Id", "Permission Group name"};
         }
 
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)

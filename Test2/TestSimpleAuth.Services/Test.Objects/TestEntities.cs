@@ -157,7 +157,7 @@ namespace Test.SimpleAuth.Services.Test.Objects
         }
     }
 
-    public class TestRoleRecordExtensions
+    public class TestPermissionRecordExtensions
     {
         [Test]
         public void ToEntityObject()
