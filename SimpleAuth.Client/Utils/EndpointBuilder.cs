@@ -32,8 +32,8 @@ namespace SimpleAuth.Client.Utils
         {
             public const string AddPermissionGroup = "api/permission-groups";
             public static string GetPermissions(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}";
-            public static string AddPermissionToGroup(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/roles";
-            public static string DeletePermissions(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/roles";
+            public static string AddPermissionToGroup(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/permissions";
+            public static string DeletePermissions(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/permissions";
             public static string UpdateLock(string permissionGroupName) => $"api/permission-groups/{permissionGroupName}/lock";
         }
     }
