@@ -11,21 +11,21 @@ namespace SimpleAuth.Shared.Domains
     {
         public string RoleId { get; set; }
         public bool Locked { get; set; }
-        public Permission Permission { get; set; }
+        public Verb Verb { get; set; }
 
-        public ClientRoleModel ToClientRoleModel()
+        public ClientPermissionModel ToClientRoleModel()
         {
             RoleUtils.Parse(RoleId, out var clientRoleModel);
-            clientRoleModel.Permission = Permission;
+            clientRoleModel.Verb = Verb;
             return clientRoleModel;
         }
 
-        public RoleModel Cast()
+        public PermissionModel Cast()
         {
-            return new RoleModel
+            return new PermissionModel
             {
                 Role = RoleId,
-                Permission = Permission.Serialize()
+                Verb = Verb.Serialize()
             };
         }
     }
@@ -36,15 +36,15 @@ namespace SimpleAuth.Shared.Domains
         {
             foreach (var sameRoles in source.OrEmpty().GroupBy(r => r.RoleId))
             {
-                var permission = Permission.None.Grant(sameRoles.Select(r => r.Permission).ToArray());
+                var permission = Verb.None.Grant(sameRoles.Select(r => r.Verb).ToArray());
                 
-                if (permission == Permission.None)
+                if (permission == Verb.None)
                     continue;
 
                 yield return new Role
                 {
                     RoleId = sameRoles.Key,
-                    Permission = permission
+                    Verb = permission
                 };
             }
         }

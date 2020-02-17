@@ -94,7 +94,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             var result = svc.SearchRoles("term", "c", "a").ToArray();
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual("c.a.e.t.m", result[0].RoleId);
-            Assert.AreEqual(Permission.None, result[0].Permission);
+            Assert.AreEqual(Verb.None, result[0].Verb);
 
             mockRoleRepository.Setup(x =>
                     x.Search(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<FindOptions>()))

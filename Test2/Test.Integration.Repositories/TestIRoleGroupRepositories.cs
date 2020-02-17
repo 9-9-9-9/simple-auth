@@ -79,7 +79,7 @@ namespace Test.Integration.Repositories
                     RoleId = $"{corp}.a1.e.t.m1",
                     Env = "e",
                     Tenant = "t",
-                    Permission = Permission.Add | Permission.Edit
+                    Verb = Verb.Add | Verb.Edit
                 }
             });
             Assert.AreEqual(1, GetGroup().RoleRecords.Count());
@@ -95,14 +95,14 @@ namespace Test.Integration.Repositories
                     RoleId = $"{corp}.a1.e.t.m2",
                     Env = "e",
                     Tenant = "t",
-                    Permission = Permission.Add | Permission.Edit
+                    Verb = Verb.Add | Verb.Edit
                 },
                 new RoleRecord
                 {
                     RoleId = $"{corp}.a1.e.t.m3",
                     Env = "e",
                     Tenant = "t",
-                    Permission = Permission.Add | Permission.Edit
+                    Verb = Verb.Add | Verb.Edit
                 }
             });
             Assert.AreEqual(2, GetGroup().RoleRecords.Count());
@@ -118,11 +118,11 @@ namespace Test.Integration.Repositories
                     RoleId = $"{corp}.a1.e.t.m2",
                     Env = "e",
                     Tenant = "t",
-                    Permission = Permission.Delete
+                    Verb = Verb.Delete
                 }
             });
-            Assert.AreEqual(Permission.Delete,
-                GetGroup().RoleRecords.First(x => x.RoleId == $"{corp}.a1.e.t.m2").Permission);
+            Assert.AreEqual(Verb.Delete,
+                GetGroup().RoleRecords.First(x => x.RoleId == $"{corp}.a1.e.t.m2").Verb);
 
             Task CreateRoles(params int[] ids)
             {
@@ -230,7 +230,7 @@ namespace Test.Integration.Repositories
                         RoleId = $"{corp}.a1.{env}.{tenant}.m{x}",
                         Env = env,
                         Tenant = tenant,
-                        Permission = Permission.Add
+                        Verb = Verb.Add
                     }
                 ).ToList());
             }

@@ -29,20 +29,20 @@ namespace AppManagementConsole.Commands
             var roleIdWithoutCorpAndApp = args[1];
             var strPermission = args[2];
 
-            if (!Enum.TryParse(typeof(Permission), strPermission, true, out var enumPermission))
+            if (!Enum.TryParse(typeof(Verb), strPermission, true, out var enumPermission))
                 throw new ArgumentException($"{strPermission} is not a valid permission");
 
             return _roleGroupManagementService.DeleteRolesAsync(roleGroupName, 
-                new RoleModel
+                new PermissionModel
                 {
                     Role =
                         $"{_simpleAuthConfigurationProvider.Corp}{Constants.SplitterRoleParts}{_simpleAuthConfigurationProvider.App}{Constants.SplitterRoleParts}{roleIdWithoutCorpAndApp}",
-                    Permission = ((Permission) enumPermission).Serialize()
+                    Verb = ((Verb) enumPermission).Serialize()
                 });
         }
 
-        private static readonly string ValidPermissionInput = string.Join(',', Enum.GetValues(typeof(Permission))
-            .Cast<Permission>()
+        private static readonly string ValidPermissionInput = string.Join(',', Enum.GetValues(typeof(Verb))
+            .Cast<Verb>()
             .Select(x => x.ToString()));
 
         public override string[] GetParametersName()

@@ -30,7 +30,7 @@ namespace SimpleAuth.Services
         Task<ICollection<Role>> GetActiveRolesAsync(string user, string corp, string app, string env = null,
             string tenant = null);
 
-        Task<ICollection<Role>> GetMissingRolesAsync(string userId, (string, Permission)[] permissions, string corp,
+        Task<ICollection<Role>> GetMissingRolesAsync(string userId, (string, Verb)[] permissions, string corp,
             string app);
 
         Task UpdateLockStatusAsync(User user);
@@ -250,17 +250,17 @@ namespace SimpleAuth.Services
             roles = roles.DistinctRoles().ToList();
             roles = roles
                 .Select(x => x.ToClientRoleModel())
-                .DistinctRoles()
+                .DistinctPermissions()
                 .Select(x => x.ToRole())
                 .ToList();
 
             return roles;
         }
 
-        public async Task<ICollection<Role>> GetMissingRolesAsync(string userId, (string, Permission)[] permissions,
+        public async Task<ICollection<Role>> GetMissingRolesAsync(string userId, (string, Verb)[] permissions,
             string corp, string app)
         {
-            if (permissions.Any(x => x.Item2 == Permission.None))
+            if (permissions.Any(x => x.Item2 == Verb.None))
                 throw new ArgumentException("Permission None is not a valid option");
 
             var activeRoles = await GetActiveRolesAsync(userId, corp, app);
@@ -271,7 +271,7 @@ namespace SimpleAuth.Services
                 .Select(x =>
                 {
                     RoleUtils.Parse(x.Item1, out var requireClientRoleModel);
-                    requireClientRoleModel.Permission = x.Item2;
+                    requireClientRoleModel.Verb = x.Item2;
                     return requireClientRoleModel;
                 }).ToArray();
 

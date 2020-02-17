@@ -6,33 +6,33 @@ namespace Test.SimpleAuth.Shared.Test.Enums
 {
     public class TestPermission
     {
-        [TestCase(Permission.None, ExpectedResult = "0")]
-        [TestCase(Permission.Add, ExpectedResult = "1")]
-        [TestCase(Permission.View, ExpectedResult = "2")]
-        [TestCase(Permission.Edit, ExpectedResult = "4")]
-        [TestCase(Permission.Delete, ExpectedResult = "8")]
-        [TestCase(Permission.Add | Permission.View, ExpectedResult = "3")]
-        [TestCase(Permission.Crud, ExpectedResult = "15")]
-        [TestCase(Permission.CurrentMax, ExpectedResult = "15")]
-        [TestCase(Permission.Full, ExpectedResult = "*")]
-        public string Serialize(Permission p)
+        [TestCase(Verb.None, ExpectedResult = "0")]
+        [TestCase(Verb.Add, ExpectedResult = "1")]
+        [TestCase(Verb.View, ExpectedResult = "2")]
+        [TestCase(Verb.Edit, ExpectedResult = "4")]
+        [TestCase(Verb.Delete, ExpectedResult = "8")]
+        [TestCase(Verb.Add | Verb.View, ExpectedResult = "3")]
+        [TestCase(Verb.Crud, ExpectedResult = "15")]
+        [TestCase(Verb.CurrentMax, ExpectedResult = "15")]
+        [TestCase(Verb.Full, ExpectedResult = "*")]
+        public string Serialize(Verb p)
         {
             return p.Serialize();
         }
 
-        [TestCase("0", ExpectedResult = Permission.None)]
-        [TestCase("", ExpectedResult = Permission.None)]
-        [TestCase("0 ", ExpectedResult = Permission.None)]
-        [TestCase("* ", ExpectedResult = Permission.None)]
-        [TestCase("1", ExpectedResult = Permission.Add)]
-        [TestCase("2", ExpectedResult = Permission.View)]
-        [TestCase("4", ExpectedResult = Permission.Edit)]
-        [TestCase("8", ExpectedResult = Permission.Delete)]
-        [TestCase("3", ExpectedResult = Permission.Add | Permission.View)]
-        [TestCase("15", ExpectedResult = Permission.Crud)]
-        [TestCase("15", ExpectedResult = Permission.CurrentMax)]
-        [TestCase("*", ExpectedResult = Permission.Full)]
-        public Permission Deserialize(string serialized)
+        [TestCase("0", ExpectedResult = Verb.None)]
+        [TestCase("", ExpectedResult = Verb.None)]
+        [TestCase("0 ", ExpectedResult = Verb.None)]
+        [TestCase("* ", ExpectedResult = Verb.None)]
+        [TestCase("1", ExpectedResult = Verb.Add)]
+        [TestCase("2", ExpectedResult = Verb.View)]
+        [TestCase("4", ExpectedResult = Verb.Edit)]
+        [TestCase("8", ExpectedResult = Verb.Delete)]
+        [TestCase("3", ExpectedResult = Verb.Add | Verb.View)]
+        [TestCase("15", ExpectedResult = Verb.Crud)]
+        [TestCase("15", ExpectedResult = Verb.CurrentMax)]
+        [TestCase("*", ExpectedResult = Verb.Full)]
+        public Verb Deserialize(string serialized)
         {
             try
             {
@@ -40,34 +40,34 @@ namespace Test.SimpleAuth.Shared.Test.Enums
             }
             catch (FormatException)
             {
-                return Permission.None;
+                return Verb.None;
             }
         }
 
-        [TestCase(Permission.Add, Permission.Add, ExpectedResult = Permission.Add)]
-        [TestCase(Permission.Add, Permission.Edit, ExpectedResult = Permission.Add | Permission.Edit)]
-        [TestCase(Permission.Add, Permission.Edit, Permission.Delete, ExpectedResult =
-            Permission.Add | Permission.Edit | Permission.Delete)]
-        [TestCase(Permission.Add, Permission.Edit, Permission.Add, ExpectedResult = Permission.Add | Permission.Edit)]
-        [TestCase(Permission.Crud, Permission.Add, ExpectedResult = Permission.Crud)]
-        [TestCase(Permission.CurrentMax, Permission.Add, ExpectedResult = Permission.CurrentMax)]
-        [TestCase(Permission.Add, Permission.Crud, ExpectedResult = Permission.Crud)]
-        [TestCase(Permission.Add, Permission.CurrentMax, ExpectedResult = Permission.CurrentMax)]
-        public Permission Grant(Permission src, params Permission[] subPermissions)
+        [TestCase(Verb.Add, Verb.Add, ExpectedResult = Verb.Add)]
+        [TestCase(Verb.Add, Verb.Edit, ExpectedResult = Verb.Add | Verb.Edit)]
+        [TestCase(Verb.Add, Verb.Edit, Verb.Delete, ExpectedResult =
+            Verb.Add | Verb.Edit | Verb.Delete)]
+        [TestCase(Verb.Add, Verb.Edit, Verb.Add, ExpectedResult = Verb.Add | Verb.Edit)]
+        [TestCase(Verb.Crud, Verb.Add, ExpectedResult = Verb.Crud)]
+        [TestCase(Verb.CurrentMax, Verb.Add, ExpectedResult = Verb.CurrentMax)]
+        [TestCase(Verb.Add, Verb.Crud, ExpectedResult = Verb.Crud)]
+        [TestCase(Verb.Add, Verb.CurrentMax, ExpectedResult = Verb.CurrentMax)]
+        public Verb Grant(Verb src, params Verb[] subPermissions)
         {
             return src.Grant(subPermissions);
         }
 
-        [TestCase(Permission.Full, Permission.Add, ExpectedResult =
-            Permission.View | Permission.Edit | Permission.Delete)]
-        [TestCase(Permission.CurrentMax, Permission.Add, ExpectedResult =
-            Permission.View | Permission.Edit | Permission.Delete)]
-        [TestCase(Permission.Crud, Permission.Add, ExpectedResult =
-            Permission.View | Permission.Edit | Permission.Delete)]
-        [TestCase(Permission.Add | Permission.Edit, Permission.Edit, ExpectedResult = Permission.Add)]
-        [TestCase(Permission.Add | Permission.Edit, Permission.Delete, ExpectedResult =
-            Permission.Add | Permission.Edit)]
-        public Permission Revoke(Permission src, params Permission[] subPermissions)
+        [TestCase(Verb.Full, Verb.Add, ExpectedResult =
+            Verb.View | Verb.Edit | Verb.Delete)]
+        [TestCase(Verb.CurrentMax, Verb.Add, ExpectedResult =
+            Verb.View | Verb.Edit | Verb.Delete)]
+        [TestCase(Verb.Crud, Verb.Add, ExpectedResult =
+            Verb.View | Verb.Edit | Verb.Delete)]
+        [TestCase(Verb.Add | Verb.Edit, Verb.Edit, ExpectedResult = Verb.Add)]
+        [TestCase(Verb.Add | Verb.Edit, Verb.Delete, ExpectedResult =
+            Verb.Add | Verb.Edit)]
+        public Verb Revoke(Verb src, params Verb[] subPermissions)
         {
             return src.Revoke(subPermissions);
         }
@@ -78,11 +78,11 @@ namespace Test.SimpleAuth.Shared.Test.Enums
             for (var i = 0; i <= 255; i++)
             {
                 var p = i.ToString().Deserialize();
-                Assert.AreEqual(p, Permission.None.Grant(p));
-                Assert.AreEqual(p, p.Grant(Permission.None));
-                Assert.AreEqual(Permission.None, Permission.None.Revoke(p));
+                Assert.AreEqual(p, Verb.None.Grant(p));
+                Assert.AreEqual(p, p.Grant(Verb.None));
+                Assert.AreEqual(Verb.None, Verb.None.Revoke(p));
                 if (i > 0)
-                    Assert.AreNotEqual(Permission.None, p.Revoke(Permission.None));
+                    Assert.AreNotEqual(Verb.None, p.Revoke(Verb.None));
             }
         }
     }

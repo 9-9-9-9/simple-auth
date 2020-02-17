@@ -15,12 +15,12 @@ namespace SimpleAuth.Client.Services
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public interface IUserAuthService : IClientService
     {
-        Task<RoleModel[]> GetActiveRolesAsync(string userId);
+        Task<PermissionModel[]> GetActiveRolesAsync(string userId);
         Task<ResponseUserModel> GetUserAsync(string userId);
         Task<ResponseUserModel> GetUserAsync(string userId, string password);
         Task<ResponseUserModel> GetUserAsync(LoginByGoogleRequest loginByGoogleRequest);
-        Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Permission permission);
-        Task<RoleModel[]> GetMissingRolesAsync(string userId, RoleModels roleModels);
+        Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Verb verb);
+        Task<PermissionModel[]> GetMissingRolesAsync(string userId, PermissionModels permissionModels);
     }
 
     public class DefaultUserAuthService : ClientService, IUserAuthService
@@ -41,9 +41,9 @@ namespace SimpleAuth.Client.Services
                 .WithFilterTenant();
         }
 
-        public Task<RoleModel[]> GetActiveRolesAsync(string userId)
+        public Task<PermissionModel[]> GetActiveRolesAsync(string userId)
         {
-            return _httpService.DoHttpRequestWithResponseContentAsync<RoleModel[]>(
+            return _httpService.DoHttpRequestWithResponseContentAsync<PermissionModel[]>(
                 NewRequest()
                     .Append(EndpointBuilder.User.GetActiveRoles(userId))
                     .Method(Constants.HttpMethods.GET)
@@ -79,11 +79,11 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public async Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Permission permission)
+        public async Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Verb verb)
         {
             var res = await _httpService.DoHttpRequestAsync<string>(
                 NewRequest()
-                    .Append(EndpointBuilder.User.CheckUserPermission(userId, roleId, permission.Serialize()))
+                    .Append(EndpointBuilder.User.CheckUserPermission(userId, roleId, verb.Serialize()))
                     .Method(Constants.HttpMethods.GET)
             );
             if (res.Item2 == HttpStatusCode.OK)
@@ -94,21 +94,21 @@ namespace SimpleAuth.Client.Services
             throw new SimpleAuthHttpRequestException(res.Item2);
         }
 
-        public async Task<RoleModel[]> GetMissingRolesAsync(string userId, RoleModels roleModels)
+        public async Task<PermissionModel[]> GetMissingRolesAsync(string userId, PermissionModels permissionModels)
         {
-            var res = await _httpService.DoHttpRequestAsync<RoleModel[]>(
+            var res = await _httpService.DoHttpRequestAsync<PermissionModel[]>(
                 NewRequest()
                     .Append(EndpointBuilder.User.GetMissingPermissions(userId))
                     .Method(Constants.HttpMethods.POST),
-                roleModels.JsonSerialize()
+                permissionModels.JsonSerialize()
             );
             if (res.Item2 == HttpStatusCode.OK)
-                return new RoleModel[0];
+                return new PermissionModel[0];
             
             if (res.Item2 == HttpStatusCode.NotAcceptable)
             {
                 if (!res.Item3.IsAny())
-                    throw new DataVerificationMismatchException($"Expected array of {nameof(RoleModel)} as response content");
+                    throw new DataVerificationMismatchException($"Expected array of {nameof(PermissionModel)} as response content");
                 return res.Item3;
             }
             

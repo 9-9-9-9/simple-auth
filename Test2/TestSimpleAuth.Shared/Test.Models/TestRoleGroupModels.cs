@@ -33,13 +33,13 @@ namespace Test.SimpleAuth.Shared.Test.Models
                     new Role
                     {
                         RoleId = "c.a.e.t.m1",
-                        Permission = Permission.Add | Permission.Delete
+                        Verb = Verb.Add | Verb.Delete
                     },
                     
                     new Role
                     {
                         RoleId = "c.a.e.t.m2",
-                        Permission = Permission.View | Permission.Edit
+                        Verb = Verb.View | Verb.Edit
                     }
                 }
             };
@@ -49,9 +49,9 @@ namespace Test.SimpleAuth.Shared.Test.Models
             Assert.IsNotNull(res.Roles);
             Assert.AreEqual(2, res.Roles.Length);
             Assert.AreEqual(rg.Roles.First().RoleId, res.Roles.First().Role);
-            Assert.AreEqual(rg.Roles.First().Permission.Serialize(), res.Roles.First().Permission);
+            Assert.AreEqual(rg.Roles.First().Verb.Serialize(), res.Roles.First().Verb);
             Assert.AreEqual(rg.Roles.Skip(1).First().RoleId, res.Roles.Skip(1).First().Role);
-            Assert.AreEqual(rg.Roles.Skip(1).First().Permission.Serialize(), res.Roles.Skip(1).First().Permission);
+            Assert.AreEqual(rg.Roles.Skip(1).First().Verb.Serialize(), res.Roles.Skip(1).First().Verb);
         }
     }
 }

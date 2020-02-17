@@ -59,7 +59,7 @@ namespace SimpleAuth.Repositories
             if (typeof(ISubModuleRelated).IsAssignableFrom(typeof(T)))
                 modelBuilder.Entity<T>().HasIndex(x => (x as ISubModuleRelated).SubModules);
             if (typeof(IPermissionRelated).IsAssignableFrom(typeof(T)))
-                modelBuilder.Entity<T>().HasIndex(x => (x as IPermissionRelated).Permission);
+                modelBuilder.Entity<T>().HasIndex(x => (x as IPermissionRelated).Verb);
             if (typeof(ILockable).IsAssignableFrom(typeof(T)))
                 modelBuilder.Entity<T>().HasIndex(x => (x as ILockable).Locked);
         }

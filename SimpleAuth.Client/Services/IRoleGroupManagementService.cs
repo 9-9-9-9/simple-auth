@@ -14,8 +14,8 @@ namespace SimpleAuth.Client.Services
     {
         Task AddRoleGroupAsync(CreateRoleGroupModel createRoleGroupModel);
         Task<RoleGroup> GetRoleGroupAsync(string roleGroupName);
-        Task AddRoleToGroupAsync(string roleGroupName, RoleModels updateRolesModel);
-        Task DeleteRolesAsync(string roleGroupName, params RoleModel[] roleModels);
+        Task AddRoleToGroupAsync(string roleGroupName, PermissionModels updatePermissionsModel);
+        Task DeleteRolesAsync(string roleGroupName, params PermissionModel[] roleModels);
         Task DeleteAllRolesAsync(string roleGroupName);
         Task SetLockRoleGroup(string roleGroupName, bool @lock);
     }
@@ -56,21 +56,21 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public Task AddRoleToGroupAsync(string roleGroupName, RoleModels updateRolesModel)
+        public Task AddRoleToGroupAsync(string roleGroupName, PermissionModels updatePermissionsModel)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
                     .Append(EndpointBuilder.RoleGroupManagement.AddRoleToGroup(roleGroupName))
                     .Method(Constants.HttpMethods.POST),
-                updateRolesModel.JsonSerialize()
+                updatePermissionsModel.JsonSerialize()
             );
         }
 
-        public Task DeleteRolesAsync(string roleGroupName, params RoleModel[] roleModels)
+        public Task DeleteRolesAsync(string roleGroupName, params PermissionModel[] roleModels)
         {
             var nameValueCollection = new NameValueCollection();
-            roleModels.ToList().ForEach(x => nameValueCollection["roles"] = RoleUtils.Merge(x.Role, x.Permission));
+            roleModels.ToList().ForEach(x => nameValueCollection["roles"] = RoleUtils.Merge(x.Role, x.Verb));
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()

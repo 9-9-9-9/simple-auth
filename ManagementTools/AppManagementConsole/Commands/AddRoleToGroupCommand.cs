@@ -26,10 +26,10 @@ namespace AppManagementConsole.Commands
 
         protected override async Task DoMainJob(string[] args)
         {
-            var validPermissionInput = string.Join(',', Enum.GetValues(typeof(Permission))
-                .Cast<Permission>()
+            var validPermissionInput = string.Join(',', Enum.GetValues(typeof(Verb))
+                .Cast<Verb>()
                 .Select(x => x.ToString()));
-            var roleModels = new List<RoleModel>();
+            var roleModels = new List<PermissionModel>();
             do
             {
                 "Role Id without Corp and App parts (leave empty to submit)".Write();
@@ -39,14 +39,14 @@ namespace AppManagementConsole.Commands
                 $"Permission (accepted values: {validPermissionInput}".Write();
                 var permission = Console.ReadLine();
 
-                if (!Enum.TryParse(typeof(Permission), permission, true, out var enumPermission))
+                if (!Enum.TryParse(typeof(Verb), permission, true, out var enumPermission))
                     throw new ArgumentException($"{permission} is not a valid permission");
 
-                roleModels.Add(new RoleModel
+                roleModels.Add(new PermissionModel
                 {
                     Role =
                         $"{_simpleAuthConfigurationProvider.Corp}{Constants.SplitterRoleParts}{_simpleAuthConfigurationProvider.App}{Constants.SplitterRoleParts}{roleIdWithoutCorpAndApp}",
-                    Permission = ((Permission) enumPermission).Serialize()
+                    Verb = ((Verb) enumPermission).Serialize()
                 });
             } while (true);
 
@@ -56,9 +56,9 @@ namespace AppManagementConsole.Commands
                 return;
             }
 
-            await _roleGroupManagementService.AddRoleToGroupAsync(args[0], new RoleModels
+            await _roleGroupManagementService.AddRoleToGroupAsync(args[0], new PermissionModels
             {
-                Roles = roleModels.ToArray()
+                Permissions = roleModels.ToArray()
             });
             Print("Added");
         }

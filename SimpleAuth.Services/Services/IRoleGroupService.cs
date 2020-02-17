@@ -23,8 +23,8 @@ namespace SimpleAuth.Services
         IEnumerable<RoleGroup> FindByName(string[] nameList, string corp, string app);
         Task AddRoleGroupAsync(CreateRoleGroupModel newRoleGroup);
         Task UpdateLockStatusAsync(RoleGroup roleGroup);
-        Task AddRolesToGroupAsync(RoleGroup roleGroup, RoleModel[] roleModels);
-        Task DeleteRolesFromGroupAsync(RoleGroup roleGroup, RoleModel[] roleModels);
+        Task AddRolesToGroupAsync(RoleGroup roleGroup, PermissionModel[] roleModels);
+        Task DeleteRolesFromGroupAsync(RoleGroup roleGroup, PermissionModel[] roleModels);
         Task DeleteAllRolesFromGroupAsync(RoleGroup roleGroup);
         Task DeleteRoleGroupAsync(RoleGroup roleGroup);
     }
@@ -134,7 +134,7 @@ namespace SimpleAuth.Services
             await Repository.UpdateAsync(entity);
         }
 
-        public async Task AddRolesToGroupAsync(RoleGroup roleGroup, RoleModel[] roleModels)
+        public async Task AddRolesToGroupAsync(RoleGroup roleGroup, PermissionModel[] roleModels)
         {
             if (roleGroup == null)
                 throw new ArgumentNullException(nameof(roleGroup));
@@ -157,7 +157,7 @@ namespace SimpleAuth.Services
                 roleModels.Select(r => new Role
                     {
                         RoleId = r.Role,
-                        Permission = r.Permission.Deserialize()
+                        Verb = r.Verb.Deserialize()
                     })
                     .DistinctRoles()
                     .Select(r => r.ToEntityObject().WithRandomId())
@@ -166,7 +166,7 @@ namespace SimpleAuth.Services
             await UpdateRolesAsync(roleGroup, newRoles);
         }
 
-        public async Task DeleteRolesFromGroupAsync(RoleGroup roleGroup, RoleModel[] roleModels)
+        public async Task DeleteRolesFromGroupAsync(RoleGroup roleGroup, PermissionModel[] roleModels)
         {
             if (roleGroup == null)
                 throw new ArgumentNullException(nameof(roleGroup));
@@ -198,7 +198,7 @@ namespace SimpleAuth.Services
                 var matchingRole = domainGroup.Roles.FirstOrDefault(x => x.RoleId == roleModel.Role);
                 if (matchingRole == default)
                     continue;
-                matchingRole.Permission = matchingRole.Permission.Revoke(roleModel.Permission.Deserialize());
+                matchingRole.Verb = matchingRole.Verb.Revoke(roleModel.Verb.Deserialize());
             }
 
             await UpdateRolesAsync(domainGroup, domainGroup.Roles

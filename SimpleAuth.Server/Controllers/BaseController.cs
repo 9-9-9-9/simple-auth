@@ -308,10 +308,10 @@ namespace SimpleAuth.Server.Controllers
                 Id = userId,
                 Corp = RequestAppHeaders.Corp,
                 Locked = user.LocalUserInfos.Single(x => x.Corp == RequestAppHeaders.Corp).Locked,
-                ActiveRoles = activeRoles.OrEmpty().Select(x => new RoleModel
+                ActiveRoles = activeRoles.OrEmpty().Select(x => new PermissionModel
                 {
                     Role = x.RoleId,
-                    Permission = x.Permission.Serialize()
+                    Verb = x.Verb.Serialize()
                 }).ToArray()
             };
         }

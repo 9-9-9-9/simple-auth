@@ -9,7 +9,7 @@ namespace WebApiPlayground.Services
 {
     public class DummyUserAuthService : IUserAuthService
     {
-        public Task<RoleModel[]> GetActiveRolesAsync(string userId)
+        public Task<PermissionModel[]> GetActiveRolesAsync(string userId)
         {
             return Task.FromResult(GetDummyUser(userId).ActiveRoles);
         }
@@ -29,14 +29,14 @@ namespace WebApiPlayground.Services
             return Task.FromResult(GetDummyUser(loginByGoogleRequest.Email));
         }
 
-        public Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Permission permission)
+        public Task<bool> DoesUserHavePermissionAsync(string userId, string roleId, Verb verb)
         {
             return Task.FromResult(true);
         }
 
-        public Task<RoleModel[]> GetMissingRolesAsync(string userId, RoleModels roleModels)
+        public Task<PermissionModel[]> GetMissingRolesAsync(string userId, PermissionModels permissionModels)
         {
-            return Task.FromResult(new RoleModel[0]);
+            return Task.FromResult(new PermissionModel[0]);
         }
 
         // ReSharper disable once UnusedParameter.Local
@@ -48,24 +48,24 @@ namespace WebApiPlayground.Services
             };
         }
 
-        private IEnumerable<RoleModel> GetDummyRoleModels()
+        private IEnumerable<PermissionModel> GetDummyRoleModels()
         {
             return YieldResults();
 
             //
-            IEnumerable<RoleModel> YieldResults()
+            IEnumerable<PermissionModel> YieldResults()
             {
-                yield return Rm("test.a.e.t.weatherforecast", Permission.View);
-                yield return Rm("test.a.e.t.weatherforecast.*", Permission.View);
-                yield return Rm("test.a.e.t.best", Permission.View);
-                yield return Rm("test.a.e.t.best.a", Permission.View);
+                yield return Rm("test.a.e.t.weatherforecast", Verb.View);
+                yield return Rm("test.a.e.t.weatherforecast.*", Verb.View);
+                yield return Rm("test.a.e.t.best", Verb.View);
+                yield return Rm("test.a.e.t.best.a", Verb.View);
             }
 
             //
-            RoleModel Rm(string roleId, Permission permission) => new RoleModel
+            PermissionModel Rm(string roleId, Verb permission) => new PermissionModel
             {
                 Role = roleId,
-                Permission = permission.Serialize()
+                Verb = permission.Serialize()
             };
         }
     }

@@ -139,7 +139,7 @@ namespace Test.SimpleAuth.Services.Test.Objects
                     {
                         Id = Guid.NewGuid(),
                         RoleId = "c.a.e.t.m",
-                        Permission = Permission.Delete,
+                        Verb = Verb.Delete,
                         Env = "e",
                         Tenant = "t"
                     }
@@ -164,12 +164,12 @@ namespace Test.SimpleAuth.Services.Test.Objects
             var role = new global::SimpleAuth.Shared.Domains.Role
             {
                 RoleId = "c.a.e.t.m",
-                Permission = Permission.View
+                Verb = Verb.View
             };
 
             var rr = role.ToEntityObject();
             Assert.AreEqual(role.RoleId, rr.RoleId);
-            Assert.AreEqual(role.Permission, rr.Permission);
+            Assert.AreEqual(role.Verb, rr.Verb);
         }
     }
 }

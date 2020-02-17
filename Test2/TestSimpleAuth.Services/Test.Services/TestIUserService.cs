@@ -91,12 +91,12 @@ namespace Test.SimpleAuth.Services.Test.Services
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m1",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m2",
-                                    Permission = Permission.Edit,
+                                    Verb = Verb.Edit,
                                 }
                             }
                         }
@@ -115,12 +115,12 @@ namespace Test.SimpleAuth.Services.Test.Services
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m3",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m4",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 }
                             }
                         }
@@ -139,12 +139,12 @@ namespace Test.SimpleAuth.Services.Test.Services
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m5",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m6",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 }
                             }
                         }
@@ -166,9 +166,9 @@ namespace Test.SimpleAuth.Services.Test.Services
             Assert.AreEqual(true, user.RoleGroups[0].Locked);
             Assert.AreEqual(false, user.RoleGroups[1].Locked);
             Assert.AreEqual($"{corp1}.a.e.t.m1", user.RoleGroups[0].Roles[0].RoleId);
-            Assert.AreEqual(Permission.View, user.RoleGroups[0].Roles[0].Permission);
+            Assert.AreEqual(Verb.View, user.RoleGroups[0].Roles[0].Verb);
             Assert.AreEqual($"{corp1}.a.e.t.m2", user.RoleGroups[0].Roles[1].RoleId);
-            Assert.AreEqual(Permission.Edit, user.RoleGroups[0].Roles[1].Permission);
+            Assert.AreEqual(Verb.Edit, user.RoleGroups[0].Roles[1].Verb);
 
             ISetup<IUserRepository, User> SetupUser() => mockUserRepository.Setup(x => x.Find(userId));
 
@@ -626,21 +626,21 @@ namespace Test.SimpleAuth.Services.Test.Services
                                     RoleId = "c.a.e.t.m111",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = "c.a.e.t.m112",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = "c.a.e.t.m113",
                                     Env = RandomEnv(),
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                             }
                         }
@@ -660,21 +660,21 @@ namespace Test.SimpleAuth.Services.Test.Services
                                     RoleId = "c.a.e.t.m121",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = "c.a.e.t.m122",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = "c.a.e.t.m123",
                                     Env = RandomEnv(),
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                             }
                         }
@@ -694,21 +694,21 @@ namespace Test.SimpleAuth.Services.Test.Services
                                     RoleId = "c.a.e.t.m211",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = "c.a.e.t.m212",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = "c.a.e.t.m213",
                                     Env = RandomEnv(),
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                             }
                         }
@@ -823,17 +823,17 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             // catch null arg
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(string.Empty, new (string, Permission)[0], corp1, app1));
+                await svc.GetMissingRolesAsync(string.Empty, new (string, Verb)[0], corp1, app1));
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[0], string.Empty, app1));
+                await svc.GetMissingRolesAsync(userId, new (string, Verb)[0], string.Empty, app1));
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[0], corp1, string.Empty));
+                await svc.GetMissingRolesAsync(userId, new (string, Verb)[0], corp1, string.Empty));
 
             // not allow arg contains permission None
             Assert.CatchAsync<ArgumentException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[]
+                await svc.GetMissingRolesAsync(userId, new (string, Verb)[]
                 {
-                    ("any", Permission.None)
+                    ("any", Verb.None)
                 }, corp1, app1)
             );
 
@@ -842,9 +842,9 @@ namespace Test.SimpleAuth.Services.Test.Services
             // catch user not found
             SetupFindUserReturns(null);
             Assert.CatchAsync<EntityNotExistsException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[]
+                await svc.GetMissingRolesAsync(userId, new (string, Verb)[]
                 {
-                    ("any", Permission.Add)
+                    ("any", Verb.Add)
                 }, corp1, app1)
             );
 
@@ -881,22 +881,22 @@ namespace Test.SimpleAuth.Services.Test.Services
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.crud",
-                                    Permission = Permission.Crud
+                                    Verb = Verb.Crud
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.full",
-                                    Permission = Permission.Full
+                                    Verb = Verb.Full
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.ae",
-                                    Permission = Permission.Add | Permission.Edit
+                                    Verb = Verb.Add | Verb.Edit
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.d",
-                                    Permission = Permission.Delete
+                                    Verb = Verb.Delete
                                 },
                             }
                         }
@@ -913,22 +913,22 @@ namespace Test.SimpleAuth.Services.Test.Services
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.crud",
-                                    Permission = Permission.Crud
+                                    Verb = Verb.Crud
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.full",
-                                    Permission = Permission.Full
+                                    Verb = Verb.Full
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.ae",
-                                    Permission = Permission.Add | Permission.Edit
+                                    Verb = Verb.Add | Verb.Edit
                                 },
                                 new RoleRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.d",
-                                    Permission = Permission.Delete
+                                    Verb = Verb.Delete
                                 },
                             }
                         }
@@ -944,18 +944,18 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             var missingRoles = await svc.GetMissingRolesAsync(userId, new[]
             {
-                ($"{corp1}.{app1}.e.t.crud", Permission.Edit), // usr has
-                ($"{corp1}.{app1}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
-                ($"{corp1}.{app1}.e.t.d", Permission.Edit), // expect
+                ($"{corp1}.{app1}.e.t.crud", Verb.Edit), // usr has
+                ($"{corp1}.{app1}.e.t.ae", Verb.Add | Verb.View), // usr has Add but not View
+                ($"{corp1}.{app1}.e.t.d", Verb.Edit), // expect
             }, corp1, app1);
 
             Assert.AreEqual(2, missingRoles.Count);
             var ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp1}.{app1}.e.t.ae");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.View, ae.Permission);
+            Assert.AreEqual(Verb.View, ae.Verb);
             var d = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp1}.{app1}.e.t.d");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.Edit, d.Permission);
+            Assert.AreEqual(Verb.Edit, d.Verb);
 
             #endregion
 
@@ -963,18 +963,18 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             missingRoles = await svc.GetMissingRolesAsync(userId, new[]
             {
-                ($"{corp2}.{app2}.e.t.crud", Permission.Edit), // usr has
-                ($"{corp2}.{app2}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
-                ($"{corp2}.{app2}.e.t.d", Permission.Edit), // expect
+                ($"{corp2}.{app2}.e.t.crud", Verb.Edit), // usr has
+                ($"{corp2}.{app2}.e.t.ae", Verb.Add | Verb.View), // usr has Add but not View
+                ($"{corp2}.{app2}.e.t.d", Verb.Edit), // expect
             }, corp2, app2);
 
             Assert.AreEqual(2, missingRoles.Count);
             ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp2}.{app2}.e.t.ae");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.View, ae.Permission);
+            Assert.AreEqual(Verb.View, ae.Verb);
             d = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp2}.{app2}.e.t.d");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.Edit, d.Permission);
+            Assert.AreEqual(Verb.Edit, d.Verb);
 
             #endregion
 

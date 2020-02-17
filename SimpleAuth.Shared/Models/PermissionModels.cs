@@ -32,28 +32,28 @@ namespace SimpleAuth.Shared.Models
         public string[] SubModules { get; set; }
     }
 
-    public class RoleModel
+    public class PermissionModel
     {
         public string Role { get; set; }
-        public string Permission { get; set; }
+        public string Verb { get; set; }
 
-        public static RoleModel Cast(Role role)
+        public static PermissionModel Cast(Role role)
         {
-            return new RoleModel
+            return new PermissionModel
             {
                 Role = role.RoleId,
-                Permission = role.Permission.Serialize()
+                Verb = role.Verb.Serialize()
             };
         }
     }
 
-    public class RoleModels
+    public class PermissionModels
     {
         [Required]
-        public RoleModel[] Roles { get; set; }
+        public PermissionModel[] Permissions { get; set; }
     }
 
-    public partial class ClientRoleModel : ICorpRelated, IAppRelated, IEnvRelated, ITenantRelated, IModuleRelated, IRawSubModulesRelated
+    public partial class ClientPermissionModel : ICorpRelated, IAppRelated, IEnvRelated, ITenantRelated, IModuleRelated, IRawSubModulesRelated
     {
         public string Corp { get; set; }
         public string App { get; set; }
@@ -61,7 +61,7 @@ namespace SimpleAuth.Shared.Models
         public string Tenant { get; set; }
         public string Module { get; set; }
         public string[] SubModules { get; set; }
-        public Permission Permission { get; set; }
+        public Verb Verb { get; set; }
         public override string ToString()
         {
             var sb = new StringBuilder($"{Corp}.{App}.{Env}.{Tenant}.{Module}");
@@ -71,7 +71,7 @@ namespace SimpleAuth.Shared.Models
                 sb.Append(string.Join(Constants.SplitterSubModules, SubModules));
             }
 
-            sb.Append($", Permission: {Permission}");
+            sb.Append($", Permission: {Verb}");
             return sb.ToString();
         }
 
@@ -80,13 +80,13 @@ namespace SimpleAuth.Shared.Models
             return new Role
             {
                 RoleId = RoleUtils.ComputeRoleId(Corp, App, Env, Tenant, Module, SubModules),
-                Permission = Permission
+                Verb = Verb
             };
         }
 
-        protected bool Equals(ClientRoleModel other)
+        protected bool Equals(ClientPermissionModel other)
         {
-            return Corp == other.Corp && App == other.App && Env == other.Env && Tenant == other.Tenant && Module == other.Module && SubModules.SequenceEqual(other.SubModules) && Permission == other.Permission;
+            return Corp == other.Corp && App == other.App && Env == other.Env && Tenant == other.Tenant && Module == other.Module && SubModules.SequenceEqual(other.SubModules) && Verb == other.Verb;
         }
 
         public override bool Equals(object obj)
@@ -94,7 +94,7 @@ namespace SimpleAuth.Shared.Models
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ClientRoleModel) obj);
+            return Equals((ClientPermissionModel) obj);
         }
 
         public override int GetHashCode()
@@ -108,39 +108,39 @@ namespace SimpleAuth.Shared.Models
                 hashCode = (hashCode * 397) ^ (Tenant != null ? Tenant.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Module != null ? Module.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (SubModules != null ? SubModules.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (int) Permission;
+                hashCode = (hashCode * 397) ^ (int) Verb;
                 // ReSharper restore NonReadonlyMemberInGetHashCode
                 return hashCode;
             }
         }
     }
     
-    public partial class ClientRoleModel
+    public partial class ClientPermissionModel
     {
         public string ComputeId()
         {
             return RoleUtils.ComputeRoleId(Corp, App, Env, Tenant, Module, SubModules);
         }
 
-        public static ClientRoleModel From(string roleId, string permission)
+        public static ClientPermissionModel From(string roleId, string permission)
         {
             RoleUtils.Parse(roleId, permission, out var clientRoleModel);
             return clientRoleModel;
         }
 
-        public static ClientRoleModel From(string roleId, Permission permission)
+        public static ClientPermissionModel From(string roleId, Verb verb)
         {
             RoleUtils.Parse(roleId, out var clientRoleModel);
-            clientRoleModel.Permission = permission;
+            clientRoleModel.Verb = verb;
             return clientRoleModel;
         }
     }
 
     public static class ClientRoleModelExtensions
     {
-        public static IEnumerable<ClientRoleModel> DistinctRoles(this IEnumerable<ClientRoleModel> clientRoleModels)
+        public static IEnumerable<ClientPermissionModel> DistinctPermissions(this IEnumerable<ClientPermissionModel> clientPermissionModels)
         {
-            return RoleUtils.Distinct(clientRoleModels);
+            return RoleUtils.Distinct(clientPermissionModels);
         }
     }
 }

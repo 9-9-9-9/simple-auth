@@ -19,14 +19,14 @@ namespace SimpleAuth.Shared.Models
     public class RoleGroupResponseModel
     {
         public string Name { get; set; }
-        public RoleModel[] Roles { get; set; }
+        public PermissionModel[] Roles { get; set; }
 
         public static RoleGroupResponseModel Cast(RoleGroup group)
         {
             return new RoleGroupResponseModel
             {
                 Name = group.Name,
-                Roles = (group.Roles?.Select(RoleModel.Cast)).OrEmpty().ToArray()
+                Roles = (group.Roles?.Select(PermissionModel.Cast)).OrEmpty().ToArray()
             };
         }
     }

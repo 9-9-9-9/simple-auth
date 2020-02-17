@@ -63,7 +63,7 @@ namespace SimpleAuth.Repositories
 
         public async Task<int> UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles)
         {
-            newRoles = newRoles.OrEmpty().Where(x => x.Permission != Permission.None).ToList();
+            newRoles = newRoles.OrEmpty().Where(x => x.Verb != Verb.None).ToList();
             
             await using var ctx = OpenConnect();
             var dbGroups = ctx.Set<RoleGroup>();

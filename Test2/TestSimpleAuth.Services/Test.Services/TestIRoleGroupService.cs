@@ -372,18 +372,18 @@ namespace Test.SimpleAuth.Services.Test.Services
             // Argument verification
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.AddRolesToGroupAsync(null, new[]
             {
-                new RoleModel()
+                new PermissionModel()
             }));
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.AddRolesToGroupAsync(rg1, null));
-            Assert.CatchAsync<ArgumentException>(async () => await svc.AddRolesToGroupAsync(rg1, new RoleModel[0]));
+            Assert.CatchAsync<ArgumentException>(async () => await svc.AddRolesToGroupAsync(rg1, new PermissionModel[0]));
             Assert.CatchAsync<ArgumentException>(async () => await svc.AddRolesToGroupAsync(rg1, new[]
             {
-                new RoleModel(), null
+                new PermissionModel(), null
             }));
             // RoleIds must from corp and app of the provided domain role group
             Assert.CatchAsync<SimpleAuthSecurityException>(async () => await svc.AddRolesToGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp2}.{app1}.e.t.m"
                 }
@@ -392,7 +392,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             rg1.Roles = new[] {new global::SimpleAuth.Shared.Domains.Role()};
             Assert.CatchAsync<InvalidOperationException>(async () => await svc.AddRolesToGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m"
                 }
@@ -412,15 +412,15 @@ namespace Test.SimpleAuth.Services.Test.Services
                 });
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AddRolesToGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m1",
-                    Permission = Permission.Add.Serialize()
+                    Verb = Verb.Add.Serialize()
                 },
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m2",
-                    Permission = Permission.Add.Serialize()
+                    Verb = Verb.Add.Serialize()
                 }
             }));
 
@@ -436,7 +436,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             await SetupFindSingleReturnsAndThenUpdate();
             mockRoleGroupRepo.Verify(m => m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => true),
                 It.Is<List<RoleRecord>>(rrs => rrs.Count == 2 && rrs.All(x =>
-                                                   x.Permission != Permission.None && x.Id != Guid.Empty &&
+                                                   x.Verb != Verb.None && x.Id != Guid.Empty &&
                                                    !x.RoleId.IsBlank() && !x.Env.IsBlank() && !x.Tenant.IsBlank()))));
 
             // normal with some existing roles
@@ -453,7 +453,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                 new RoleRecord
                 {
                     RoleId = $"{corp1}.{app1}.e.t.m3",
-                    Permission = Permission.Edit
+                    Verb = Verb.Edit
                 }
             });
             mockRoleGroupRepo.Verify(m => m.UpdateRoleRecordsAsync(It.Is<RoleGroup>(rg => true),
@@ -479,15 +479,15 @@ namespace Test.SimpleAuth.Services.Test.Services
                     App = app1
                 }, new[]
                 {
-                    new RoleModel
+                    new PermissionModel
                     {
                         Role = $"{corp1}.{app1}.e.t.m1",
-                        Permission = Permission.Add.Serialize()
+                        Verb = Verb.Add.Serialize()
                     },
-                    new RoleModel
+                    new PermissionModel
                     {
                         Role = $"{corp1}.{app1}.e.t.m2",
-                        Permission = Permission.Add.Serialize()
+                        Verb = Verb.Add.Serialize()
                     }
                 });
             }
@@ -514,19 +514,19 @@ namespace Test.SimpleAuth.Services.Test.Services
             // Argument verification
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteRolesFromGroupAsync(null, new[]
             {
-                new RoleModel()
+                new PermissionModel()
             }));
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, null));
             Assert.CatchAsync<ArgumentException>(async () =>
-                await svc.DeleteRolesFromGroupAsync(rg1, new RoleModel[0]));
+                await svc.DeleteRolesFromGroupAsync(rg1, new PermissionModel[0]));
             Assert.CatchAsync<ArgumentException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel(), null
+                new PermissionModel(), null
             }));
             // RoleIds must from corp and app of the provided domain role group
             Assert.CatchAsync<SimpleAuthSecurityException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp2}.{app1}.e.t.m"
                 }
@@ -535,7 +535,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             rg1.Roles = new[] {new global::SimpleAuth.Shared.Domains.Role()};
             Assert.CatchAsync<InvalidOperationException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m"
                 }
@@ -563,15 +563,15 @@ namespace Test.SimpleAuth.Services.Test.Services
             });
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m1",
-                    Permission = Permission.Add.Serialize()
+                    Verb = Verb.Add.Serialize()
                 },
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m2",
-                    Permission = Permission.Add.Serialize()
+                    Verb = Verb.Add.Serialize()
                 }
             }));
 
@@ -579,10 +579,10 @@ namespace Test.SimpleAuth.Services.Test.Services
             SetupFindSingleRoleGroup(null);
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m1",
-                    Permission = Permission.Add.Serialize()
+                    Verb = Verb.Add.Serialize()
                 }
             }));
 
@@ -598,10 +598,10 @@ namespace Test.SimpleAuth.Services.Test.Services
             });
             await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m1",
-                    Permission = Permission.Add.Serialize()
+                    Verb = Verb.Add.Serialize()
                 }
             });
             mockRoleGroupRepo.Verify(m =>
@@ -618,9 +618,9 @@ namespace Test.SimpleAuth.Services.Test.Services
                 App = app1,
                 RoleRecords = new List<RoleRecord>
                 {
-                    RoleRecord(1, corp1, app1, Permission.Add),
-                    RoleRecord(2, corp1, app1, Permission.Add, Permission.Edit),
-                    RoleRecord(3, corp1, app1, Permission.Crud),
+                    RoleRecord(1, corp1, app1, Verb.Add),
+                    RoleRecord(2, corp1, app1, Verb.Add, Verb.Edit),
+                    RoleRecord(3, corp1, app1, Verb.Crud),
                 }
             });
             SetupFindSingleRoleAsyncReturns(1, out var expectedEnv, out var expectedTenant);
@@ -628,10 +628,10 @@ namespace Test.SimpleAuth.Services.Test.Services
                 .ReturnsAsync(1);
             await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m1",
-                    Permission = Permission.Add.Serialize()
+                    Verb = Verb.Add.Serialize()
                 }
             });
             mockRoleGroupRepo.Verify(m =>
@@ -639,7 +639,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     It.Is<List<RoleRecord>>(rrs =>
                         rrs.Count == 3
                         && 1 == rrs.Count(x =>
-                            x.RoleId.EndsWith(".m1") && x.Permission == Permission.None && x.Env == expectedEnv &&
+                            x.RoleId.EndsWith(".m1") && x.Verb == Verb.None && x.Env == expectedEnv &&
                             x.Tenant == expectedTenant
                         )
                     )
@@ -649,10 +649,10 @@ namespace Test.SimpleAuth.Services.Test.Services
             SetupFindSingleRoleAsyncReturns(2, out expectedEnv, out expectedTenant);
             await svc.DeleteRolesFromGroupAsync(rg1, new[]
             {
-                new RoleModel
+                new PermissionModel
                 {
                     Role = $"{corp1}.{app1}.e.t.m2",
-                    Permission = (Permission.Edit | Permission.Delete).Serialize()
+                    Verb = (Verb.Edit | Verb.Delete).Serialize()
                 }
             });
             mockRoleGroupRepo.Verify(m =>
@@ -660,7 +660,7 @@ namespace Test.SimpleAuth.Services.Test.Services
                     It.Is<List<RoleRecord>>(rrs =>
                         rrs.Count == 3
                         && 1 == rrs.Count(x =>
-                            x.RoleId.EndsWith(".m2") && x.Permission == Permission.Add && x.Env == expectedEnv &&
+                            x.RoleId.EndsWith(".m2") && x.Verb == Verb.Add && x.Env == expectedEnv &&
                             x.Tenant == expectedTenant
                         )
                     )
@@ -679,13 +679,13 @@ namespace Test.SimpleAuth.Services.Test.Services
                 mockRoleRepo.Reset();
             }
 
-            RoleRecord RoleRecord(int moduleNo, string corp, string app, params Permission[] permissions)
+            RoleRecord RoleRecord(int moduleNo, string corp, string app, params Verb[] permissions)
             {
                 return new RoleRecord
                 {
                     Id = Guid.NewGuid(),
                     RoleId = $"{corp}.{app}.e.t.m{moduleNo}",
-                    Permission = Permission.None.Grant(permissions),
+                    Verb = Verb.None.Grant(permissions),
                     Env = "e",
                     Tenant = "t"
                 };

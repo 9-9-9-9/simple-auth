@@ -103,7 +103,7 @@ namespace SimpleAuth.Server.Controllers
             return await ProcedureResponseForArrayLookUp(() =>
                 FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
                     .ContinueWith(x =>
-                        x.Result.Roles.OrEmpty().Select(RoleModel.Cast)
+                        x.Result.Roles.OrEmpty().Select(PermissionModel.Cast)
                     )
             );
         }
@@ -122,7 +122,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AddRoles(
             string groupName,
-            [FromBody] RoleModels model)
+            [FromBody] PermissionModels model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(nameof(ModelState));
@@ -130,7 +130,7 @@ namespace SimpleAuth.Server.Controllers
             return await ProcedureDefaultResponse(async () =>
             {
                 var group = await FindRoleGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App);
-                await Service.AddRolesToGroupAsync(group, model.Roles);
+                await Service.AddRolesToGroupAsync(group, model.Permissions);
             });
         }
 
@@ -170,10 +170,10 @@ namespace SimpleAuth.Server.Controllers
                     await Service.DeleteAllRolesFromGroupAsync(group);
                 else
                     await Service.DeleteRolesFromGroupAsync(group, roles.Select(RoleUtils.UnMerge)
-                        .Select(tp => new RoleModel
+                        .Select(tp => new PermissionModel
                         {
                             Role = tp.Item1,
-                            Permission = tp.Item2.Serialize()
+                            Verb = tp.Item2.Serialize()
                         })
                         .ToArray());
             });

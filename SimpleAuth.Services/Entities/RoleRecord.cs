@@ -11,7 +11,7 @@ namespace SimpleAuth.Services.Entities
         [Index, Required] public string RoleId { get; set; }
         [Index, Required] public string Env { get; set; }
         [Index, Required] public string Tenant { get; set; }
-        public Permission Permission { get; set; }
+        public Verb Verb { get; set; }
     }
 
     public partial class RoleRecord
@@ -21,7 +21,7 @@ namespace SimpleAuth.Services.Entities
             return new Shared.Domains.Role
             {
                 RoleId = RoleId,
-                Permission = Permission
+                Verb = Verb
             };
         }
     }
@@ -33,7 +33,7 @@ namespace SimpleAuth.Services.Entities
             return new RoleRecord
             {
                 RoleId = role.RoleId,
-                Permission = role.Permission
+                Verb = role.Verb
             };
         }
     }

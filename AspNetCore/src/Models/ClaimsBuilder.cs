@@ -25,13 +25,13 @@ namespace SimpleAuth.Client.AspNetCore.Models
         {
         }
 
-        public ClaimsBuilder(string module, Permission permission, params string[] subModules)
+        public ClaimsBuilder(string module, Verb verb, params string[] subModules)
         {
             WithModule(module);
-            WithPermission(permission, subModules);
+            WithPermission(verb, subModules);
         }
 
-        public ClaimsBuilder(string module, params (Permission, string[])[] permissions)
+        public ClaimsBuilder(string module, params (Verb, string[])[] permissions)
         {
             WithModule(module);
             foreach (var permission in permissions)
@@ -81,14 +81,14 @@ namespace SimpleAuth.Client.AspNetCore.Models
             return this;
         }
 
-        public ClaimsBuilder WithPermission(Permission permission, params string[] subModules)
+        public ClaimsBuilder WithPermission(Verb verb, params string[] subModules)
         {
             if (subModules?.Any(x => x.IsBlank()) == true)
                 throw new ArgumentException($"{nameof(subModules)} contains blank element");
 
             PermissionBatches.Add(new PermissionBatch
             {
-                Permission = permission,
+                Verb = verb,
                 SubModules = subModules ?? new string[0]
             });
 
@@ -97,13 +97,13 @@ namespace SimpleAuth.Client.AspNetCore.Models
 
         public ClaimsBuilder WithPermission(SaPermissionAttribute permission)
         {
-            return WithPermission(permission.Permission, permission.SubModules);
+            return WithPermission(permission.Verb, permission.SubModules);
         }
 
         public ClaimsBuilder WithPermissions(IEnumerable<SaPermissionAttribute> permissions)
         {
             foreach (var permission in permissions)
-                WithPermission(permission.Permission, permission.SubModules);
+                WithPermission(permission.Verb, permission.SubModules);
             return this;
         }
 
@@ -152,13 +152,13 @@ namespace SimpleAuth.Client.AspNetCore.Models
                 throw new ArgumentNullException(
                     $"No permission provided, perhaps you missed calling method {nameof(WithPermission)} or {nameof(WithPermissions)}");
 
-            if (PermissionBatches.Any(x => x.Permission == Permission.None))
-                throw new ArgumentException($"Non-allowed permission value {nameof(Permission.None)} is existing");
+            if (PermissionBatches.Any(x => x.Verb == Verb.None))
+                throw new ArgumentException($"Non-allowed permission value {nameof(Verb.None)} is existing");
 
             foreach (var permissionBatch in PermissionBatches)
             {
                 yield return new SimpleAuthorizationClaim(
-                    new ClientRoleModel
+                    new ClientPermissionModel
                     {
                         Corp = corp,
                         App = app,
@@ -166,7 +166,7 @@ namespace SimpleAuth.Client.AspNetCore.Models
                         Tenant = tenant,
                         Module = Module,
                         SubModules = permissionBatch.SubModules,
-                        Permission = permissionBatch.Permission
+                        Verb = permissionBatch.Verb
                     }
                 );
             }
@@ -243,12 +243,12 @@ namespace SimpleAuth.Client.AspNetCore.Models
 
     public class PermissionBatch
     {
-        public Permission Permission { get; set; }
+        public Verb Verb { get; set; }
         public string[] SubModules { get; set; } = new string[0];
 
         protected bool Equals(PermissionBatch other)
         {
-            if (Permission != other.Permission)
+            if (Verb != other.Verb)
                 return false;
             if (SubModules.Length != other.SubModules.Length)
                 return false;
@@ -270,7 +270,7 @@ namespace SimpleAuth.Client.AspNetCore.Models
                 // ReSharper disable once NonReadonlyMemberInGetHashCode
                 var subModules = SubModules;
                 // ReSharper disable once NonReadonlyMemberInGetHashCode
-                return ((int) Permission * 397) ^ (subModules != null ? subModules.GetHashCode() : 0);
+                return ((int) Verb * 397) ^ (subModules != null ? subModules.GetHashCode() : 0);
             }
         }
     }

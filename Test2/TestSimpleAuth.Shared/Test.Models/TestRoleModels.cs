@@ -14,25 +14,25 @@ namespace Test.SimpleAuth.Shared.Test.Models
             var role = new Role
             {
                 RoleId = "c.a.e.t.m",
-                Permission = Permission.Delete
+                Verb = Verb.Delete
             };
             
-            var roleModel = RoleModel.Cast(role);
+            var roleModel = PermissionModel.Cast(role);
             Assert.NotNull(roleModel);
             Assert.AreEqual(role.RoleId, roleModel.Role);
-            Assert.AreEqual("8", roleModel.Permission);
+            Assert.AreEqual("8", roleModel.Verb);
         }
     }
 
     public class TestClientRoleModel
     {
-        [TestCase("c", "a", "e", "t", "m", Permission.Add, ExpectedResult = "c.a.e.t.m, Permission: Add")]
-        [TestCase("c", "a", "e", "t", "m", Permission.Delete, ExpectedResult = "c.a.e.t.m, Permission: Delete")]
-        [TestCase("c", "a", "e", "t", "m", Permission.Delete, "s", ExpectedResult = "c.a.e.t.m.s, Permission: Delete")]
-        [TestCase("c", "a", "e", "t", "m", Permission.Delete, "s", "2", ExpectedResult = "c.a.e.t.m.s|2, Permission: Delete")]
-        public string ToString_Override(string corp, string app, string env, string tenant, string module, Permission permission, params string[] subModules)
+        [TestCase("c", "a", "e", "t", "m", Verb.Add, ExpectedResult = "c.a.e.t.m, Permission: Add")]
+        [TestCase("c", "a", "e", "t", "m", Verb.Delete, ExpectedResult = "c.a.e.t.m, Permission: Delete")]
+        [TestCase("c", "a", "e", "t", "m", Verb.Delete, "s", ExpectedResult = "c.a.e.t.m.s, Permission: Delete")]
+        [TestCase("c", "a", "e", "t", "m", Verb.Delete, "s", "2", ExpectedResult = "c.a.e.t.m.s|2, Permission: Delete")]
+        public string ToString_Override(string corp, string app, string env, string tenant, string module, Verb verb, params string[] subModules)
         {
-            return new ClientRoleModel
+            return new ClientPermissionModel
             {
                 Corp = corp,
                 App = app,
@@ -40,7 +40,7 @@ namespace Test.SimpleAuth.Shared.Test.Models
                 Tenant = tenant,
                 Module = module,
                 SubModules = subModules,
-                Permission = permission
+                Verb = verb
             }.ToString();
         }
 
@@ -50,7 +50,7 @@ namespace Test.SimpleAuth.Shared.Test.Models
         [TestCase("c.a.e.t.m.s|2", "c", "a", "e", "t", "m", "s", "2")]
         public void ToRole(string expectedRoleId, string corp, string app, string env, string tenant, string module, params string[] subModules)
         {
-            var role = new ClientRoleModel
+            var role = new ClientPermissionModel
             {
                 Corp = corp,
                 App = app,
@@ -58,12 +58,12 @@ namespace Test.SimpleAuth.Shared.Test.Models
                 Tenant = tenant,
                 Module = module,
                 SubModules = subModules,
-                Permission = Permission.Crud
+                Verb = Verb.Crud
             }.ToRole();
             
             Assert.NotNull(role);
             Assert.AreEqual(expectedRoleId, role.RoleId);
-            Assert.AreEqual(Permission.Crud, role.Permission);
+            Assert.AreEqual(Verb.Crud, role.Verb);
             Assert.IsFalse(role.Locked);
         }
 
@@ -71,22 +71,22 @@ namespace Test.SimpleAuth.Shared.Test.Models
         public void Equals_Override()
         {
             // ReSharper disable once EqualExpressionComparison
-            Assert.IsTrue(Crm("c.a.e.t.m", Permission.Add).Equals(Crm("c.a.e.t.m", Permission.Add)));
+            Assert.IsTrue(Crm("c.a.e.t.m", Verb.Add).Equals(Crm("c.a.e.t.m", Verb.Add)));
             // ReSharper disable once EqualExpressionComparison
-            Assert.IsTrue(Crm("c.a.e.t.m.s", Permission.Add).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
+            Assert.IsTrue(Crm("c.a.e.t.m.s", Verb.Add).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
             
-            Assert.IsFalse(Crm("q.a.e.t.m.s", Permission.Add).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
-            Assert.IsFalse(Crm("c.q.e.t.m.s", Permission.Add).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
-            Assert.IsFalse(Crm("c.a.q.t.m.s", Permission.Add).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
-            Assert.IsFalse(Crm("c.a.e.q.m.s", Permission.Add).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
-            Assert.IsFalse(Crm("c.a.e.t.q.s", Permission.Add).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
-            Assert.IsFalse(Crm("c.a.e.t.m.q", Permission.Add).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
-            Assert.IsFalse(Crm("c.a.e.t.m.s", Permission.Edit).Equals(Crm("c.a.e.t.m.s", Permission.Add)));
-            Assert.IsFalse(Crm("c.a.e.t.q.s|3", Permission.Add).Equals(Crm("c.a.e.t.m.s|2", Permission.Add)));
+            Assert.IsFalse(Crm("q.a.e.t.m.s", Verb.Add).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
+            Assert.IsFalse(Crm("c.q.e.t.m.s", Verb.Add).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
+            Assert.IsFalse(Crm("c.a.q.t.m.s", Verb.Add).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
+            Assert.IsFalse(Crm("c.a.e.q.m.s", Verb.Add).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
+            Assert.IsFalse(Crm("c.a.e.t.q.s", Verb.Add).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
+            Assert.IsFalse(Crm("c.a.e.t.m.q", Verb.Add).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
+            Assert.IsFalse(Crm("c.a.e.t.m.s", Verb.Edit).Equals(Crm("c.a.e.t.m.s", Verb.Add)));
+            Assert.IsFalse(Crm("c.a.e.t.q.s|3", Verb.Add).Equals(Crm("c.a.e.t.m.s|2", Verb.Add)));
 
-            ClientRoleModel Crm(string roleId, Permission permission)
+            ClientPermissionModel Crm(string roleId, Verb permission)
             {
-                return ClientRoleModel.From(roleId, permission);
+                return ClientPermissionModel.From(roleId, permission);
             }
         }
 
@@ -95,7 +95,7 @@ namespace Test.SimpleAuth.Shared.Test.Models
         [TestCase("c", "a", "e", "t", "m", "s", "2", ExpectedResult = "c.a.e.t.m.s|2")]
         public string ComputeId(string corp, string app, string env, string tenant, string module, params string[] subModules)
         {
-            return new ClientRoleModel
+            return new ClientPermissionModel
             {
                 Corp = corp,
                 App = app,
@@ -111,17 +111,17 @@ namespace Test.SimpleAuth.Shared.Test.Models
         {
             var distinct = new[]
             {
-                ClientRoleModel.From("c.a.e.t.m", Permission.Add),
-                ClientRoleModel.From("c.a.e.t.m", Permission.Edit)
-            }.DistinctRoles().ToArray();
+                ClientPermissionModel.From("c.a.e.t.m", Verb.Add),
+                ClientPermissionModel.From("c.a.e.t.m", Verb.Edit)
+            }.DistinctPermissions().ToArray();
             
             Assert.AreEqual(2, distinct.Length);
             
             distinct = new[]
             {
-                ClientRoleModel.From("c.a.e.t.m", Permission.Add),
-                ClientRoleModel.From("c.a.e.t.m", Permission.Add)
-            }.DistinctRoles().ToArray();
+                ClientPermissionModel.From("c.a.e.t.m", Verb.Add),
+                ClientPermissionModel.From("c.a.e.t.m", Verb.Add)
+            }.DistinctPermissions().ToArray();
             
             Assert.AreEqual(1, distinct.Length);
             
@@ -130,13 +130,13 @@ namespace Test.SimpleAuth.Shared.Test.Models
             Assert.AreEqual("e", distinct.First().Env);
             Assert.AreEqual("t", distinct.First().Tenant);
             Assert.AreEqual("m", distinct.First().Module);
-            Assert.AreEqual(Permission.Add, distinct.First().Permission);
+            Assert.AreEqual(Verb.Add, distinct.First().Verb);
             
             distinct = new[]
             {
-                ClientRoleModel.From("c.a.e.t.m", Permission.Add),
-                ClientRoleModel.From("c.a.e.t.m", Permission.Crud)
-            }.DistinctRoles().ToArray();
+                ClientPermissionModel.From("c.a.e.t.m", Verb.Add),
+                ClientPermissionModel.From("c.a.e.t.m", Verb.Crud)
+            }.DistinctPermissions().ToArray();
             
             Assert.AreEqual(1, distinct.Length);
             
@@ -145,13 +145,13 @@ namespace Test.SimpleAuth.Shared.Test.Models
             Assert.AreEqual("e", distinct.First().Env);
             Assert.AreEqual("t", distinct.First().Tenant);
             Assert.AreEqual("m", distinct.First().Module);
-            Assert.AreEqual(Permission.Crud, distinct.First().Permission);
+            Assert.AreEqual(Verb.Crud, distinct.First().Verb);
             
             distinct = new[]
             {
-                ClientRoleModel.From("c.a.e.t.m", "7"),
-                ClientRoleModel.From("c.a.e.*.m", Permission.Crud)
-            }.DistinctRoles().ToArray();
+                ClientPermissionModel.From("c.a.e.t.m", "7"),
+                ClientPermissionModel.From("c.a.e.*.m", Verb.Crud)
+            }.DistinctPermissions().ToArray();
             
             Assert.AreEqual(1, distinct.Length);
             
@@ -160,13 +160,13 @@ namespace Test.SimpleAuth.Shared.Test.Models
             Assert.AreEqual("e", distinct.First().Env);
             Assert.AreEqual("*", distinct.First().Tenant);
             Assert.AreEqual("m", distinct.First().Module);
-            Assert.AreEqual(Permission.Crud, distinct.First().Permission);
+            Assert.AreEqual(Verb.Crud, distinct.First().Verb);
             
             distinct = new[]
             {
-                ClientRoleModel.From("c.a.e.t.m", Permission.Add),
-                ClientRoleModel.From("c.a.e.*.m", Permission.Edit)
-            }.DistinctRoles().ToArray();
+                ClientPermissionModel.From("c.a.e.t.m", Verb.Add),
+                ClientPermissionModel.From("c.a.e.*.m", Verb.Edit)
+            }.DistinctPermissions().ToArray();
             
             Assert.AreEqual(2, distinct.Length);
         }

@@ -100,7 +100,7 @@ namespace SimpleAuth.Client.AspNetCore.Services
                 .ToArray();
 
             if (missingClaims.Any())
-                throw new DataVerificationMismatchException($"Require {missingClaims[0].ClientRoleModel}");
+                throw new DataVerificationMismatchException($"Require {missingClaims[0].ClientPermissionModel}");
 
             await Task.CompletedTask;
         }
@@ -113,15 +113,15 @@ namespace SimpleAuth.Client.AspNetCore.Services
                     $"Can't find user id from {nameof(PackageSimpleAuthorizationClaim)}");
 
             var missingRoles = await _userAuthService.GetMissingRolesAsync(packageSimpleAuthorizationClaim.UserId,
-                new RoleModels
+                new PermissionModels
                 {
-                    Roles = requiredClaims.Select(x => x.ClientRoleModel.ToRole().Cast()).ToArray()
+                    Permissions = requiredClaims.Select(x => x.ClientPermissionModel.ToRole().Cast()).ToArray()
                 });
 
             if (missingRoles.Any())
             {
                 var firstRoleModel = missingRoles.First();
-                RoleUtils.Parse(firstRoleModel.Role, firstRoleModel.Permission, out var clientRoleModel);
+                RoleUtils.Parse(firstRoleModel.Role, firstRoleModel.Verb, out var clientRoleModel);
                 throw new DataVerificationMismatchException($"Require {clientRoleModel}");
             }
         }

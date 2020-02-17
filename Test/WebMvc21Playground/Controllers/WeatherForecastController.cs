@@ -28,8 +28,8 @@ namespace WebMvc21Playground.Controllers
         }
 
         [HttpGet]
-        [SaPermission(Permission.View, "a")]
-        [SaPermission(Permission.View, "b")]
+        [SaPermission(Verb.View, "a")]
+        [SaPermission(Verb.View, "b")]
         public IEnumerable<WeatherForecast> GetWithControllerModule()
         {
             return GetSample();
@@ -40,18 +40,18 @@ namespace WebMvc21Playground.Controllers
         {
             return await ResponseAsync(
                 ClaimsBuilder.FromMetaData<WeatherForecastController>()
-                    .WithPermission(Permission.View, "a")
-                    .WithPermission(Permission.View, "b")
+                    .WithPermission(Verb.View, "a")
+                    .WithPermission(Verb.View, "b")
             );
         }
 
         [HttpGet("1d")]
-        [SaPermission(Permission.View, "a")]
+        [SaPermission(Verb.View, "a")]
         public async Task<IActionResult> GetWithControllerModule_With_Declared_and_Extra_Addition_At_Runtime()
         {
             return await ResponseAsync(
                 ClaimsBuilder.FromMetaData<WeatherForecastController>()
-                    .WithPermission(Permission.View, "b")
+                    .WithPermission(Verb.View, "b")
             );
         }
 
@@ -64,7 +64,7 @@ namespace WebMvc21Playground.Controllers
                 return new ContentResult
                 {
                     StatusCode = StatusCodes.Status403Forbidden,
-                    Content = $"Require {missingClaims.First().ClientRoleModel}"
+                    Content = $"Require {missingClaims.First().ClientPermissionModel}"
                 };
             }
 
@@ -77,7 +77,7 @@ namespace WebMvc21Playground.Controllers
 
         [HttpGet("2")]
         [SaModule("best")] // Override attribute of class
-        [SaPermission(Permission.View)]
+        [SaPermission(Verb.View)]
         public IEnumerable<WeatherForecast> GetWithOverridenModule()
         {
             return GetSample();
@@ -89,7 +89,7 @@ namespace WebMvc21Playground.Controllers
         {
             return await ResponseAsync(
                 ClaimsBuilder.FromMetaData<WeatherForecastController>()
-                    .WithPermission(Permission.View)
+                    .WithPermission(Verb.View)
             );
         }
 
@@ -99,15 +99,15 @@ namespace WebMvc21Playground.Controllers
         {
             return await ResponseAsync(
                 ClaimsBuilder.FromMetaData<WeatherForecastController>()
-                    .WithPermission(Permission.View)
+                    .WithPermission(Verb.View)
             );
             // The attribute SaModule has to be removed in order to process this method
         }
 
         [HttpGet("3")]
         [SaModule("best")] // Override attribute of class
-        [SaPermission(Permission.View, "a")]
-        [SaPermission(Permission.View, "b")]
+        [SaPermission(Verb.View, "a")]
+        [SaPermission(Verb.View, "b")]
         public IEnumerable<WeatherForecast> GetWithMissingPermission()
         {
             return GetSample();
