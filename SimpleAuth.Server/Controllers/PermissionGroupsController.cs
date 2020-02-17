@@ -10,42 +10,40 @@ using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
-using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;
 using SimpleAuth.Shared.Validation;
-using PermissionGroup = SimpleAuth.Services.Entities.PermissionGroup;
 
 namespace SimpleAuth.Server.Controllers
 {
     /// <summary>
-    /// Create and manage Role Groups, which contains a lot of roles with permission, then user can be assigned into Role Group to inherit there permissions
+    /// Create and manage Permission Groups, which contains a lot of permissions, then user can be assigned into Permission Group to inherit there permissions
     /// </summary>
-    [Route("api/role-groups")]
+    [Route("api/permission-groups")]
     [RequireAppToken]
-    public class RoleGroupsController : BaseController<IPermissionGroupService, IPermissionGroupRepository, PermissionGroup>
+    public class PermissionGroupsController : BaseController<IPermissionGroupService, IPermissionGroupRepository, PermissionGroup>
     {
         private readonly IPermissionGroupValidationService _permissionGroupValidation;
-        private readonly ILogger<RoleGroupsController> _logger;
+        private readonly ILogger<PermissionGroupsController> _logger;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public RoleGroupsController(IServiceProvider serviceProvider,
+        public PermissionGroupsController(IServiceProvider serviceProvider,
             IPermissionGroupValidationService permissionGroupValidation) :
             base(serviceProvider)
         {
             _permissionGroupValidation = permissionGroupValidation;
-            _logger = serviceProvider.ResolveLogger<RoleGroupsController>();
+            _logger = serviceProvider.ResolveLogger<PermissionGroupsController>();
         }
 
         /// <summary>
-        /// Create a role group, which belong to Corp and App specified in x-app-token header
+        /// Create a permission group, which belong to Corp and App specified in x-app-token header
         /// </summary>
         /// <param name="model">Details of the new group</param>
-        /// <response code="201">Role Group had been created successfully</response>
+        /// <response code="201">Permission Group had been created successfully</response>
         /// <response code="400">Request model is malformed</response>
         /// <response code="409">The group name is already exists within app</response>
         [HttpPost]
