@@ -51,9 +51,11 @@ namespace SimpleAuth.Server.Controllers
         /// <returns>A newly created token, with version increased</returns>
         /// <response code="200">Token generated successfully</response>
         /// <response code="400">Specified corp/app is malformed</response>
+        /// <response code="428">Token has to be generated without ReadOnly flag set to false (means public != true)</response>
         [HttpGet("token/{corp}/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status428PreconditionRequired)]
         public async Task<IActionResult> GenerateAppPermissionToken(string corp, string app, [FromQuery] bool @public)
         {
             _logger.LogWarning($"{nameof(GenerateAppPermissionToken)} for application {corp}.{app}");
@@ -70,6 +72,9 @@ namespace SimpleAuth.Server.Controllers
                     Corp = corp,
                     App = app
                 }, true);
+
+                if (currentVersion < 1)
+                    return StatusCodes.Status428PreconditionRequired.WithEmpty();
 
                 var actionResult =
                     StatusCodes.Status200OK.WithMessage(GenerateAppTokenContent(currentVersion, true));
