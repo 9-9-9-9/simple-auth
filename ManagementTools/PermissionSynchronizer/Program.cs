@@ -38,7 +38,7 @@ namespace PermissionSynchronizer
         internal static async Task Main(string[] args)
         {
             await Task.CompletedTask;
-            
+
             if (!args.IsAny())
                 throw new ArgumentException("Require file as parameter");
 
@@ -87,7 +87,7 @@ namespace PermissionSynchronizer
             builder
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile("/configmaps/management-tools/appsettings.json", optional: true, reloadOnChange: true);
-            
+
             var configuration = builder.Build();
 
             IServiceCollection services = new ServiceCollection();
@@ -106,14 +106,52 @@ namespace PermissionSynchronizer
             CreateRoles(allRoleIdsWoCA);
             CreateGroups(allGroupNames);
             CreateUsers(allUserIds);
-            
+
+            await AddPermissionToGroupsAsync(groups);
+
             "Done".Write();
         }
+
+        private static async Task AddPermissionToGroupsAsync(ICollection<GroupModel> groupModels)
+        {
+            nameof(AddPermissionToGroupsAsync).Write();
+
+            var permissionGroupManagementService = ServiceProvider.GetService<IPermissionGroupManagementService>();
+
+            foreach (var groupModel in groupModels)
+            {
+                $"Revoke all permissions of group: {groupModel.Name}".Write();
+                await permissionGroupManagementService.RevokeAllPermissionsAsync(groupModel.Name);
+            }
+
+            foreach (var groupModel in groupModels.Where(x => x.PermissionModels.IsAny()))
+            {
+                try
+                {
+                    await permissionGroupManagementService.AddPermissionToGroupAsync(groupModel.Name,
+                        new PermissionModels
+                        {
+                            Permissions = groupModel.PermissionModels.Select(x =>
+                                new SimpleAuth.Shared.Models.PermissionModel
+                                {
+                                    Role = $"{Corp}.{App}.{x.RoleIdWithoutCorpApp}",
+                                    Verb = x.Verb.Serialize()
+                                }).ToArray()
+                        });
+                }
+                catch (SimpleAuthHttpRequestException e)
+                {
+                    throw new SimpleAuthHttpRequestException(e.HttpStatusCode, $"Assign permission to group {groupModel.Name}");
+                }
+            }
+        }
+
+        #region Entities creatation
 
         private static void CreateRoles(ICollection<string> roleIdsWoCA)
         {
             nameof(CreateRoles).Write();
-            
+
             var roleManagementService = ServiceProvider.GetService<IRoleManagementService>();
 
             var clientPermissionModels = roleIdsWoCA.Select(roleIdWoCA =>
@@ -153,7 +191,7 @@ namespace PermissionSynchronizer
         private static void CreateGroups(ICollection<string> groups)
         {
             nameof(CreateGroups).Write();
-            
+
             var permissionGroupManagementService = ServiceProvider.GetService<IPermissionGroupManagementService>();
 
             var createGroupModels = groups.Select(x => new CreatePermissionGroupModel
@@ -183,7 +221,7 @@ namespace PermissionSynchronizer
         private static void CreateUsers(ICollection<string> users)
         {
             nameof(CreateUsers).Write();
-            
+
             var userManagementService = ServiceProvider.GetService<IUserManagementService>();
 
             var createUserModels = users.Select(x => new CreateUserModel
@@ -207,6 +245,8 @@ namespace PermissionSynchronizer
 
             ThrowIfAnyFailure(result);
         }
+
+        #endregion
 
         private static void ThrowIfAnyFailure(ICollection<(bool, HttpStatusCode, string)> input)
         {

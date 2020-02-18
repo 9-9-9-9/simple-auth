@@ -159,7 +159,7 @@ namespace SimpleAuth.Services
                         Verb = r.Verb.Deserialize()
                     })
                     .DistinctRoles()
-                    .Select(r => r.ToEntityObject().WithRandomId())
+                    .Select(r => r.ToEntityObject())
                     .ToList();
 
             await UpdateRolesAsync(permissionGroup, newRoles);

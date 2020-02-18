@@ -436,8 +436,7 @@ namespace Test.SimpleAuth.Services.Test.Services
             await SetupFindSingleReturnsAndThenUpdate();
             mockPermissionGroupRepo.Verify(m => m.UpdatePermissionRecordsAsync(It.Is<PermissionGroup>(rg => true),
                 It.Is<List<PermissionRecord>>(rrs => rrs.Count == 2 && rrs.All(x =>
-                                                   x.Verb != Verb.None && x.Id != Guid.Empty &&
-                                                   !x.RoleId.IsBlank() && !x.Env.IsBlank() && !x.Tenant.IsBlank()))));
+                                                   x.Verb != Verb.None && !x.RoleId.IsBlank() && !x.Env.IsBlank() && !x.Tenant.IsBlank()))));
 
             // normal with some existing roles
             mockPermissionGroupRepo.Setup(x => x.UpdatePermissionRecordsAsync(It.IsAny<PermissionGroup>(), It.IsAny<List<PermissionRecord>>()))

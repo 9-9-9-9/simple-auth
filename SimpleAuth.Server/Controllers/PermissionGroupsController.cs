@@ -120,7 +120,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> AddRoles(
+        public async Task<IActionResult> AddPermissions(
             string groupName,
             [FromBody] PermissionModels model)
         {

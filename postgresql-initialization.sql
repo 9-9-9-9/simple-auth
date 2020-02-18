@@ -99,7 +99,7 @@ CREATE INDEX "IX_PermissionGroupUsers_PermissionGroupId" ON "PermissionGroupUser
 
 CREATE INDEX "IX_PermissionGroupUsers_UserId" ON "PermissionGroupUsers" ("UserId");
 
-CREATE INDEX "IX_PermissionRecords_Permission" ON "PermissionRecords" ("Permission");
+CREATE INDEX "IX_PermissionRecords_Permission" ON "PermissionRecords" ("Verb");
 
 CREATE INDEX "IX_PermissionRecords_PermissionGroupId" ON "PermissionRecords" ("PermissionGroupId");
 
