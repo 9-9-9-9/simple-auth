@@ -7,8 +7,8 @@ namespace SimpleAuth.Client.Services
     public interface IAdministrationService : IClientService
     {
         Task<string> GenerateCorpPermissionTokenAsync(string corp);
-        Task<string> GenerateAppPermissionTokenAsync(string corp, string app);
-        Task<string> GenerateAppPermissionTokenAsync(string app);
+        Task<string> GenerateAppPermissionTokenAsync(string corp, string app, bool @public = false);
+        Task<string> GenerateAppPermissionTokenAsync(string app, bool @public = false);
         Task<string> EncryptUsingMasterEncryptionKey(string data);
         Task<string> DecryptUsingMasterEncryptionKey(string data);
     }
@@ -44,21 +44,31 @@ namespace SimpleAuth.Client.Services
             );
         }
 
-        public async Task<string> GenerateAppPermissionTokenAsync(string corp, string app)
+        public async Task<string> GenerateAppPermissionTokenAsync(string corp, string app, bool @public = false)
         {
+            var requestBuilder = NewRequest()
+                .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(corp, app))
+                .Method(Constants.HttpMethods.GET);
+            
+            if (@public)
+                requestBuilder.WithQuery("public", "true");
+            
             return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
-                NewRequest()
-                    .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(corp, app))
-                    .Method(Constants.HttpMethods.GET)
+                requestBuilder
             );
         }
 
-        public async Task<string> GenerateAppPermissionTokenAsync(string app)
+        public async Task<string> GenerateAppPermissionTokenAsync(string app, bool @public = false)
         {
+            var requestBuilder = NewRequestForCorpManagement()
+                .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(app))
+                .Method(Constants.HttpMethods.GET);
+
+            if (@public)
+                requestBuilder.WithQuery("public", "true");
+            
             return await _httpService.DoHttpRequestWithResponseContentAsync<string>(
-                NewRequestForCorpManagement()
-                    .Append(EndpointBuilder.Administration.GenerateAppPermissionToken(app))
-                    .Method(Constants.HttpMethods.GET)
+               requestBuilder 
             );
         }
 

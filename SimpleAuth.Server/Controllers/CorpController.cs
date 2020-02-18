@@ -29,7 +29,7 @@ namespace SimpleAuth.Server.Controllers
         /// DI constructor
         /// </summary>
         public CorpController(IServiceProvider serviceProvider, IEncryptionService encryption,
-            ITokenInfoService tokenInfoService, IRolePartsValidationService rolePartsValidationService) 
+            ITokenInfoService tokenInfoService, IRolePartsValidationService rolePartsValidationService)
             : base(serviceProvider)
         {
             _encryption = encryption;
@@ -37,43 +37,69 @@ namespace SimpleAuth.Server.Controllers
             _rolePartsValidationService = rolePartsValidationService;
             _logger = serviceProvider.ResolveLogger<CorpController>();
         }
-        
+
         /// <summary>
         /// Generate a token, which has to be provided in 'x-app-token' header for some restricted actions
         /// </summary>
         /// <param name="app">Target app to generate token, if app does not exists, a newly one with version 1 will be generated</param>
+        /// <param name="public">Query param indicate this is generated for public use, being used by client, those client are restricted to read-only</param>
         /// <returns>A newly created token, with version increased</returns>
         /// <response code="200">Token generated successfully</response>
         /// <response code="400">Specified app is malformed</response>
         [HttpGet("token/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GenerateAppPermissionToken(string app)
+        public async Task<IActionResult> GenerateAppPermissionToken(string app, [FromQuery] bool @public)
         {
             _logger.LogWarning($"{nameof(GenerateAppPermissionToken)} for application {RequireCorpToken.Corp}.{app}");
-            
+
             if (!_rolePartsValidationService.IsValidApp(app).IsValid)
                 return StatusCodes.Status400BadRequest.WithMessage(nameof(app));
-            
-            var corp = RequireCorpToken.Corp;
-            
-            var nextTokenVersion = await _tokenInfoService.IncreaseVersionAsync(new TokenInfo
-            {
-                Corp = corp,
-                App = app
-            });
-            
-            var actionResult = StatusCodes.Status200OK.WithMessage(_encryption.Encrypt(new RequestAppHeaders
-            {
-                Header = Constants.Headers.AppPermission,
-                Corp = corp,
-                App = app,
-                Version = nextTokenVersion
-            }.ToJson()));
-            
-            _logger.LogWarning($"Generated token for {RequireCorpToken.Corp}.{app} version {nextTokenVersion}");
 
-            return actionResult;
+            var corp = RequireCorpToken.Corp;
+
+            if (@public)
+            {
+                var currentVersion = await _tokenInfoService.GetCurrentVersionAsync(new TokenInfo
+                {
+                    Corp = corp,
+                    App = app
+                }, true);
+
+                var actionResult =
+                    StatusCodes.Status200OK.WithMessage(GenerateAppTokenContent(currentVersion, true));
+
+                _logger.LogWarning($"Generated read-only token for {RequireCorpToken.Corp}.{app} at current version {currentVersion}");
+
+                return actionResult;
+            }
+            else
+            {
+                var nextTokenVersion = await _tokenInfoService.IncreaseVersionAsync(new TokenInfo
+                {
+                    Corp = corp,
+                    App = app
+                });
+
+                var actionResult =
+                    StatusCodes.Status200OK.WithMessage(GenerateAppTokenContent(nextTokenVersion, false));
+
+                _logger.LogWarning($"Generated token for {RequireCorpToken.Corp}.{app} version {nextTokenVersion}");
+
+                return actionResult;
+            }
+
+            string GenerateAppTokenContent(int version, bool isReadOnly)
+            {
+                return _encryption.Encrypt(new RequestAppHeaders
+                {
+                    Header = Constants.Headers.AppPermission,
+                    Corp = corp,
+                    App = app,
+                    Version = version,
+                    ReadOnly = isReadOnly
+                }.ToJson());
+            }
         }
     }
 }
