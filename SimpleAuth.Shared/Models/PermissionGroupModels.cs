@@ -5,7 +5,7 @@ using SimpleAuth.Shared.Domains;
 
 namespace SimpleAuth.Shared.Models
 {
-    public class CreateRoleGroupModel
+    public class CreatePermissionGroupModel
     {
         public string Name { get; set; }
 
@@ -13,20 +13,20 @@ namespace SimpleAuth.Shared.Models
 
         [Required] public string App { get; set; }
 
-        public string[] CopyFromRoleGroups { get; set; }
+        public string[] CopyFromPermissionGroups { get; set; }
     }
 
-    public class RoleGroupResponseModel
+    public class PermissionGroupResponseModel
     {
         public string Name { get; set; }
-        public RoleModel[] Roles { get; set; }
+        public PermissionModel[] Roles { get; set; }
 
-        public static RoleGroupResponseModel Cast(RoleGroup group)
+        public static PermissionGroupResponseModel Cast(PermissionGroup group)
         {
-            return new RoleGroupResponseModel
+            return new PermissionGroupResponseModel
             {
                 Name = group.Name,
-                Roles = (group.Roles?.Select(RoleModel.Cast)).OrEmpty().ToArray()
+                Roles = (group.Permissions?.Select(PermissionModel.Cast)).OrEmpty().ToArray()
             };
         }
     }

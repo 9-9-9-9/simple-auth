@@ -13,7 +13,7 @@ namespace Test.SimpleAuth.Services.Test.Objects
         [Test]
         public void WithRandomId()
         {
-            var gr = new RoleGroup();
+            var gr = new PermissionGroup();
             Assert.IsTrue(Guid.Empty.Equals(gr.Id));
             gr.WithRandomId();
             Assert.IsFalse(Guid.Empty.Equals(gr.Id));
@@ -80,14 +80,6 @@ namespace Test.SimpleAuth.Services.Test.Objects
 
     public class TestRoleExtensions
     {
-        [TestCase("s", "2", "3", ExpectedResult = "s|2|3")]
-        [TestCase("s", "2", ExpectedResult = "s|2")]
-        [TestCase("s", ExpectedResult = "s")]
-        [TestCase(ExpectedResult = null)]
-        public string JoinSubModules(params string[] subModules)
-        {
-            return subModules.JoinSubModules();
-        }
 
         [Test]
         public void JoinSubModules_Err()
@@ -95,6 +87,15 @@ namespace Test.SimpleAuth.Services.Test.Objects
             Assert.Catch<ArgumentNullException>(() => new[] {"a", string.Empty}.JoinSubModules());
             Assert.Catch<ArgumentNullException>(() => new[] {"a", string.Empty, "b"}.JoinSubModules());
             Assert.Catch<ArgumentNullException>(() => new[] {string.Empty, "b"}.JoinSubModules());
+        }
+        
+        [TestCase(ExpectedResult = null)]
+        [TestCase("s", "2", "3", ExpectedResult = "s|2|3")]
+        [TestCase("s", "2", ExpectedResult = "s|2")]
+        [TestCase("s", ExpectedResult = "s")]
+        public string JoinSubModules_NormalCase(params string[] subModules)
+        {
+            return subModules.JoinSubModules();
         }
 
         [Test]
@@ -121,25 +122,25 @@ namespace Test.SimpleAuth.Services.Test.Objects
         }
     }
 
-    public class TestRoleGroup
+    public class TestPermissionGroup
     {
         [Test]
         public void ToDomainObject()
         {
-            var eRg = new RoleGroup
+            var eRg = new PermissionGroup
             {
                 Name = "rg",
                 Corp = "c",
                 App = "a",
                 Locked = true,
-                RoleGroupUsers = Enumerable.Empty<RoleGroupUser>().ToList(),
-                RoleRecords = new List<RoleRecord>
+                PermissionGroupUsers = Enumerable.Empty<PermissionGroupUser>().ToList(),
+                PermissionRecords = new List<PermissionRecord>
                 {
-                    new RoleRecord
+                    new PermissionRecord
                     {
                         Id = Guid.NewGuid(),
                         RoleId = "c.a.e.t.m",
-                        Permission = Permission.Delete,
+                        Verb = Verb.Delete,
                         Env = "e",
                         Tenant = "t"
                     }
@@ -152,24 +153,24 @@ namespace Test.SimpleAuth.Services.Test.Objects
             Assert.AreEqual(eRg.Corp, dRg.Corp);
             Assert.AreEqual(eRg.App, dRg.App);
             Assert.AreEqual(eRg.Locked, dRg.Locked);
-            Assert.AreEqual(eRg.RoleRecords.Count, dRg.Roles.Length);
+            Assert.AreEqual(eRg.PermissionRecords.Count, dRg.Permissions.Length);
         }
     }
 
-    public class TestRoleRecordExtensions
+    public class TestPermissionRecordExtensions
     {
         [Test]
         public void ToEntityObject()
         {
-            var role = new global::SimpleAuth.Shared.Domains.Role
+            var role = new global::SimpleAuth.Shared.Domains.Permission
             {
                 RoleId = "c.a.e.t.m",
-                Permission = Permission.View
+                Verb = Verb.View
             };
 
             var rr = role.ToEntityObject();
             Assert.AreEqual(role.RoleId, rr.RoleId);
-            Assert.AreEqual(role.Permission, rr.Permission);
+            Assert.AreEqual(role.Verb, rr.Verb);
         }
     }
 }

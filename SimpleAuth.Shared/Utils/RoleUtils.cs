@@ -68,7 +68,7 @@ namespace SimpleAuth.Shared.Utils
                 throw new ArgumentNullException(nameof(module));
         }
 
-        public static void Parse(string roleId, out ClientRoleModel clientRoleModel)
+        public static void Parse(string roleId, out ClientPermissionModel clientPermissionModel)
         {
             var spl = roleId.Split(new[] {Constants.ChSplitterRoleParts}, StringSplitOptions.None);
             if (spl.Length < 5 || spl.Length > 6)
@@ -86,7 +86,7 @@ namespace SimpleAuth.Shared.Utils
                 subModules = new string[0];
             }
 
-            clientRoleModel = new ClientRoleModel
+            clientPermissionModel = new ClientPermissionModel
             {
                 Corp = spl[0],
                 App = spl[1],
@@ -97,14 +97,14 @@ namespace SimpleAuth.Shared.Utils
             };
         }
 
-        public static void Parse(string roleId, string permission, out ClientRoleModel clientRoleModel)
+        public static void Parse(string roleId, string verb, out ClientPermissionModel clientPermissionModel)
         {
-            Parse(roleId, out var tmpClientRoleModel);
-            tmpClientRoleModel.Permission = permission.Deserialize();
-            clientRoleModel = tmpClientRoleModel;
+            Parse(roleId, out var tmpClientPermissionModel);
+            tmpClientPermissionModel.Verb = verb.Deserialize();
+            clientPermissionModel = tmpClientPermissionModel;
         }
 
-        public static bool ContainsOrEquals(ClientRoleModel big, ClientRoleModel small, ComparisionFlag comparisionFlag)
+        public static bool ContainsOrEquals(ClientPermissionModel big, ClientPermissionModel small, ComparisionFlag comparisionFlag)
         {
             if (comparisionFlag.HasFlag(ComparisionFlag.Corp) && !ContainsOrEquals(big.Corp, small.Corp))
                 return false;
@@ -139,7 +139,7 @@ namespace SimpleAuth.Shared.Utils
             }
 
             if (comparisionFlag.HasFlag(ComparisionFlag.Permission))
-                return big.Permission.HasFlag(small.Permission);
+                return big.Verb.HasFlag(small.Verb);
             else
                 return true;
 
@@ -157,10 +157,10 @@ namespace SimpleAuth.Shared.Utils
             }
         }
 
-        public static IEnumerable<ClientRoleModel> Distinct(IEnumerable<ClientRoleModel> source)
+        public static IEnumerable<ClientPermissionModel> Distinct(IEnumerable<ClientPermissionModel> source)
         {
             var org = source.ToList();
-            var toBeRemoved = new HashSet<ClientRoleModel>();
+            var toBeRemoved = new HashSet<ClientPermissionModel>();
             foreach (var candidateBig in org)
             {
                 if (toBeRemoved.Contains(candidateBig))
@@ -200,26 +200,26 @@ namespace SimpleAuth.Shared.Utils
             All = Corp | FromApp
         }
 
-        public static string Merge(string roleId, string permission)
+        public static string Merge(string roleId, string verb)
         {
             if (roleId.IsBlank())
                 throw new ArgumentNullException(nameof(roleId));
 
-            if (permission.IsBlank())
-                throw new ArgumentNullException(nameof(permission));
+            if (verb.IsBlank())
+                throw new ArgumentNullException(nameof(verb));
 
-            if (permission == "0")
-                throw new ArgumentException(nameof(permission));
+            if (verb == "0")
+                throw new ArgumentException(nameof(verb));
 
-            return $"{roleId}{Constants.ChSplitterMergedRoleIdWithPermission}{permission}";
+            return $"{roleId}{Constants.ChSplitterMergedRoleIdWithPermission}{verb}";
         }
 
-        public static string Merge(string roleId, Permission permission)
+        public static string Merge(string roleId, Verb verb)
         {
-            return Merge(roleId, permission.Serialize());
+            return Merge(roleId, verb.Serialize());
         }
 
-        public static (string, Permission) UnMerge(string merged)
+        public static (string, Verb) UnMerge(string merged)
         {
             if (merged.IsBlank())
                 throw new ArgumentNullException(nameof(merged));
@@ -231,22 +231,22 @@ namespace SimpleAuth.Shared.Utils
             return (spl[0], spl[1].Deserialize());
         }
 
-        public static IEnumerable<(string, Permission)> ParseToMinimum(string roleId, Permission permission)
+        public static IEnumerable<(string, Verb)> ParseToMinimum(string roleId, Verb verb)
         {
-            foreach (var p in ParseToMinimum(permission))
+            foreach (var p in ParseToMinimum(verb))
                 yield return (roleId, p);
         }
 
-        public static IEnumerable<Permission> ParseToMinimum(Permission permission)
+        public static IEnumerable<Verb> ParseToMinimum(Verb verb)
         {
-            if (permission.HasFlag(Permission.Add))
-                yield return Permission.Add;
-            if (permission.HasFlag(Permission.View))
-                yield return Permission.View;
-            if (permission.HasFlag(Permission.Edit))
-                yield return Permission.Edit;
-            if (permission.HasFlag(Permission.Delete))
-                yield return Permission.Delete;
+            if (verb.HasFlag(Verb.Add))
+                yield return Verb.Add;
+            if (verb.HasFlag(Verb.View))
+                yield return Verb.View;
+            if (verb.HasFlag(Verb.Edit))
+                yield return Verb.Edit;
+            if (verb.HasFlag(Verb.Delete))
+                yield return Verb.Delete;
         }
     }
 }

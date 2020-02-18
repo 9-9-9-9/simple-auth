@@ -10,7 +10,7 @@ namespace SimpleAuth.Client.Models
     public class SimpleAuthorizationClaim
     {
         // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
-        public ClientRoleModel ClientRoleModel { get; set; }
+        public ClientPermissionModel ClientPermissionModel { get; set; }
         // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
 
         // ReSharper disable UnusedMember.Global
@@ -19,15 +19,15 @@ namespace SimpleAuth.Client.Models
         }
         // ReSharper restore UnusedMember.Global
 
-        public SimpleAuthorizationClaim(ClientRoleModel clientRoleModel)
+        public SimpleAuthorizationClaim(ClientPermissionModel clientPermissionModel)
         {
-            ClientRoleModel = clientRoleModel;
+            ClientPermissionModel = clientPermissionModel;
         }
 
-        public SimpleAuthorizationClaim(RoleModel roleModel)
+        public SimpleAuthorizationClaim(PermissionModel permissionModel)
         {
-            RoleUtils.Parse(roleModel.Role, roleModel.Permission, out var clientRoleModel);
-            ClientRoleModel = clientRoleModel;
+            RoleUtils.Parse(permissionModel.Role, permissionModel.Verb, out var clientRoleModel);
+            ClientPermissionModel = clientRoleModel;
         }
 
         public bool Contains(SimpleAuthorizationClaim another)
@@ -35,7 +35,7 @@ namespace SimpleAuth.Client.Models
             var big = this;
             var small = another;
 
-            return RoleUtils.ContainsOrEquals(big.ClientRoleModel, small.ClientRoleModel,
+            return RoleUtils.ContainsOrEquals(big.ClientPermissionModel, small.ClientPermissionModel,
                 RoleUtils.ComparisionFlag.All);
         }
     }
@@ -55,7 +55,7 @@ namespace SimpleAuth.Client.Models
     public static class SimpleAuthorizationClaimExtensions
     {
         public static ICollection<SimpleAuthorizationClaim> ToSimpleAuthorizationClaims(
-            this ICollection<RoleModel> roleModels)
+            this ICollection<PermissionModel> roleModels)
         {
             return roleModels.Select(x => new SimpleAuthorizationClaim(x)).ToList();
         }

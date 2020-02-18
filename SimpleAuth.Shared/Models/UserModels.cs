@@ -19,7 +19,7 @@ namespace SimpleAuth.Shared.Models
         public string Corp { get; set; }
         public string Email { get; set; }
         public bool Locked { get; set; }
-        public RoleModel[] ActiveRoles { get; set; }
+        public PermissionModel[] ActiveRoles { get; set; }
         
         public GoogleTokenResponseResult GoogleToken { get; set; }
         public long? ExpiryDate { get; set; }
@@ -64,8 +64,8 @@ namespace SimpleAuth.Shared.Models
         [DataMember(Name = "typ", IsRequired = false)] public string Typ { get; set; }
     }
 
-    public class ModifyUserRoleGroupsModel
+    public class ModifyUserPermissionGroupsModel
     {
-        public string[] RoleGroups { get; set; }
+        public string[] PermissionGroups { get; set; }
     }
 }

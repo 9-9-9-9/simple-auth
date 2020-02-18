@@ -14,42 +14,42 @@ namespace AppManagementConsole.Commands
     public class RevokePermissionCommand : AbstractCommand
     {
         private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public RevokePermissionCommand(IRoleGroupManagementService roleGroupManagementService,
+        public RevokePermissionCommand(IPermissionGroupManagementService permissionGroupManagementService,
             ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider)
         {
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
             _simpleAuthConfigurationProvider = simpleAuthConfigurationProvider;
         }
 
         protected override Task DoMainJob(string[] args)
         {
-            var roleGroupName = args[0];
+            var permissionGroupName = args[0];
             var roleIdWithoutCorpAndApp = args[1];
             var strPermission = args[2];
 
-            if (!Enum.TryParse(typeof(Permission), strPermission, true, out var enumPermission))
+            if (!Enum.TryParse(typeof(Verb), strPermission, true, out var enumPermission))
                 throw new ArgumentException($"{strPermission} is not a valid permission");
 
-            return _roleGroupManagementService.DeleteRolesAsync(roleGroupName, 
-                new RoleModel
+            return _permissionGroupManagementService.RevokePermissionsAsync(permissionGroupName, 
+                new PermissionModel
                 {
                     Role =
                         $"{_simpleAuthConfigurationProvider.Corp}{Constants.SplitterRoleParts}{_simpleAuthConfigurationProvider.App}{Constants.SplitterRoleParts}{roleIdWithoutCorpAndApp}",
-                    Permission = ((Permission) enumPermission).Serialize()
+                    Verb = ((Verb) enumPermission).Serialize()
                 });
         }
 
-        private static readonly string ValidPermissionInput = string.Join(',', Enum.GetValues(typeof(Permission))
-            .Cast<Permission>()
+        private static readonly string ValidPermissionInput = string.Join(',', Enum.GetValues(typeof(Verb))
+            .Cast<Verb>()
             .Select(x => x.ToString()));
 
         public override string[] GetParametersName()
         {
             return new[]
             {
-                "Role Group name", "Role Id without Corp and App parts",
+                "Permission Group name", "Role Id without Corp and App parts",
                 $"Permission (accepted values: {ValidPermissionInput}"
             };
         }

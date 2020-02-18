@@ -1,0 +1,16 @@
+Target
+	corp
+		test
+	app
+		wap
+
+Users
+	theone
+		admin
+
+Groups
+	admin
+		d.0.weatherforecast.a 	View
+		d.0.weatherforecast.b 	View
+		d.0.best.a 		View
+	user

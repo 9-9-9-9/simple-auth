@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
-using Role = SimpleAuth.Shared.Domains.Role;
+using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 
@@ -13,8 +13,8 @@ namespace SimpleAuth.Services
     public interface IRoleService : IDomainService
     {
         Task AddRoleAsync(CreateRoleModel model);
-        Task UpdateLockStatus(Role role);
-        IEnumerable<Role> SearchRoles(string term, string corp, string app, FindOptions findOptions = null);
+        Task UpdateLockStatus(Permission permission);
+        IEnumerable<Permission> SearchRoles(string term, string corp, string app, FindOptions findOptions = null);
     }
 
     public class DefaultRoleService : DomainService<IRoleRepository, Entities.Role>, IRoleService
@@ -33,20 +33,20 @@ namespace SimpleAuth.Services
             await Repository.CreateAsync(entity);
         }
 
-        public async Task UpdateLockStatus(Role role)
+        public async Task UpdateLockStatus(Permission permission)
         {
-            var entity = Repository.Find(role.RoleId);
+            var entity = Repository.Find(permission.RoleId);
             if (entity == null)
-                throw new EntityNotExistsException(role.RoleId);
+                throw new EntityNotExistsException(permission.RoleId);
 
-            entity.Locked = role.Locked;
+            entity.Locked = permission.Locked;
             
             await Repository.UpdateAsync(entity);
         }
 
-        public IEnumerable<Role> SearchRoles(string term, string corp, string app, FindOptions findOptions = null)
+        public IEnumerable<Permission> SearchRoles(string term, string corp, string app, FindOptions findOptions = null)
         {
-            return Repository.Search(term, corp, app, findOptions).Select(x => new Role
+            return Repository.Search(term, corp, app, findOptions).Select(x => new Permission
             {
                 RoleId = x.Id
             });

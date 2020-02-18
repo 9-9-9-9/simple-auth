@@ -8,19 +8,19 @@ namespace SimpleAuth.Client.AspNetCore.Attributes
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class SaPermissionAttribute : Attribute
     {
-        public Permission Permission { get; }
+        public Verb Verb { get; }
         public string[] SubModules { get; }
 
-        public SaPermissionAttribute(Permission permission, params string[] subModules)
+        public SaPermissionAttribute(Verb verb, params string[] subModules)
         {
-            if (permission == Permission.None)
+            if (verb == Verb.None)
                 throw new ArgumentException(
-                    $"{nameof(permission)}: can't define '{nameof(Permission.None)}' value here");
+                    $"{nameof(verb)}: can't define '{nameof(Verb.None)}' value here");
             
             if (subModules?.Any(x => x == Constants.WildCard) == true)
                 throw new ArgumentException($"{nameof(subModules)}: can't use wildcard here");
             
-            Permission = permission;
+            Verb = verb;
             SubModules = subModules;
         }
     }

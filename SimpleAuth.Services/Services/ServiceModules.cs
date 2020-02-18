@@ -9,7 +9,7 @@ namespace SimpleAuth.Services
         {
             serviceCollection.AddSingleton<IEncryptionService, DefaultEncryptionService>();
             serviceCollection.AddTransient<IRoleService, DefaultRoleService>();
-            serviceCollection.AddTransient<IRoleGroupService, DefaultRoleGroupService>();
+            serviceCollection.AddTransient<IPermissionGroupService, DefaultPermissionGroupService>();
             serviceCollection.AddTransient<IUserService, DefaultUserService>();
             serviceCollection.AddTransient<ITokenInfoService, DefaultTokenInfoService>();
         }

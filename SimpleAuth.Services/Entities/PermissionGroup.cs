@@ -8,11 +8,11 @@ using Toolbelt.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleAuth.Services.Entities
 {
-    public partial class RoleGroup : BaseEntity<Guid>, ILockable, ICorpRelated, IAppRelated
+    public partial class PermissionGroup : BaseEntity<Guid>, ILockable, ICorpRelated, IAppRelated
     {
         [Index, Required] public string Name { get; set; }
 
-        public ICollection<RoleRecord> RoleRecords { get; set; }
+        public ICollection<PermissionRecord> PermissionRecords { get; set; }
 
         [Index] public bool Locked { get; set; }
 
@@ -20,20 +20,20 @@ namespace SimpleAuth.Services.Entities
 
         [Index, Required] public string App { get; set; }
 
-        public ICollection<RoleGroupUser> RoleGroupUsers { get; set; }
+        public ICollection<PermissionGroupUser> PermissionGroupUsers { get; set; }
     }
 
-    public partial class RoleGroup
+    public partial class PermissionGroup
     {
-        public Shared.Domains.RoleGroup ToDomainObject()
+        public Shared.Domains.PermissionGroup ToDomainObject()
         {
-            return new Shared.Domains.RoleGroup
+            return new Shared.Domains.PermissionGroup
             {
                 Name = Name,
                 Corp = Corp,
                 App = App,
                 Locked = Locked,
-                Roles = RoleRecords.OrEmpty().Select(x => x.ToDomainObject()).ToArray(),
+                Permissions = PermissionRecords.OrEmpty().Select(x => x.ToDomainObject()).ToArray(),
             };
         }
     }

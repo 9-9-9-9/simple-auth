@@ -12,24 +12,24 @@ using SimpleAuth.Shared.Models;
 namespace AppManagementConsole.Commands
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class AddRoleToGroupCommand : AbstractCommand
+    public class AddPermissionToGroupCommand : AbstractCommand
     {
         private readonly ISimpleAuthConfigurationProvider _simpleAuthConfigurationProvider;
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public AddRoleToGroupCommand(IRoleGroupManagementService roleGroupManagementService,
+        public AddPermissionToGroupCommand(IPermissionGroupManagementService permissionGroupManagementService,
             ISimpleAuthConfigurationProvider simpleAuthConfigurationProvider)
         {
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
             _simpleAuthConfigurationProvider = simpleAuthConfigurationProvider;
         }
 
         protected override async Task DoMainJob(string[] args)
         {
-            var validPermissionInput = string.Join(',', Enum.GetValues(typeof(Permission))
-                .Cast<Permission>()
+            var validPermissionInput = string.Join(',', Enum.GetValues(typeof(Verb))
+                .Cast<Verb>()
                 .Select(x => x.ToString()));
-            var roleModels = new List<RoleModel>();
+            var roleModels = new List<PermissionModel>();
             do
             {
                 "Role Id without Corp and App parts (leave empty to submit)".Write();
@@ -39,14 +39,14 @@ namespace AppManagementConsole.Commands
                 $"Permission (accepted values: {validPermissionInput}".Write();
                 var permission = Console.ReadLine();
 
-                if (!Enum.TryParse(typeof(Permission), permission, true, out var enumPermission))
+                if (!Enum.TryParse(typeof(Verb), permission, true, out var enumPermission))
                     throw new ArgumentException($"{permission} is not a valid permission");
 
-                roleModels.Add(new RoleModel
+                roleModels.Add(new PermissionModel
                 {
                     Role =
                         $"{_simpleAuthConfigurationProvider.Corp}{Constants.SplitterRoleParts}{_simpleAuthConfigurationProvider.App}{Constants.SplitterRoleParts}{roleIdWithoutCorpAndApp}",
-                    Permission = ((Permission) enumPermission).Serialize()
+                    Verb = ((Verb) enumPermission).Serialize()
                 });
             } while (true);
 
@@ -56,16 +56,16 @@ namespace AppManagementConsole.Commands
                 return;
             }
 
-            await _roleGroupManagementService.AddRoleToGroupAsync(args[0], new RoleModels
+            await _permissionGroupManagementService.AddPermissionToGroupAsync(args[0], new PermissionModels
             {
-                Roles = roleModels.ToArray()
+                Permissions = roleModels.ToArray()
             });
             Print("Added");
         }
 
         public override string[] GetParametersName()
         {
-            return new[] {"Role Group name"};
+            return new[] {"Permissions Group name"};
         }
 
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)

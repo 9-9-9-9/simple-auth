@@ -9,29 +9,29 @@ using SimpleAuth.Core.Extensions;
 namespace AppManagementConsole.Commands
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class ListingRolesOfGroupCommand : AbstractCommand
+    public class ListingPermissionsOfGroupCommand : AbstractCommand
     {
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public ListingRolesOfGroupCommand(IRoleGroupManagementService roleGroupManagementService)
+        public ListingPermissionsOfGroupCommand(IPermissionGroupManagementService permissionGroupManagementService)
         {
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
         }
 
         protected override Task DoMainJob(string[] args)
         {
-            return Print(_roleGroupManagementService.GetRoleGroupAsync(args[0])
+            return Print(_permissionGroupManagementService.GetPermissionGroupAsync(args[0])
                 .ContinueWith(x =>
                 {
-                    var roleGroup = x.Result;
+                    var permissionGroup = x.Result;
                     var sb = new StringBuilder();
 
-                    if (roleGroup.Roles.IsAny())
-                        roleGroup.Roles.ToList().ForEach(rm => { sb.AppendLine($"<{rm.Permission,20}> {rm.RoleId}"); });
+                    if (permissionGroup.Permissions.IsAny())
+                        permissionGroup.Permissions.ToList().ForEach(rm => { sb.AppendLine($"<{rm.Verb,20}> {rm.RoleId}"); });
                     else
-                        sb.AppendLine("Group doesn't have any role");
-                    if (roleGroup.Locked)
-                        sb.AppendLine($"Group {roleGroup.Name} is being LOCKED");
+                        sb.AppendLine("Group doesn't have any permission");
+                    if (permissionGroup.Locked)
+                        sb.AppendLine($"Group {permissionGroup.Name} is being LOCKED");
 
                     return sb.ToString();
                 })

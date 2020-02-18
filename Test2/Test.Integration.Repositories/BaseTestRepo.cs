@@ -68,28 +68,28 @@ namespace Test.Integration.Repositories
             return (roleRepository, corp);
         }
 
-        protected async Task<(IRoleGroupRepository, string)> GenerateGroupsAsync()
+        protected async Task<(IPermissionGroupRepository, string)> GenerateGroupsAsync()
         {
-            var roleGroupRepository = Svc<IRoleGroupRepository>();
+            var permissionGroupRepository = Svc<IPermissionGroupRepository>();
             var corp = RandomCorp();
 
-            await roleGroupRepository.CreateManyAsync(new[]
+            await permissionGroupRepository.CreateManyAsync(new[]
             {
-                new RoleGroup
+                new PermissionGroup
                 {
                     Corp = corp,
                     App = "a1",
                     Name = "g11",
                     Locked = false,
                 }.WithRandomId(),
-                new RoleGroup
+                new PermissionGroup
                 {
                     Corp = corp,
                     App = "a1",
                     Name = "g12",
                     Locked = false,
                 }.WithRandomId(),
-                new RoleGroup
+                new PermissionGroup
                 {
                     Corp = corp,
                     App = "a2",
@@ -98,7 +98,7 @@ namespace Test.Integration.Repositories
                 }.WithRandomId(),
             });
 
-            return (roleGroupRepository, corp);
+            return (permissionGroupRepository, corp);
         }
 
         protected async Task<(ITokenInfoRepository, string)> GenerateTokensAsync()

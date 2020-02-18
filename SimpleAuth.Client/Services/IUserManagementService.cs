@@ -8,7 +8,7 @@ namespace SimpleAuth.Client.Services
 {
     public interface IUserManagementService
     {
-        Task AssignUserToGroupsAsync(string userId, ModifyUserRoleGroupsModel modifyUserRoleGroupsModel);
+        Task AssignUserToGroupsAsync(string userId, ModifyUserPermissionGroupsModel modifyUserPermissionGroupsModel);
         Task CreateUserAsync(CreateUserModel createUserModel);
     }
 
@@ -28,14 +28,14 @@ namespace SimpleAuth.Client.Services
                 .WithAppToken();
         }
 
-        public Task AssignUserToGroupsAsync(string userId, ModifyUserRoleGroupsModel modifyUserRoleGroupsModel)
+        public Task AssignUserToGroupsAsync(string userId, ModifyUserPermissionGroupsModel modifyUserPermissionGroupsModel)
         {
             return _httpService.DoHttpRequestWithoutResponseAsync(
                 true,
                 NewRequest()
-                    .Append(EndpointBuilder.User.AssignUserToRoleGroups(userId))
+                    .Append(EndpointBuilder.User.AssignUserToPermissionGroups(userId))
                     .Method(Constants.HttpMethods.POST),
-                modifyUserRoleGroupsModel.JsonSerialize()
+                modifyUserPermissionGroupsModel.JsonSerialize()
             );
         }
 

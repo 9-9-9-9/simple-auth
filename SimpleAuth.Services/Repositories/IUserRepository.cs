@@ -12,28 +12,28 @@ namespace SimpleAuth.Repositories
     public interface IUserRepository : IRepository<User, string>
     {
         Task CreateUserAsync(User user, LocalUserInfo userInfo);
-        Task AssignUserToGroups(User user, RoleGroup[] roleGroups);
-        Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups);
+        Task AssignUserToGroups(User user, PermissionGroup[] permissionGroups);
+        Task UnAssignUserFromGroups(User user, PermissionGroup[] permissionGroups);
     }
 
     public class UserRepository : Repository<User, string>, IUserRepository
     {
-        private readonly IRoleGroupRepository _roleGroupRepository;
+        private readonly IPermissionGroupRepository _permissionGroupRepository;
 
         public UserRepository(IDbContextFactory dbContextFactory,
-            IRoleGroupRepository roleGroupRepository)
+            IPermissionGroupRepository permissionGroupRepository)
             : base(dbContextFactory)
         {
-            _roleGroupRepository = roleGroupRepository;
+            _permissionGroupRepository = permissionGroupRepository;
         }
 
         protected override IQueryable<User> Include(DbSet<User> dbSet)
         {
             return base
                 .Include(dbSet)
-                .Include(x => x.RoleGroupUsers)
-                .ThenInclude(gu => gu.RoleGroup)
-                .ThenInclude(rg => rg.RoleRecords)
+                .Include(x => x.PermissionGroupUsers)
+                .ThenInclude(gu => gu.PermissionGroup)
+                .ThenInclude(rg => rg.PermissionRecords)
                 .Include(x => x.UserInfos);
         }
 
@@ -93,34 +93,34 @@ namespace SimpleAuth.Repositories
             await ctx.SaveChangesAsync();
         }
 
-        public async Task AssignUserToGroups(User user, RoleGroup[] roleGroups)
+        public async Task AssignUserToGroups(User user, PermissionGroup[] permissionGroups)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            if (roleGroups.IsEmpty())
-                throw new ArgumentNullException(nameof(roleGroups));
+            if (permissionGroups.IsEmpty())
+                throw new ArgumentNullException(nameof(permissionGroups));
             
-            var targetGrIds = roleGroups.Select(rg => rg.Id);
-            var lookupRoleGroups = _roleGroupRepository
+            var targetGrIds = permissionGroups.Select(rg => rg.Id);
+            var lookupPermissionGroups = _permissionGroupRepository
                 .Find(x => targetGrIds.Contains(x.Id)
                 ).ToArray();
 
-            if (lookupRoleGroups.Length != roleGroups.Length)
-                throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
-                    .Except(lookupRoleGroups.Select(g => g.Name)));
+            if (lookupPermissionGroups.Length != permissionGroups.Length)
+                throw new EntityNotExistsException(permissionGroups.Select(g => g.Name)
+                    .Except(lookupPermissionGroups.Select(g => g.Name)));
 
             await using var ctx = OpenConnect();
 
             var lookupUser = await ctx.Set<User>()
-                .Include(x => x.RoleGroupUsers)
+                .Include(x => x.PermissionGroupUsers)
                 .FirstOrDefaultAsync(x => x.Id == user.Id);
             if (lookupUser == null)
                 throw new EntityNotExistsException(user.Id);
 
-            var toBeAdded = lookupUser.RoleGroupUsers.IsEmpty()
-                ? lookupRoleGroups
-                : lookupRoleGroups
-                    .Where(g => lookupUser.RoleGroupUsers.Any(x => x.RoleGroupId != g.Id))
+            var toBeAdded = lookupUser.PermissionGroupUsers.IsEmpty()
+                ? lookupPermissionGroups
+                : lookupPermissionGroups
+                    .Where(g => lookupUser.PermissionGroupUsers.Any(x => x.PermissionGroupId != g.Id))
                     .ToArray();
 
             if (toBeAdded.IsEmpty())
@@ -128,17 +128,17 @@ namespace SimpleAuth.Repositories
 
             foreach (var gr in toBeAdded)
             {
-                var newRecord = new RoleGroupUser
+                var newRecord = new PermissionGroupUser
                 {
                     UserId = lookupUser.Id,
-                    RoleGroupId = gr.Id,
+                    PermissionGroupId = gr.Id,
                 };
-                ctx.Set<RoleGroupUser>().Add(newRecord);
+                ctx.Set<PermissionGroupUser>().Add(newRecord);
 
-                lookupUser.RoleGroupUsers = lookupUser.RoleGroupUsers.Concat(newRecord).ToList();
+                lookupUser.PermissionGroupUsers = lookupUser.PermissionGroupUsers.Concat(newRecord).ToList();
 
-                gr.RoleGroupUsers = gr.RoleGroupUsers.Concat(newRecord).ToList();
-                ctx.Set<RoleGroup>().Update(gr);
+                gr.PermissionGroupUsers = gr.PermissionGroupUsers.Concat(newRecord).ToList();
+                ctx.Set<PermissionGroup>().Update(gr);
             }
 
             ctx.Set<User>().Update(lookupUser);
@@ -146,42 +146,42 @@ namespace SimpleAuth.Repositories
             await ctx.SaveChangesAsync();
         }
 
-        public async Task UnAssignUserFromGroups(User user, RoleGroup[] roleGroups)
+        public async Task UnAssignUserFromGroups(User user, PermissionGroup[] permissionGroups)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-            if (roleGroups.IsEmpty())
-                throw new ArgumentNullException(nameof(roleGroups));
+            if (permissionGroups.IsEmpty())
+                throw new ArgumentNullException(nameof(permissionGroups));
             
-            var targetGrIds = roleGroups.Select(rg => rg.Id);
-            var lookupRoleGroups = _roleGroupRepository
+            var targetGrIds = permissionGroups.Select(rg => rg.Id);
+            var lookupPermissionGroups = _permissionGroupRepository
                 .Find(x => targetGrIds.Contains(x.Id)
                 ).ToArray();
 
-            if (lookupRoleGroups.Length != roleGroups.Length)
-                throw new EntityNotExistsException(roleGroups.Select(g => g.Name)
-                    .Except(lookupRoleGroups.Select(g => g.Name)));
+            if (lookupPermissionGroups.Length != permissionGroups.Length)
+                throw new EntityNotExistsException(permissionGroups.Select(g => g.Name)
+                    .Except(lookupPermissionGroups.Select(g => g.Name)));
 
             await using var ctx = OpenConnect();
 
             var lookupUser = await ctx.Set<User>()
-                .Include(x => x.RoleGroupUsers)
+                .Include(x => x.PermissionGroupUsers)
                 .FirstOrDefaultAsync(x => x.Id == user.Id);
             if (lookupUser == null)
                 throw new EntityNotExistsException(user.Id);
 
-            if (lookupUser.RoleGroupUsers.IsEmpty())
+            if (lookupUser.PermissionGroupUsers.IsEmpty())
                 return;
 
-            var rguSet = ctx.Set<RoleGroupUser>();
-            foreach (var gr in lookupRoleGroups)
+            var rguSet = ctx.Set<PermissionGroupUser>();
+            foreach (var gr in lookupPermissionGroups)
             {
-                gr.RoleGroupUsers.Remove(gr.RoleGroupUsers.First(x =>
-                    x.RoleGroupId == gr.Id && x.UserId == lookupUser.Id));
-                lookupUser.RoleGroupUsers.Remove(
-                    lookupUser.RoleGroupUsers.First(x => x.RoleGroupId == gr.Id && x.UserId == lookupUser.Id));
+                gr.PermissionGroupUsers.Remove(gr.PermissionGroupUsers.First(x =>
+                    x.PermissionGroupId == gr.Id && x.UserId == lookupUser.Id));
+                lookupUser.PermissionGroupUsers.Remove(
+                    lookupUser.PermissionGroupUsers.First(x => x.PermissionGroupId == gr.Id && x.UserId == lookupUser.Id));
 
-                ctx.Set<RoleGroup>().Update(gr);
+                ctx.Set<PermissionGroup>().Update(gr);
                 ctx.Set<User>().Update(lookupUser);
 
                 rguSet.Remove(rguSet.Find(lookupUser.Id, gr.Id));

@@ -69,9 +69,9 @@ namespace Test.SimpleAuth.Services.Test.Services
                         Corp = corp2
                     }
                 },
-                RoleGroupUsers = new List<RoleGroupUser>
+                PermissionGroupUsers = new List<PermissionGroupUser>
                 {
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
                         UserId = userId,
                         User = new User
@@ -79,72 +79,72 @@ namespace Test.SimpleAuth.Services.Test.Services
                             Id = userId,
                             NormalizedId = userId
                         },
-                        RoleGroupId = Guid.NewGuid(),
-                        RoleGroup = new RoleGroup
+                        PermissionGroupId = Guid.NewGuid(),
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g11",
                             Corp = corp1,
                             App = "a",
                             Locked = true,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m1",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m2",
-                                    Permission = Permission.Edit,
+                                    Verb = Verb.Edit,
                                 }
                             }
                         }
                     },
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
                         UserId = userId,
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g12",
                             Corp = corp1,
                             App = "a",
                             Locked = false,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m3",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m4",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 }
                             }
                         }
                     },
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
                         UserId = userId,
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g21",
                             Corp = corp2,
                             App = "a",
                             Locked = true,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m5",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.a.e.t.m6",
-                                    Permission = Permission.View,
+                                    Verb = Verb.View,
                                 }
                             }
                         }
@@ -156,19 +156,19 @@ namespace Test.SimpleAuth.Services.Test.Services
             Assert.NotNull(user);
             Assert.AreEqual(1, user.LocalUserInfos.Length);
             Assert.AreEqual(corp1, user.LocalUserInfos.First().Corp);
-            Assert.AreEqual(2, user.RoleGroups.Length);
-            Assert.AreEqual("g11", user.RoleGroups[0].Name);
-            Assert.AreEqual("g12", user.RoleGroups[1].Name);
-            Assert.AreEqual(2, user.RoleGroups[0].Roles.Length);
-            Assert.AreEqual(2, user.RoleGroups[1].Roles.Length);
-            Assert.AreEqual(corp1, user.RoleGroups[0].Corp);
-            Assert.AreEqual("a", user.RoleGroups[0].App);
-            Assert.AreEqual(true, user.RoleGroups[0].Locked);
-            Assert.AreEqual(false, user.RoleGroups[1].Locked);
-            Assert.AreEqual($"{corp1}.a.e.t.m1", user.RoleGroups[0].Roles[0].RoleId);
-            Assert.AreEqual(Permission.View, user.RoleGroups[0].Roles[0].Permission);
-            Assert.AreEqual($"{corp1}.a.e.t.m2", user.RoleGroups[0].Roles[1].RoleId);
-            Assert.AreEqual(Permission.Edit, user.RoleGroups[0].Roles[1].Permission);
+            Assert.AreEqual(2, user.PermissionGroups.Length);
+            Assert.AreEqual("g11", user.PermissionGroups[0].Name);
+            Assert.AreEqual("g12", user.PermissionGroups[1].Name);
+            Assert.AreEqual(2, user.PermissionGroups[0].Permissions.Length);
+            Assert.AreEqual(2, user.PermissionGroups[1].Permissions.Length);
+            Assert.AreEqual(corp1, user.PermissionGroups[0].Corp);
+            Assert.AreEqual("a", user.PermissionGroups[0].App);
+            Assert.AreEqual(true, user.PermissionGroups[0].Locked);
+            Assert.AreEqual(false, user.PermissionGroups[1].Locked);
+            Assert.AreEqual($"{corp1}.a.e.t.m1", user.PermissionGroups[0].Permissions[0].RoleId);
+            Assert.AreEqual(Verb.View, user.PermissionGroups[0].Permissions[0].Verb);
+            Assert.AreEqual($"{corp1}.a.e.t.m2", user.PermissionGroups[0].Permissions[1].RoleId);
+            Assert.AreEqual(Verb.Edit, user.PermissionGroups[0].Permissions[1].Verb);
 
             ISetup<IUserRepository, User> SetupUser() => mockUserRepository.Setup(x => x.Find(userId));
 
@@ -255,18 +255,18 @@ namespace Test.SimpleAuth.Services.Test.Services
         [Test]
         public async Task AssignUserToGroupsAsync()
         {
-            var svc = Prepare<IRoleGroupRepository, RoleGroup, Guid>(out var mockUserRepository,
-                out var mockRoleGroupRepository).GetRequiredService<IUserService>();
+            var svc = Prepare<IPermissionGroupRepository, PermissionGroup, Guid>(out var mockUserRepository,
+                out var mockPermissionGroupRepo).GetRequiredService<IUserService>();
 
-            mockUserRepository.Setup(x => x.AssignUserToGroups(It.IsAny<User>(), It.IsAny<RoleGroup[]>()))
+            mockUserRepository.Setup(x => x.AssignUserToGroups(It.IsAny<User>(), It.IsAny<PermissionGroup[]>()))
                 .Returns(Task.CompletedTask);
 
             var userId = RandomUser();
             var corp1 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
-            var roleGroup2 = RandomRoleGroup();
+            var permissionGroup1 = RandomPermissionGroup();
+            var permissionGroup2 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -275,18 +275,18 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.AssignUserToGroupsAsync(null, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 }
             }));
 
             Assert.CatchAsync<ArgumentException>(async () =>
-                await svc.AssignUserToGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]));
+                await svc.AssignUserToGroupsAsync(user, new global::SimpleAuth.Shared.Domains.PermissionGroup[0]));
 
             Assert.CatchAsync<ArgumentException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 },
@@ -295,38 +295,38 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<InvalidOperationException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
                 },
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app2
                 }
             }));
 
-            mockRoleGroupRepository.Setup(x =>
-                    x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>(), It.IsAny<FindOptions>()))
-                .Returns((IEnumerable<RoleGroup>) null);
+            mockPermissionGroupRepo.Setup(x =>
+                    x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(), It.IsAny<FindOptions>()))
+                .Returns((IEnumerable<PermissionGroup>) null);
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
                 },
             }));
 
-            mockRoleGroupRepository.Setup(x =>
-                    x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroup, bool>>>>(), It.IsAny<FindOptions>()))
+            mockPermissionGroupRepo.Setup(x =>
+                    x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroup, bool>>>>(), It.IsAny<FindOptions>()))
                 .Returns(new[]
                 {
-                    new RoleGroup
+                    new PermissionGroup
                     {
-                        Name = roleGroup1,
+                        Name = permissionGroup1,
                         Corp = corp1,
                         App = app1
                     }
@@ -334,9 +334,9 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup2,
+                    Name = permissionGroup2,
                     Corp = corp1,
                     App = app1
                 },
@@ -344,33 +344,33 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             await svc.AssignUserToGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1
                 },
             });
 
             mockUserRepository.Verify(m => m.AssignUserToGroups(It.Is<User>(u => u.Id == userId),
-                It.Is<RoleGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == roleGroup1)));
+                It.Is<PermissionGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == permissionGroup1)));
         }
 
         [Test]
         public async Task UnAssignUserFromGroupsAsync()
         {
-            var svc = Prepare<IRoleGroupUserRepository, RoleGroupUser>(out var mockUserRepository,
-                out var mockRoleGroupUserRepository).GetRequiredService<IUserService>();
+            var svc = Prepare<IPermissionGroupUserRepository, PermissionGroupUser>(out var mockUserRepository,
+                out var mockPermissionGroupUserRepository).GetRequiredService<IUserService>();
 
-            mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<RoleGroup[]>()))
+            mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<PermissionGroup[]>()))
                 .Returns(Task.CompletedTask);
 
             var userId = RandomUser();
             var corp1 = RandomCorp();
             var app1 = RandomApp();
             var app2 = RandomApp();
-            var roleGroup1 = RandomRoleGroup();
-            var roleGroup2 = RandomRoleGroup();
+            var permissionGroup1 = RandomPermissionGroup();
+            var permissionGroup2 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -379,7 +379,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromGroupsAsync(null, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 }
@@ -387,12 +387,12 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<ArgumentNullException>(async () => await svc.UnAssignUserFromGroupsAsync(user, null));
 
-            await svc.UnAssignUserFromGroupsAsync(user, new global::SimpleAuth.Shared.Domains.RoleGroup[0]);
-            mockRoleGroupUserRepository.VerifyNoOtherCalls();
+            await svc.UnAssignUserFromGroupsAsync(user, new global::SimpleAuth.Shared.Domains.PermissionGroup[0]);
+            mockPermissionGroupUserRepository.VerifyNoOtherCalls();
 
             Assert.CatchAsync<ArgumentException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1
                 },
@@ -401,12 +401,12 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<InvalidOperationException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
                 },
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app2
@@ -417,7 +417,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
                     Corp = corp1,
                     App = app1
@@ -426,12 +426,12 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             SetupFindManyReturns(new[]
             {
-                new RoleGroupUser
+                new PermissionGroupUser
                 {
                     UserId = userId,
-                    RoleGroup = new RoleGroup
+                    PermissionGroup = new PermissionGroup
                     {
-                        Name = roleGroup1,
+                        Name = permissionGroup1,
                         Corp = corp1,
                         App = app1
                     }
@@ -440,15 +440,15 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             Assert.CatchAsync<EntityNotExistsException>(async () => await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1
                 },
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup2,
+                    Name = permissionGroup2,
                     Corp = corp1,
                     App = app1
                 },
@@ -456,22 +456,22 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             await svc.UnAssignUserFromGroupsAsync(user, new[]
             {
-                new global::SimpleAuth.Shared.Domains.RoleGroup
+                new global::SimpleAuth.Shared.Domains.PermissionGroup
                 {
-                    Name = roleGroup1,
+                    Name = permissionGroup1,
                     Corp = corp1,
                     App = app1
                 },
             });
 
             mockUserRepository.Verify(m => m.UnAssignUserFromGroups(It.Is<User>(u => u.Id == userId),
-                It.Is<RoleGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == roleGroup1)));
+                It.Is<PermissionGroup[]>(rgs => rgs.Length == 1 && rgs[0].Name == permissionGroup1)));
 
-            void SetupFindManyReturns(IEnumerable<RoleGroupUser> roleGroupUsers) =>
-                mockRoleGroupUserRepository.Setup(x =>
-                        x.FindMany(It.IsAny<IEnumerable<Expression<Func<RoleGroupUser, bool>>>>(),
+            void SetupFindManyReturns(IEnumerable<PermissionGroupUser> permissionGroupUsers) =>
+                mockPermissionGroupUserRepository.Setup(x =>
+                        x.FindMany(It.IsAny<IEnumerable<Expression<Func<PermissionGroupUser, bool>>>>(),
                             It.IsAny<FindOptions>()))
-                    .Returns(roleGroupUsers);
+                    .Returns(permissionGroupUsers);
         }
 
         [Test]
@@ -479,16 +479,16 @@ namespace Test.SimpleAuth.Services.Test.Services
         {
             var svc = Prepare(out var mockUserRepository).GetRequiredService<IUserService>();
 
-            mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<RoleGroup[]>()))
+            mockUserRepository.Setup(x => x.UnAssignUserFromGroups(It.IsAny<User>(), It.IsAny<PermissionGroup[]>()))
                 .Returns(Task.CompletedTask);
 
             var userId = RandomUser();
             var corp1 = RandomCorp();
             var corp2 = RandomCorp();
             var corp3 = RandomCorp();
-            var roleGroup1 = RandomRoleGroup();
-            var roleGroup2 = RandomRoleGroup();
-            var roleGroup3 = RandomRoleGroup();
+            var permissionGroup1 = RandomPermissionGroup();
+            var permissionGroup2 = RandomPermissionGroup();
+            var permissionGroup3 = RandomPermissionGroup();
 
             var user = new global::SimpleAuth.Shared.Domains.User
             {
@@ -505,7 +505,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             SetupFindReturns(new User
             {
-                RoleGroupUsers = null
+                PermissionGroupUsers = null
             });
             await svc.UnAssignUserFromAllGroupsAsync(user, corp1);
             mockUserRepository.Verify(m => m.Find(It.IsAny<string>()));
@@ -513,29 +513,29 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             SetupFindReturns(new User
             {
-                RoleGroupUsers = new List<RoleGroupUser>
+                PermissionGroupUsers = new List<PermissionGroupUser>
                 {
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
-                            Name = roleGroup1,
+                            Name = permissionGroup1,
                             Corp = corp1
                         },
                     },
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
-                            Name = roleGroup2,
+                            Name = permissionGroup2,
                             Corp = corp1
                         },
                     },
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
-                            Name = roleGroup3,
+                            Name = permissionGroup3,
                             Corp = corp3
                         },
                     }
@@ -548,8 +548,8 @@ namespace Test.SimpleAuth.Services.Test.Services
             await svc.UnAssignUserFromAllGroupsAsync(user, corp1);
 
             mockUserRepository.Verify(m => m.UnAssignUserFromGroups(It.Is<User>(u => u.Id == userId),
-                It.Is<RoleGroup[]>(rgs =>
-                    rgs.Length == 2 && rgs[0].Name == roleGroup1 && rgs.All(x => x.Corp == corp1))));
+                It.Is<PermissionGroup[]>(rgs =>
+                    rgs.Length == 2 && rgs[0].Name == permissionGroup1 && rgs.All(x => x.Corp == corp1))));
 
             void SetupFindReturns(User u) => mockUserRepository.Setup(x => x.Find(It.IsAny<string>())).Returns(u);
         }
@@ -593,7 +593,7 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             // normal
 
-            #region SetupFindUserReturns 3 RoleGroupUsers of groups named g11, g12, g21
+            #region SetupFindUserReturns 3 PermissionGroupUsers of groups named g11, g12, g21
 
             SetupFindUserReturns(new User
             {
@@ -610,105 +610,105 @@ namespace Test.SimpleAuth.Services.Test.Services
                         Corp = corp2
                     }
                 },
-                RoleGroupUsers = new List<RoleGroupUser>
+                PermissionGroupUsers = new List<PermissionGroupUser>
                 {
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g11",
                             Corp = corp1,
                             App = app1,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m111",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m112",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m113",
                                     Env = RandomEnv(),
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                             }
                         }
                     },
 
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g12",
                             Corp = corp1,
                             App = app1,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m121",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m122",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m123",
                                     Env = RandomEnv(),
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                             }
                         }
                     },
 
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g21",
                             Corp = corp2,
                             App = app2,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m211",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m212",
                                     Env = env,
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = "c.a.e.t.m213",
                                     Env = RandomEnv(),
                                     Tenant = tenant,
-                                    Permission = Permission.Add
+                                    Verb = Verb.Add
                                 },
                             }
                         }
@@ -823,17 +823,17 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             // catch null arg
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(string.Empty, new (string, Permission)[0], corp1, app1));
+                await svc.GetMissingPermissionsAsync(string.Empty, new (string, Verb)[0], corp1, app1));
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[0], string.Empty, app1));
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[0], string.Empty, app1));
             Assert.CatchAsync<ArgumentNullException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[0], corp1, string.Empty));
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[0], corp1, string.Empty));
 
             // not allow arg contains permission None
             Assert.CatchAsync<ArgumentException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[]
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[]
                 {
-                    ("any", Permission.None)
+                    ("any", Verb.None)
                 }, corp1, app1)
             );
 
@@ -842,9 +842,9 @@ namespace Test.SimpleAuth.Services.Test.Services
             // catch user not found
             SetupFindUserReturns(null);
             Assert.CatchAsync<EntityNotExistsException>(async () =>
-                await svc.GetMissingRolesAsync(userId, new (string, Permission)[]
+                await svc.GetMissingPermissionsAsync(userId, new (string, Verb)[]
                 {
-                    ("any", Permission.Add)
+                    ("any", Verb.Add)
                 }, corp1, app1)
             );
 
@@ -867,68 +867,68 @@ namespace Test.SimpleAuth.Services.Test.Services
                         Corp = corp2
                     }
                 },
-                RoleGroupUsers = new List<RoleGroupUser>
+                PermissionGroupUsers = new List<PermissionGroupUser>
                 {
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g1",
                             Corp = corp1,
                             App = app1,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.crud",
-                                    Permission = Permission.Crud
+                                    Verb = Verb.Crud
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.full",
-                                    Permission = Permission.Full
+                                    Verb = Verb.Full
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.ae",
-                                    Permission = Permission.Add | Permission.Edit
+                                    Verb = Verb.Add | Verb.Edit
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp1}.{app1}.e.t.d",
-                                    Permission = Permission.Delete
+                                    Verb = Verb.Delete
                                 },
                             }
                         }
                     },
-                    new RoleGroupUser
+                    new PermissionGroupUser
                     {
-                        RoleGroup = new RoleGroup
+                        PermissionGroup = new PermissionGroup
                         {
                             Name = "g2",
                             Corp = corp2,
                             App = app2,
-                            RoleRecords = new List<RoleRecord>
+                            PermissionRecords = new List<PermissionRecord>
                             {
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.crud",
-                                    Permission = Permission.Crud
+                                    Verb = Verb.Crud
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.full",
-                                    Permission = Permission.Full
+                                    Verb = Verb.Full
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.ae",
-                                    Permission = Permission.Add | Permission.Edit
+                                    Verb = Verb.Add | Verb.Edit
                                 },
-                                new RoleRecord
+                                new PermissionRecord
                                 {
                                     RoleId = $"{corp2}.{app2}.e.t.d",
-                                    Permission = Permission.Delete
+                                    Verb = Verb.Delete
                                 },
                             }
                         }
@@ -942,39 +942,39 @@ namespace Test.SimpleAuth.Services.Test.Services
 
             #region corp1
 
-            var missingRoles = await svc.GetMissingRolesAsync(userId, new[]
+            var missingRoles = await svc.GetMissingPermissionsAsync(userId, new[]
             {
-                ($"{corp1}.{app1}.e.t.crud", Permission.Edit), // usr has
-                ($"{corp1}.{app1}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
-                ($"{corp1}.{app1}.e.t.d", Permission.Edit), // expect
+                ($"{corp1}.{app1}.e.t.crud", Verb.Edit), // usr has
+                ($"{corp1}.{app1}.e.t.ae", Verb.Add | Verb.View), // usr has Add but not View
+                ($"{corp1}.{app1}.e.t.d", Verb.Edit), // expect
             }, corp1, app1);
 
             Assert.AreEqual(2, missingRoles.Count);
             var ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp1}.{app1}.e.t.ae");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.View, ae.Permission);
+            Assert.AreEqual(Verb.View, ae.Verb);
             var d = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp1}.{app1}.e.t.d");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.Edit, d.Permission);
+            Assert.AreEqual(Verb.Edit, d.Verb);
 
             #endregion
 
             #region corp2
 
-            missingRoles = await svc.GetMissingRolesAsync(userId, new[]
+            missingRoles = await svc.GetMissingPermissionsAsync(userId, new[]
             {
-                ($"{corp2}.{app2}.e.t.crud", Permission.Edit), // usr has
-                ($"{corp2}.{app2}.e.t.ae", Permission.Add | Permission.View), // usr has Add but not View
-                ($"{corp2}.{app2}.e.t.d", Permission.Edit), // expect
+                ($"{corp2}.{app2}.e.t.crud", Verb.Edit), // usr has
+                ($"{corp2}.{app2}.e.t.ae", Verb.Add | Verb.View), // usr has Add but not View
+                ($"{corp2}.{app2}.e.t.d", Verb.Edit), // expect
             }, corp2, app2);
 
             Assert.AreEqual(2, missingRoles.Count);
             ae = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp2}.{app2}.e.t.ae");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.View, ae.Permission);
+            Assert.AreEqual(Verb.View, ae.Verb);
             d = missingRoles.FirstOrDefault(x => x.RoleId == $"{corp2}.{app2}.e.t.d");
             Assert.NotNull(ae);
-            Assert.AreEqual(Permission.Edit, d.Permission);
+            Assert.AreEqual(Verb.Edit, d.Verb);
 
             #endregion
 

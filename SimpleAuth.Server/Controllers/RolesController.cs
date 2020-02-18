@@ -17,7 +17,7 @@ using SimpleAuth.Shared.Validation;
 namespace SimpleAuth.Server.Controllers
 {
     /// <summary>
-    /// Create and manage roles, this role will be added into Role Group therefore can be assigned to user
+    /// Create and manage roles, this role will be added into Permission Group therefore can be assigned to user
     /// </summary>
     [Route("api/roles")]
     [RequireAppToken]
@@ -112,7 +112,7 @@ namespace SimpleAuth.Server.Controllers
             
             return await ProcedureDefaultResponse(async () =>
                 {
-                    await Service.UpdateLockStatus(new Shared.Domains.Role
+                    await Service.UpdateLockStatus(new Shared.Domains.Permission
                     {
                         RoleId = roleId,
                         Locked = true
@@ -140,7 +140,7 @@ namespace SimpleAuth.Server.Controllers
             
             return await ProcedureDefaultResponse(async () =>
                 {
-                    await Service.UpdateLockStatus(new Shared.Domains.Role
+                    await Service.UpdateLockStatus(new Shared.Domains.Permission
                     {
                         RoleId = roleId,
                         Locked = false

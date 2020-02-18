@@ -8,7 +8,7 @@ namespace SimpleAuth.Shared.Validation
         public override void RegisterModules(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IRoleValidationService, DefaultRoleValidationService>();
-            serviceCollection.AddSingleton<IRoleGroupValidationService, DefaultRoleGroupValidationService>();
+            serviceCollection.AddSingleton<IPermissionGroupValidationService, DefaultPermissionGroupValidationService>();
             serviceCollection.AddSingleton<IUserValidationService, DefaultUserValidationService>();
             serviceCollection.AddSingleton<IRolePartsValidationService, DefaultRolePartsValidationService>();
         }

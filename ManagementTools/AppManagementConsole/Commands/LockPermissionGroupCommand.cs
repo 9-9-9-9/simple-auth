@@ -7,25 +7,25 @@ using SimpleAuth.Core.Extensions;
 namespace AppManagementConsole.Commands
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class LockRoleGroupCommand : AbstractCommand
+    public class LockPermissionGroupCommand : AbstractCommand
     {
-        private readonly IRoleGroupManagementService _roleGroupManagementService;
+        private readonly IPermissionGroupManagementService _permissionGroupManagementService;
 
-        public LockRoleGroupCommand(IRoleGroupManagementService roleGroupManagementService)
+        public LockPermissionGroupCommand(IPermissionGroupManagementService permissionGroupManagementService)
         {
-            _roleGroupManagementService = roleGroupManagementService;
+            _permissionGroupManagementService = permissionGroupManagementService;
         }
 
         protected override Task DoMainJob(string[] args)
         {
-            var roleGroupName = args[0];
+            var permissionGroupName = args[0];
             var @lock = args[1].Trim().EqualsIgnoreCase("lock");
-            return _roleGroupManagementService.SetLockRoleGroup(roleGroupName, @lock);
+            return _permissionGroupManagementService.SetLockPermissionGroup(permissionGroupName, @lock);
         }
 
         public override string[] GetParametersName()
         {
-            return new[] {"Role Group name", "Lock or Unlock"};
+            return new[] {"Permission Group name", "Lock or Unlock"};
         }
 
         // ReSharper disable RedundantJumpStatement

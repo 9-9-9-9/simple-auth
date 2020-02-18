@@ -25,7 +25,7 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
             await httpContext.Response
                 .WithStatus(StatusCodes.Status200OK)
                 .WithBody(
-                    JsonConvert.SerializeObject(userClaims.Select(c => RoleUtils.ComputeRoleId(c.ClientRoleModel.Corp, c.ClientRoleModel.App, c.ClientRoleModel.Env, c.ClientRoleModel.Tenant, c.ClientRoleModel.Module, c.ClientRoleModel.SubModules) + $":{c.ClientRoleModel.Permission}").ToArray())
+                    JsonConvert.SerializeObject(userClaims.Select(c => RoleUtils.ComputeRoleId(c.ClientPermissionModel.Corp, c.ClientPermissionModel.App, c.ClientPermissionModel.Env, c.ClientPermissionModel.Tenant, c.ClientPermissionModel.Module, c.ClientPermissionModel.SubModules) + $":{c.ClientPermissionModel.Verb}").ToArray())
                 );
         }
     }

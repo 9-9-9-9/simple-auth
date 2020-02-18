@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Client.AspNetCor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebMvc21Playground", "Test\WebMvc21Playground\WebMvc21Playground.csproj", "{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermissionSynchronizer", "ManagementTools\PermissionSynchronizer\PermissionSynchronizer.csproj", "{48EA69C1-A12C-43E4-AE50-7C008459DB4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -373,6 +375,18 @@ Global
 		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|x64.Build.0 = Release|Any CPU
 		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|x86.ActiveCfg = Release|Any CPU
 		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE}.Release|x86.Build.0 = Release|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Debug|x64.Build.0 = Debug|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Debug|x86.Build.0 = Debug|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|x64.ActiveCfg = Release|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|x64.Build.0 = Release|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|x86.ActiveCfg = Release|Any CPU
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -398,6 +412,7 @@ Global
 		{DC0C339F-545B-4634-AD9D-48B61CC1122A} = {88CDF640-EADD-43A7-94FA-21B4D822337A}
 		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74} = {88CDF640-EADD-43A7-94FA-21B4D822337A}
 		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE} = {4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}
+		{48EA69C1-A12C-43E4-AE50-7C008459DB4B} = {F97DA732-802E-4C94-800D-AF1E8772E829}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B53DD286-B6DE-4EBF-8E02-1081D86E57B1}

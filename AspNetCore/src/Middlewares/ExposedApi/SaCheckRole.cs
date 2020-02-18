@@ -96,14 +96,14 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
 
             permissions = qPermissions.Single();
 
-            var permission = Permission.None;
+            var permission = Verb.None;
             try
             {
                 var ePermissions = permissions.Split('|', StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim())
                     .Where(x => !string.IsNullOrWhiteSpace(x))
                     .Distinct()
-                    .Select(x => (Permission) Enum.Parse(typeof(Permission), x, true))
+                    .Select(x => (Verb) Enum.Parse(typeof(Verb), x, true))
                     .ToList();
 
                 if (ePermissions.IsEmpty())
@@ -136,9 +136,9 @@ namespace SimpleAuth.Client.AspNetCore.Middlewares
                     .WithStatus(StatusCodes.Status406NotAcceptable)
                     .WithBody(
                         JsonConvert.SerializeObject(missingClaims.Select(c =>
-                            RoleUtils.ComputeRoleId(c.ClientRoleModel.Corp, c.ClientRoleModel.App,
-                                c.ClientRoleModel.Env, c.ClientRoleModel.Tenant, c.ClientRoleModel.Module,
-                                c.ClientRoleModel.SubModules) + $":{c.ClientRoleModel.Permission}").ToArray())
+                            RoleUtils.ComputeRoleId(c.ClientPermissionModel.Corp, c.ClientPermissionModel.App,
+                                c.ClientPermissionModel.Env, c.ClientPermissionModel.Tenant, c.ClientPermissionModel.Module,
+                                c.ClientPermissionModel.SubModules) + $":{c.ClientPermissionModel.Verb}").ToArray())
                     );
                 return;
             }

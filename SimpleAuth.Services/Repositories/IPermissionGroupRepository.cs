@@ -11,26 +11,26 @@ using SimpleAuth.Shared.Exceptions;
 
 namespace SimpleAuth.Repositories
 {
-    public interface IRoleGroupRepository : IRepository<RoleGroup, Guid>
+    public interface IPermissionGroupRepository : IRepository<PermissionGroup, Guid>
     {
-        IEnumerable<RoleGroup> Search(string term, string corp, string app, FindOptions findOptions = null);
-        Task<int> UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles);
+        IEnumerable<PermissionGroup> Search(string term, string corp, string app, FindOptions findOptions = null);
+        Task<int> UpdatePermissionRecordsAsync(PermissionGroup permissionGroup, List<PermissionRecord> newPermissions);
     }
 
-    public class RoleGroupRepository : Repository<RoleGroup, Guid>, IRoleGroupRepository
+    public class PermissionGroupRepository : Repository<PermissionGroup, Guid>, IPermissionGroupRepository
     {
-        public RoleGroupRepository(IDbContextFactory dbContextFactory) : base(dbContextFactory)
+        public PermissionGroupRepository(IDbContextFactory dbContextFactory) : base(dbContextFactory)
         {
         }
 
-        protected override IQueryable<RoleGroup> Include(DbSet<RoleGroup> dbSet)
+        protected override IQueryable<PermissionGroup> Include(DbSet<PermissionGroup> dbSet)
         {
             return base.Include(dbSet)
-                .Include(x => x.RoleRecords)
-                .Include(x => x.RoleGroupUsers);
+                .Include(x => x.PermissionRecords)
+                .Include(x => x.PermissionGroupUsers);
         }
 
-        public IEnumerable<RoleGroup> Search(string term, string corp, string app, FindOptions findOptions = null)
+        public IEnumerable<PermissionGroup> Search(string term, string corp, string app, FindOptions findOptions = null)
         {
             if (corp == null)
                 throw new ArgumentNullException(nameof(corp));
@@ -44,7 +44,7 @@ namespace SimpleAuth.Repositories
 
             findOptions ??= new FindOptions();
 
-            var policies = new List<Expression<Func<RoleGroup, bool>>>()
+            var policies = new List<Expression<Func<PermissionGroup, bool>>>()
             {
                 x => x.Corp == corp && x.App == app,
                 x => !x.Locked,
@@ -53,7 +53,7 @@ namespace SimpleAuth.Repositories
             if (!term.IsEmpty() && !"*".Equals(term))
                 policies.Add(x => x.Name.Contains(term));
 
-            return FindManyOrdered(policies, findOptions, new OrderByOptions<RoleGroup,Guid>
+            return FindManyOrdered(policies, findOptions, new OrderByOptions<PermissionGroup,Guid>
             {
                 Expression = x => x.Id,
                 Direction = OrderDirection.Asc
@@ -61,42 +61,42 @@ namespace SimpleAuth.Repositories
         }
 
 
-        public async Task<int> UpdateRoleRecordsAsync(RoleGroup roleGroup, List<RoleRecord> newRoles)
+        public async Task<int> UpdatePermissionRecordsAsync(PermissionGroup permissionGroup, List<PermissionRecord> newPermissions)
         {
-            newRoles = newRoles.OrEmpty().Where(x => x.Permission != Permission.None).ToList();
+            newPermissions = newPermissions.OrEmpty().Where(x => x.Verb != Verb.None).ToList();
             
             await using var ctx = OpenConnect();
-            var dbGroups = ctx.Set<RoleGroup>();
-            var dbRecords = ctx.Set<RoleRecord>();
+            var dbGroups = ctx.Set<PermissionGroup>();
+            var dbRecords = ctx.Set<PermissionRecord>();
 
-            roleGroup = await Include(dbGroups).SingleAsync(x => x.Id == roleGroup.Id);
+            permissionGroup = await Include(dbGroups).SingleAsync(x => x.Id == permissionGroup.Id);
             
-            if (roleGroup.RoleRecords.IsAny())
-                dbRecords.RemoveRange(roleGroup.RoleRecords);
+            if (permissionGroup.PermissionRecords.IsAny())
+                dbRecords.RemoveRange(permissionGroup.PermissionRecords);
 
-            if (newRoles.IsAny())
+            if (newPermissions.IsAny())
             {
-                newRoles.ForEach(r =>
+                newPermissions.ForEach(r =>
                 {
                     r.WithRandomId();
                     ctx.Entry(r).State = EntityState.Added;
                 });
-                await dbRecords.AddRangeAsync(newRoles);
+                await dbRecords.AddRangeAsync(newPermissions);
             }
 
-            roleGroup.RoleRecords = newRoles;
+            permissionGroup.PermissionRecords = newPermissions;
 
-            dbGroups.Update(roleGroup);
+            dbGroups.Update(permissionGroup);
 
             return await ctx.SaveChangesAsync();
         }
 
-        public override async Task<int> DeleteManyAsync(IEnumerable<RoleGroup> entities)
+        public override async Task<int> DeleteManyAsync(IEnumerable<PermissionGroup> entities)
         {
             var ids = entities.Select(e => e.Id).Distinct().ToList();
             await using var ctx = OpenConnect();
 
-            var gSet = ctx.Set<RoleGroup>();
+            var gSet = ctx.Set<PermissionGroup>();
             var queryable = Include(gSet);
 
             var lookupEntities = await queryable.Where(x => ids.Any(id => x.Id == id)).ToListAsync();
@@ -104,16 +104,16 @@ namespace SimpleAuth.Repositories
             if (missingIds.IsAny())
                 throw new EntityNotExistsException(missingIds.Select(id => id.ToString()));
 
-            var inUsedEntities = lookupEntities.Where(x => x.RoleGroupUsers.IsAny()).ToList();
+            var inUsedEntities = lookupEntities.Where(x => x.PermissionGroupUsers.IsAny()).ToList();
             if (inUsedEntities.Any())
                 throw new SimpleAuthException(
                     $"Groups {string.Join(", ", inUsedEntities.Select(x => x.Name))} are in use");
 
-            var rrSet = ctx.Set<RoleRecord>();
+            var rrSet = ctx.Set<PermissionRecord>();
             foreach (var g in lookupEntities)
             {
-                rrSet.RemoveRange(g.RoleRecords);
-                g.RoleRecords.Clear();
+                rrSet.RemoveRange(g.PermissionRecords);
+                g.PermissionRecords.Clear();
             }
 
             gSet.RemoveRange(lookupEntities);

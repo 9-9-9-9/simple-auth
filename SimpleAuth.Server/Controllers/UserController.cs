@@ -9,13 +9,13 @@ using SimpleAuth.Repositories;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Middlewares;
 using SimpleAuth.Services;
-using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Validation;
 using LocalUserInfo = SimpleAuth.Shared.Domains.LocalUserInfo;
-using RoleGroup = SimpleAuth.Shared.Domains.RoleGroup;
+using User = SimpleAuth.Services.Entities.User;
 
 namespace SimpleAuth.Server.Controllers
 {
@@ -110,22 +110,22 @@ namespace SimpleAuth.Server.Controllers
         }
 
         /// <summary>
-        /// Assign user to specific Role Group of the same Corp, same App.
-        /// In order to grant permission for user, manager has to set permissions for role group and then assign user to that group if user is not belong to it.
+        /// Assign user to specific Permission Group of the same Corp, same App.
+        /// In order to grant permission for user, manager has to set permissions for permission group and then assign user to that group if user is not belong to it.
         /// </summary>
         /// <param name="userId">The target user which should be granted permission</param>
-        /// <param name="modifyUserRoleGroupsModel">The target role groups which should take the user</param>
-        /// <response code="200">Assign user to the specific role groups completed</response>
+        /// <param name="modifyUserPermissionGroupsModel">The target permission groups which should take the user</param>
+        /// <response code="200">Assign user to the specific permission groups completed</response>
         /// <response code="400">Request model is invalid</response>
-        /// <response code="404">Target user id or role group not found</response>
-        [HttpPost, Route("{userId}/role-groups")]
+        /// <response code="404">Target user id or permission group not found</response>
+        [HttpPost, Route("{userId}/permission-groups")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> AssignUserToGroupsAsync(string userId,
-            [FromBody] ModifyUserRoleGroupsModel modifyUserRoleGroupsModel)
+            [FromBody] ModifyUserPermissionGroupsModel modifyUserPermissionGroupsModel)
         {
-            if ((modifyUserRoleGroupsModel?.RoleGroups?.Length ?? 0) == 0)
+            if ((modifyUserPermissionGroupsModel?.PermissionGroups?.Length ?? 0) == 0)
                 return BadRequest();
 
             return await ProcedureDefaultResponse(async () =>
@@ -137,14 +137,14 @@ namespace SimpleAuth.Server.Controllers
                     await Service.AssignUserToGroupsAsync(new Shared.Domains.User
                     {
                         Id = userId
-                    }, modifyUserRoleGroupsModel.RoleGroups.Select(x => new RoleGroup
+                    }, modifyUserPermissionGroupsModel.PermissionGroups.Select(x => new PermissionGroup
                     {
                         Name = x,
                         Corp = RequestAppHeaders.Corp,
                         App = RequestAppHeaders.App
                     }).ToArray());
                     _logger.LogInformation(
-                        $"Assigned user {userId} to groups {string.Join(',', modifyUserRoleGroupsModel.RoleGroups)} ({RequestAppHeaders.Corp}.{RequestAppHeaders.App})"
+                        $"Assigned user {userId} to groups {string.Join(',', modifyUserPermissionGroupsModel.PermissionGroups)} ({RequestAppHeaders.Corp}.{RequestAppHeaders.App})"
                     );
                 }
             );
@@ -154,7 +154,7 @@ namespace SimpleAuth.Server.Controllers
         /// Get the current active roles of an user, but for the current corp and app only, another corp/app are excluded
         /// </summary>
         /// <param name="userId">The target user which should be checked</param>
-        /// <returns>Array of <see cref="SimpleAuth.Shared.Models.RoleModel"/></returns>
+        /// <returns>Array of <see cref="SimpleAuth.Shared.Models.PermissionModel"/></returns>
         /// <response code="200">Retrieve information without any problem</response>
         /// <response code="404">User id could not be found</response>
         [HttpGet("{userId}/roles")]
@@ -180,25 +180,25 @@ namespace SimpleAuth.Server.Controllers
         /// </summary>
         /// <param name="userId">User to be checked</param>
         /// <param name="roleId">Role to be checked, with full parts, example: corp.app.env.tenant.module.subModules</param>
-        /// <param name="permission">Serialized permission (byte value)</param>
+        /// <param name="verb">Serialized permission (byte value)</param>
         /// <returns>No content but status code is 200 if user has permission, 406 if user doesn't have that permission</returns>
         /// <response code="200">User HAS the required permission</response>
         /// <response code="406">User DOES NOT HAVE the required permission</response>
         /// <response code="404">User is not exists</response>
-        [HttpGet, Route("{userId}/roles/{roleId}/{permission}")]
+        [HttpGet, Route("{userId}/roles/{roleId}/{verb}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string permission)
+        public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string verb)
         {
             return await ProcedureDefaultResponseIfError(() =>
                 {
-                    var ePermission = permission.Deserialize();
-                    _logger.LogInformation($"Checking permission [{roleId}, {ePermission}] for user {userId}");
+                    var eVerb = verb.Deserialize();
+                    _logger.LogInformation($"Checking permission [{roleId}, {eVerb}] for user {userId}");
 
-                    return Service.GetMissingRolesAsync(
+                    return Service.GetMissingPermissionsAsync(
                         userId,
-                        new[] {(roleId, ePermission)},
+                        new[] {(roleId, eVerb)},
                         RequestAppHeaders.Corp, RequestAppHeaders.App
                     ).ContinueWith(
                         x => (x.Result.IsAny()
@@ -214,7 +214,7 @@ namespace SimpleAuth.Server.Controllers
         /// Check if user has all permissions which are declared in payload
         /// </summary>
         /// <param name="userId">User to be checked</param>
-        /// <param name="roleModels">Role to be checked, with full parts, example: corp.app.env.tenant.module.subModules, permission is serialized Permission (byte value)</param>
+        /// <param name="permissionModels">Role to be checked, with full parts, example: corp.app.env.tenant.module.subModules, permission is serialized Permission (byte value)</param>
         /// <returns>Status code is 200 without content if user has all required permissions or status code 406 with json array of missing permissions</returns>
         /// <response code="200">User HAS all the required permissions</response>
         /// <response code="406">Any of the permissions user does not have</response>
@@ -223,18 +223,18 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetMissingPermissions(string userId, [FromBody] RoleModels roleModels)
+        public async Task<IActionResult> GetMissingPermissions(string userId, [FromBody] PermissionModels permissionModels)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             return await ProcedureDefaultResponseIfError(() =>
                 {
-                    var roles = roleModels.Roles.Select(x => (x.Role, x.Permission.Deserialize())).ToArray();
+                    var roles = permissionModels.Permissions.Select(x => (x.Role, x.Verb.Deserialize())).ToArray();
                     _logger.LogInformation(
                         $"Checking permissions [{string.Join(",", roles.Select(x => $"{x.Role},{x.Item2}"))}] for user {userId}");
 
-                    return Service.GetMissingRolesAsync(
+                    return Service.GetMissingPermissionsAsync(
                         userId,
                         roles,
                         RequestAppHeaders.Corp, RequestAppHeaders.App

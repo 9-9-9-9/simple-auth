@@ -2,10 +2,10 @@ using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Shared.Domains
 {
-    public class RoleGroup : BaseDomain, ICorpRelated, IAppRelated, ILockable
+    public class PermissionGroup : BaseDomain, ICorpRelated, IAppRelated, ILockable
     {
         public string Name { get; set; }
-        public Role[] Roles { get; set; }
+        public Permission[] Permissions { get; set; }
         
         public string Corp { get; set; }
         

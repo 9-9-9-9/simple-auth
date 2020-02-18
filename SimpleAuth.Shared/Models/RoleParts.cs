@@ -38,7 +38,7 @@ namespace SimpleAuth.Shared.Models
 
     public interface IPermissionRelated
     {
-        Permission Permission { get; set; }
+        Verb Verb { get; set; }
     }
 
     public interface ILockable

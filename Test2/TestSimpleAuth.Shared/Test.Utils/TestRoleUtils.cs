@@ -100,10 +100,10 @@ namespace Test.SimpleAuth.Shared.Test.Utils
             var splExpected = expectedValue.Split("#", 6);
             var subModulesExpected = (splExpected.Skip(5).FirstOrDefault()?.Split("#")).OrEmpty().ToArray();
 
-            ClientRoleModel clientRoleModel;
+            ClientPermissionModel clientPermissionModel;
             try
             {
-                RoleUtils.Parse(roleId, out clientRoleModel);
+                RoleUtils.Parse(roleId, out clientPermissionModel);
                 if (expectErr)
                     Assert.Fail("Error expected");
             }
@@ -114,45 +114,45 @@ namespace Test.SimpleAuth.Shared.Test.Utils
                 throw;
             }
 
-            Assert.NotNull(clientRoleModel.SubModules);
+            Assert.NotNull(clientPermissionModel.SubModules);
 
-            Assert.AreEqual(splExpected[0], clientRoleModel.Corp);
-            Assert.AreEqual(splExpected[1], clientRoleModel.App);
-            Assert.AreEqual(splExpected[2], clientRoleModel.Env);
-            Assert.AreEqual(splExpected[3], clientRoleModel.Tenant);
-            Assert.AreEqual(splExpected[4], clientRoleModel.Module);
-            Assert.AreEqual(subModulesExpected, clientRoleModel.SubModules);
+            Assert.AreEqual(splExpected[0], clientPermissionModel.Corp);
+            Assert.AreEqual(splExpected[1], clientPermissionModel.App);
+            Assert.AreEqual(splExpected[2], clientPermissionModel.Env);
+            Assert.AreEqual(splExpected[3], clientPermissionModel.Tenant);
+            Assert.AreEqual(splExpected[4], clientPermissionModel.Module);
+            Assert.AreEqual(subModulesExpected, clientPermissionModel.SubModules);
         }
 
-        [TestCase("8", Permission.Delete)]
-        [TestCase("12", Permission.Delete | Permission.Edit)]
-        public void Parse_WithPermission(string inputPermission, Permission expectedPermission)
+        [TestCase("8", Verb.Delete)]
+        [TestCase("12", Verb.Delete | Verb.Edit)]
+        public void Parse_WithPermission(string inputPermission, Verb expectedVerb)
         {
             RoleUtils.Parse("c.a.e.t.m", inputPermission, out var clientRoleModel);
-            Assert.AreEqual(expectedPermission, clientRoleModel.Permission);
+            Assert.AreEqual(expectedVerb, clientRoleModel.Verb);
         }
 
-        [TestCase("c.a.e.t.m", Permission.Crud, "c.a.e.t.m", Permission.Add, ExpectedResult = true)]
-        [TestCase("c.a.e.t.m.s", Permission.Crud, "c.a.e.t.m.s", Permission.Add, ExpectedResult = true)]
-        [TestCase("c.a.e.t.m", Permission.Add, "c.a.e.t.m", Permission.Crud, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "c.a.e.t.m.s", Permission.Crud, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m", Permission.Add, "c.a.e.t.m", Permission.Add, ExpectedResult = true)]
-        [TestCase("c.a.e.t.m", Permission.Add, "c.a.e.t.m", Permission.Edit, ExpectedResult = false)]
-        [TestCase("*.a.e.t.m", Permission.Add, "c.a.e.t.m", Permission.Add, ExpectedResult = true)]
-        [TestCase("c.a.e.t.m", Permission.Add, "*.a.e.t.m", Permission.Add, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "c.a.e.t.m.s|2", Permission.Add, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "q.a.e.t.m.s", Permission.Add, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "c.q.e.t.m.s", Permission.Add, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "c.a.q.t.m.s", Permission.Add, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "c.a.e.q.m.s", Permission.Add, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "c.a.e.t.q.s", Permission.Add, ExpectedResult = false)]
-        [TestCase("c.a.e.t.m.s", Permission.Add, "c.a.e.t.m.q", Permission.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m", Verb.Crud, "c.a.e.t.m", Verb.Add, ExpectedResult = true)]
+        [TestCase("c.a.e.t.m.s", Verb.Crud, "c.a.e.t.m.s", Verb.Add, ExpectedResult = true)]
+        [TestCase("c.a.e.t.m", Verb.Add, "c.a.e.t.m", Verb.Crud, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "c.a.e.t.m.s", Verb.Crud, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m", Verb.Add, "c.a.e.t.m", Verb.Add, ExpectedResult = true)]
+        [TestCase("c.a.e.t.m", Verb.Add, "c.a.e.t.m", Verb.Edit, ExpectedResult = false)]
+        [TestCase("*.a.e.t.m", Verb.Add, "c.a.e.t.m", Verb.Add, ExpectedResult = true)]
+        [TestCase("c.a.e.t.m", Verb.Add, "*.a.e.t.m", Verb.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "c.a.e.t.m.s|2", Verb.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "q.a.e.t.m.s", Verb.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "c.q.e.t.m.s", Verb.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "c.a.q.t.m.s", Verb.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "c.a.e.q.m.s", Verb.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "c.a.e.t.q.s", Verb.Add, ExpectedResult = false)]
+        [TestCase("c.a.e.t.m.s", Verb.Add, "c.a.e.t.m.q", Verb.Add, ExpectedResult = false)]
         public bool ContainsOrEquals_All(
-            string bigRoleId, Permission bigPermission,
-            string smallRoleId, Permission smallPermission)
+            string bigRoleId, Verb bigVerb,
+            string smallRoleId, Verb smallVerb)
         {
-            RoleUtils.Parse(bigRoleId, bigPermission.Serialize(), out var bigClientRoleModel);
-            RoleUtils.Parse(smallRoleId, smallPermission.Serialize(), out var smallClientRoleModel);
+            RoleUtils.Parse(bigRoleId, bigVerb.Serialize(), out var bigClientRoleModel);
+            RoleUtils.Parse(smallRoleId, smallVerb.Serialize(), out var smallClientRoleModel);
 
             return RoleUtils.ContainsOrEquals(bigClientRoleModel, smallClientRoleModel, RoleUtils.ComparisionFlag.All);
         }
@@ -161,8 +161,8 @@ namespace Test.SimpleAuth.Shared.Test.Utils
         public void ContainsOrEquals_IgnorePermission()
         {
             var roleId = "c.a.e.t.m";
-            RoleUtils.Parse(roleId, Permission.Add.Serialize(), out var big);
-            RoleUtils.Parse(roleId, Permission.Edit.Serialize(), out var small);
+            RoleUtils.Parse(roleId, Verb.Add.Serialize(), out var big);
+            RoleUtils.Parse(roleId, Verb.Edit.Serialize(), out var small);
             
             Assert.IsFalse(RoleUtils.ContainsOrEquals(big, small, RoleUtils.ComparisionFlag.All));
             Assert.IsTrue(RoleUtils.ContainsOrEquals(big, small, RoleUtils.ComparisionFlag.Corp | RoleUtils.ComparisionFlag.App | RoleUtils.ComparisionFlag.Env | RoleUtils.ComparisionFlag.Tenant | RoleUtils.ComparisionFlag.Module | RoleUtils.ComparisionFlag.SubModule));
@@ -177,14 +177,14 @@ namespace Test.SimpleAuth.Shared.Test.Utils
         public void ContainsOrEquals_ArgumentNullException(bool expectedError, string bigRoleId)
         {
             RoleUtils.Parse(bigRoleId, "1", out var bigClientRoleModel);
-            var smallClientRoleModel = new ClientRoleModel
+            var smallClientRoleModel = new ClientPermissionModel
             {
                 Corp = "c",
                 App = "a",
                 Env = "e",
                 Tenant = "t",
                 Module = "m",
-                Permission = Permission.Add
+                Verb = Verb.Add
             };
             var err = false;
             try
@@ -211,10 +211,10 @@ namespace Test.SimpleAuth.Shared.Test.Utils
         {
             var l = new[]
             {
-                Crm("c.a.e.t.m", Permission.Edit),
-                Crm("c.a.e.t.m", Permission.Add | Permission.Edit),
-                Crm("c.a.e.t.m", Permission.Edit),
-                Crm("c.a.e.0.m", Permission.Add),
+                Crm("c.a.e.t.m", Verb.Edit),
+                Crm("c.a.e.t.m", Verb.Add | Verb.Edit),
+                Crm("c.a.e.t.m", Verb.Edit),
+                Crm("c.a.e.0.m", Verb.Add),
             };
 
             l = RoleUtils.Distinct(l).ToArray();
@@ -222,38 +222,38 @@ namespace Test.SimpleAuth.Shared.Test.Utils
 
             var e1 = l.First(x => x.Tenant == "t");
             Assert.NotNull(e1);
-            Assert.AreEqual(Permission.Add | Permission.Edit, e1.Permission);
+            Assert.AreEqual(Verb.Add | Verb.Edit, e1.Verb);
 
             var e2 = l.First(x => x.Tenant == "0");
             Assert.NotNull(e2);
-            Assert.AreEqual(Permission.Add, e2.Permission);
+            Assert.AreEqual(Verb.Add, e2.Verb);
 
-            ClientRoleModel Crm(string roleId, Permission permission)
+            ClientPermissionModel Crm(string roleId, Verb permission)
             {
                 RoleUtils.Parse(roleId, out var clientRoleModel);
-                clientRoleModel.Permission = permission;
+                clientRoleModel.Verb = permission;
                 return clientRoleModel;
             }
         }
 
-        [TestCase("c.a.e.t.m", Permission.Add)]
-        [TestCase("c.a.e.t.m", Permission.Crud)]
-        [TestCase("c.a.e.t.m", Permission.CurrentMax)]
-        [TestCase("c.a.e.t.m", Permission.Full)]
-        public void Merge_And_UnMerge(string roleId, Permission permission)
+        [TestCase("c.a.e.t.m", Verb.Add)]
+        [TestCase("c.a.e.t.m", Verb.Crud)]
+        [TestCase("c.a.e.t.m", Verb.CurrentMax)]
+        [TestCase("c.a.e.t.m", Verb.Full)]
+        public void Merge_And_UnMerge(string roleId, Verb verb)
         {
-            var merged = RoleUtils.Merge(roleId, permission);
+            var merged = RoleUtils.Merge(roleId, verb);
             var unMerged = RoleUtils.UnMerge(merged);
             Assert.AreEqual(roleId, unMerged.Item1);
-            Assert.AreEqual(permission, unMerged.Item2);
+            Assert.AreEqual(verb, unMerged.Item2);
         }
         
         [Test]
         public void Merge_And_UnMerge_Exception()
         {
-            Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge(null, Permission.Add));
-            Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge(string.Empty, Permission.Add));
-            Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge("    ", Permission.Add));
+            Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge(null, Verb.Add));
+            Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge(string.Empty, Verb.Add));
+            Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge("    ", Verb.Add));
             Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge("c.a.e.t.m", null));
             Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge("c.a.e.t.m", string.Empty));
             Assert.Catch<ArgumentNullException>(() => RoleUtils.Merge("c.a.e.t.m", "    "));

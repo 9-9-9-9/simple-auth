@@ -10,13 +10,13 @@ namespace Test.SimpleAuth.Shared.Test.Objects
         [Test]
         public void ToClientRoleModel()
         {
-            var role = new Role
+            var role = new Permission
             {
                 RoleId = "c.a.e.t.m.s",
-                Permission = Permission.Add
+                Verb = Verb.Add
             };
 
-            var crm = role.ToClientRoleModel();
+            var crm = role.ToClientPermissionModel();
             Assert.NotNull(crm);
             Assert.AreEqual("c", crm.Corp);
             Assert.AreEqual("a", crm.App);
@@ -24,22 +24,22 @@ namespace Test.SimpleAuth.Shared.Test.Objects
             Assert.AreEqual("t", crm.Tenant);
             Assert.AreEqual("m", crm.Module);
             Assert.AreEqual("s", crm.SubModules.First());
-            Assert.AreEqual(role.Permission, crm.Permission);
+            Assert.AreEqual(role.Verb, crm.Verb);
         }
 
         [Test]
         public void Cast()
         {
-            var role = new Role
+            var role = new Permission
             {
                 RoleId = "c.a.e.t.m.s",
-                Permission = Permission.Add
+                Verb = Verb.Add
             };
 
             var rm = role.Cast();
             Assert.NotNull(rm);
             Assert.AreEqual(role.RoleId, rm.Role);
-            Assert.AreEqual("1", rm.Permission);
+            Assert.AreEqual("1", rm.Verb);
         }
     }
 
@@ -48,42 +48,42 @@ namespace Test.SimpleAuth.Shared.Test.Objects
         [Test]
         public void DistinctRoles()
         {
-            var arr = ArrS("c.a.e.t.m", Permission.Add, Permission.Edit);
+            var arr = ArrS("c.a.e.t.m", Verb.Add, Verb.Edit);
             Assert.AreEqual(2, arr.Length);
             
             arr = arr.DistinctRoles().ToArray();
             Assert.AreEqual(1, arr.Length);
             Assert.AreEqual("c.a.e.t.m", arr[0].RoleId);
-            Assert.AreEqual(Permission.Add | Permission.Edit, arr[0].Permission);
+            Assert.AreEqual(Verb.Add | Verb.Edit, arr[0].Verb);
             
-            arr = ArrS("c.a.e.t.m", Permission.Add, Permission.Edit).Concat(ArrS("c.a.*.t.m", Permission.Delete)).ToArray();
+            arr = ArrS("c.a.e.t.m", Verb.Add, Verb.Edit).Concat(ArrS("c.a.*.t.m", Verb.Delete)).ToArray();
             Assert.AreEqual(3, arr.Length);
             
             arr = arr.DistinctRoles().ToArray();
             Assert.AreEqual(2, arr.Length);
             
-            arr = ArrS("c.a.*.t.m", Permission.Crud).Concat(ArrS("c.a.e.t.m", Permission.Add, Permission.Edit)).ToArray();
+            arr = ArrS("c.a.*.t.m", Verb.Crud).Concat(ArrS("c.a.e.t.m", Verb.Add, Verb.Edit)).ToArray();
             Assert.AreEqual(3, arr.Length);
             
             arr = arr.DistinctRoles().ToArray();
             Assert.AreEqual(2, arr.Length);
             Assert.AreEqual("c.a.*.t.m", arr[0].RoleId);
-            Assert.AreEqual(Permission.Crud, arr[0].Permission);
+            Assert.AreEqual(Verb.Crud, arr[0].Verb);
             Assert.AreEqual("c.a.e.t.m", arr[1].RoleId);
-            Assert.AreEqual(Permission.Add | Permission.Edit, arr[1].Permission);
+            Assert.AreEqual(Verb.Add | Verb.Edit, arr[1].Verb);
 
-            arr = ArrS("c.a.*.t.m", Permission.None);
+            arr = ArrS("c.a.*.t.m", Verb.None);
             Assert.AreEqual(1, arr.Length);
             
             arr = arr.DistinctRoles().ToArray();
             Assert.AreEqual(0, arr.Length);
 
-            Role[] ArrS(string roleId, params Permission[] permissions)
+            Permission[] ArrS(string roleId, params Verb[] permissions)
             {
-                return permissions.Select(x => new Role
+                return permissions.Select(x => new Permission
                 {
                     RoleId = roleId,
-                    Permission = x
+                    Verb = x
                 }).ToArray();
             }
         }

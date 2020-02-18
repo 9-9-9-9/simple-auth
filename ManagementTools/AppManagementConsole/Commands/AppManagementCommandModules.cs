@@ -11,13 +11,13 @@ namespace AppManagementConsole.Commands
             serviceCollection.RegisterCommand<CreateUserCommand>();
             serviceCollection.RegisterCommand<GetUserCommand>();
             serviceCollection.RegisterCommand<AddRoleCommand>();
-            serviceCollection.RegisterCommand<AddRoleGroupCommand>();
-            serviceCollection.RegisterCommand<LockRoleGroupCommand>();
-            serviceCollection.RegisterCommand<ListingRolesOfGroupCommand>();
-            serviceCollection.RegisterCommand<AddRoleToGroupCommand>();
+            serviceCollection.RegisterCommand<AddPermissionGroupCommand>();
+            serviceCollection.RegisterCommand<LockPermissionGroupCommand>();
+            serviceCollection.RegisterCommand<ListingPermissionsOfGroupCommand>();
+            serviceCollection.RegisterCommand<AddPermissionToGroupCommand>();
             serviceCollection.RegisterCommand<RevokePermissionCommand>();
             serviceCollection.RegisterCommand<RevokeAllPermissionCommand>();
-            serviceCollection.RegisterCommand<AssignUserToRoleGroupCommand>();
+            serviceCollection.RegisterCommand<AssignUserToPermissionGroupCommand>();
         }
     }
 }

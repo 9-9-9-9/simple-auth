@@ -53,6 +53,19 @@ namespace Test.SimpleAuth.Core.Test.Extensions
             Assert.AreEqual(size, src.DropNull().Count());
         }
 
+        [TestCase(1, "a")]
+        [TestCase(0, "    ")]
+        [TestCase(0, "    ", null)]
+        [TestCase(0, " ")]
+        [TestCase(0, " ", null)]
+        [TestCase(1, "b", null)]
+        [TestCase(0)]
+        [TestCase(0, null)]
+        public void DropBlank(int size, params string[] src)
+        {
+            Assert.AreEqual(size, src.DropBlank().Count());
+        }
+
         [Test]
         public void Concat()
         {
