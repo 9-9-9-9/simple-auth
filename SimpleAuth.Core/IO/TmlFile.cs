@@ -81,14 +81,35 @@ namespace SimpleAuth.Core.IO
                 return ChildrenNodes.SingleOrDefault(expression);
             }
 
+            public TmlNode SingleOrDefault(string content, bool ignoreCase = true)
+            {
+                if (ignoreCase)
+                    return SingleOrDefault(x => x.Content?.ToLowerInvariant() == content?.ToLowerInvariant());
+                return SingleOrDefault(x => x.Content == content);
+            }
+
             public TmlNode FirstOrDefault(Func<TmlNode, bool> expression)
             {
                 return ChildrenNodes.FirstOrDefault(expression);
             }
 
+            public TmlNode FirstOrDefault(string content, bool ignoreCase = true)
+            {
+                if (ignoreCase)
+                    return FirstOrDefault(x => x.Content?.ToLowerInvariant() == content?.ToLowerInvariant());
+                return FirstOrDefault(x => x.Content == content);
+            }
+
             public IEnumerable<TmlNode> Where(Func<TmlNode, bool> expression)
             {
                 return ChildrenNodes.Where(expression);
+            }
+
+            public IEnumerable<TmlNode> Where(string content, bool ignoreCase = true)
+            {
+                if (ignoreCase)
+                    return Where(x => x.Content?.ToLowerInvariant() == content?.ToLowerInvariant());
+                return Where(x => x.Content == content);
             }
         }
     }

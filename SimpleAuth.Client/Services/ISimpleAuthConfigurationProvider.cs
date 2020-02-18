@@ -12,7 +12,7 @@ namespace SimpleAuth.Client.Services
         string MasterToken { get; }
         string CorpToken { get; }
         string AppToken { get; set; }
-        string Corp { get; }
+        string Corp { get; set; }
         string App { get; set; }
         string Env { get; }
         string Tenant { get; }
@@ -42,7 +42,13 @@ namespace SimpleAuth.Client.Services
             set => _appToken = value;
         }
 
-        public string Corp => _simpleAuthSettings.Corp;
+        private static string _corp;
+        
+        public string Corp
+        {
+            get => _corp = _corp.Or(_simpleAuthSettings.Corp);
+            set => _corp = value;
+        }
 
         private static string _app;
 
