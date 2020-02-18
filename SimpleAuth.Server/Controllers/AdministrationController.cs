@@ -79,7 +79,7 @@ namespace SimpleAuth.Server.Controllers
                 var actionResult =
                     StatusCodes.Status200OK.WithMessage(GenerateAppTokenContent(currentVersion, true));
 
-                _logger.LogWarning($"Generated read-only token for {RequireCorpToken.Corp}.{app} at current version {currentVersion}");
+                _logger.LogWarning($"Generated read-only token for {corp}.{app} at current version {currentVersion}");
 
                 return actionResult;
             }
