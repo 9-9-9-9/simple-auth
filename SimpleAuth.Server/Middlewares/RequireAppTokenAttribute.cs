@@ -18,6 +18,14 @@ namespace SimpleAuth.Server.Middlewares
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class RequireAppTokenAttribute : BaseActionFilterAttribute
     {
+        private readonly bool _allowReadOnly;
+
+        /// <inheritdoc />
+        public RequireAppTokenAttribute(bool allowReadOnly = false)
+        {
+            _allowReadOnly = allowReadOnly;
+        }
+
         /// <summary>
         /// Do the business
         /// </summary>
@@ -65,15 +73,29 @@ namespace SimpleAuth.Server.Middlewares
                         $"Client using an out dated token version {requestAppHeaders.Version}, current version is {currentTokenVersion}");
                     actionExecutingContext.Result =
                         StatusCodes.Status426UpgradeRequired.WithMessage(
-                            $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {requestAppHeaders.Version}");
+                            $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {requestAppHeaders.Version}"
+                        );
+                    return;
+                }
+
+                if (!_allowReadOnly && requestAppHeaders.ReadOnly)
+                {
+                    logger.LogError(
+                        $"Client using a read-only token version {requestAppHeaders.Version}, corp {requestAppHeaders.Corp}, app {requestAppHeaders.App}");
+                    actionExecutingContext.Result =
+                        StatusCodes.Status426UpgradeRequired.WithMessage(
+                            "Expected Non read-only token"
+                        );
                     return;
                 }
 
                 actionExecutingContext.HttpContext.Items[Constants.Headers.AppPermission] = requestAppHeaders;
                 logger.LogInformation($"Access granted for {nameof(RequestAppHeaders)}");
-                
-                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceCorp, requestAppHeaders.Corp);
-                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceApp, requestAppHeaders.App);
+
+                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceCorp,
+                    requestAppHeaders.Corp);
+                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceApp,
+                    requestAppHeaders.App);
             }
         }
     }

@@ -51,6 +51,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status423Locked)]
         [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
+        [RequireAppToken(true)]
         public async Task<IActionResult> GetUserByGoogleToken([FromBody] LoginByGoogleRequest form)
         {
             if (!ModelState.IsValid)

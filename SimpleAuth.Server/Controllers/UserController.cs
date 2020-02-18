@@ -99,6 +99,7 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [RequireAppToken(true)]
         public async Task<IActionResult> GetUser(string userId)
         {
             return await ProcedureDefaultResponseIfError(() =>
@@ -188,6 +189,7 @@ namespace SimpleAuth.Server.Controllers
         [HttpGet("{userId}/roles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [RequireAppToken(true)]
         public async Task<IActionResult> GetActiveRoles(string userId)
         {
             return await ProcedureDefaultResponseIfError(() =>
@@ -217,6 +219,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [RequireAppToken(true)]
         public async Task<IActionResult> CheckUserPermission(string userId, string roleId, string verb)
         {
             return await ProcedureDefaultResponseIfError(() =>
@@ -251,6 +254,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [RequireAppToken(true)]
         public async Task<IActionResult> GetMissingPermissions(string userId, [FromBody] PermissionModels permissionModels)
         {
             if (!ModelState.IsValid)
@@ -290,6 +294,7 @@ namespace SimpleAuth.Server.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [RequireAppToken(true)]
         public async Task<IActionResult> CheckPass(string userId, [FromBody] string password)
         {
             return await ProcedureDefaultResponseIfError(async () =>
