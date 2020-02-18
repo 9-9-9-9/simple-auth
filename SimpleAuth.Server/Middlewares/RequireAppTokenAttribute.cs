@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using SimpleAuth.Core.Extensions;
+using SimpleAuth.Server.Attributes;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Models;
 using SimpleAuth.Services;
@@ -18,14 +20,6 @@ namespace SimpleAuth.Server.Middlewares
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class RequireAppTokenAttribute : BaseActionFilterAttribute
     {
-        private readonly bool _allowReadOnly;
-
-        /// <inheritdoc />
-        public RequireAppTokenAttribute(bool allowReadOnly = false)
-        {
-            _allowReadOnly = allowReadOnly;
-        }
-
         /// <summary>
         /// Do the business
         /// </summary>
@@ -78,12 +72,16 @@ namespace SimpleAuth.Server.Middlewares
                     return;
                 }
 
-                if (!_allowReadOnly && requestAppHeaders.ReadOnly)
+                var methodInfoOfAction = actionExecutingContext.ActionDescriptor.GetType().GetProperty("MethodInfo")
+                    ?.GetValue(actionExecutingContext.ActionDescriptor) as MethodInfo;
+                var allowReadOnly = methodInfoOfAction?.GetCustomAttribute<AllowReadOnlyAppTokenAttribute>(false) != null;
+                if (!allowReadOnly && requestAppHeaders.ReadOnly)
                 {
                     logger.LogError(
                         $"Client using a read-only token version {requestAppHeaders.Version}, corp {requestAppHeaders.Corp}, app {requestAppHeaders.App}");
                     actionExecutingContext.Result =
-                        StatusCodes.Status426UpgradeRequired.WithMessage(
+                        // TODO replace status code
+                        StatusCodes.Status418ImATeapot.WithMessage(
                             "Expected Non read-only token"
                         );
                     return;
