@@ -123,6 +123,12 @@ namespace PermissionSynchronizer
 
             foreach (var userModel in userModels)
             {
+                $"Un-assigning user {userModel.UserId} from permission groups".Write();
+                await userManagementService.UnAssignUserFromAllGroupsAsync(userModel.UserId);
+            }
+
+            foreach (var userModel in userModels)
+            {
                 try
                 {
                     await userManagementService.AssignUserToGroupsAsync(userModel.UserId,

@@ -25,6 +25,7 @@ namespace SimpleAuth.Services
         Task AssignUserToGroupsAsync(User user, PermissionGroup[] permissionGroups);
         Task UnAssignUserFromGroupsAsync(User user, PermissionGroup[] permissionGroups);
         Task UnAssignUserFromAllGroupsAsync(User user, string corp);
+        Task UnAssignUserFromAllGroupsAsync(User user, string corp, string app);
 
         Task<ICollection<Permission>> GetActiveRolesAsync(string user, string corp, string app, string env = null,
             string tenant = null);
@@ -207,6 +208,39 @@ namespace SimpleAuth.Services
                 return;
 
             var tobeRemoved = lookupUser.PermissionGroupUsers.Where(rg => rg.PermissionGroup.Corp == corp).ToList();
+
+            if (tobeRemoved.IsEmpty())
+                return;
+
+            await Repository.UnAssignUserFromGroups(new Entities.User
+                {
+                    Id = user.Id
+                },
+                tobeRemoved
+                    .Select(x => x.PermissionGroup)
+                    .ToArray()
+            );
+        }
+
+        public async Task UnAssignUserFromAllGroupsAsync(User user, string corp, string app)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
+            if (corp.IsBlank())
+                throw new ArgumentNullException(nameof(corp));
+
+            if (app.IsBlank())
+                throw new ArgumentNullException(nameof(app));
+
+            var lookupUser = Repository.Find(user.Id);
+            if (lookupUser == null)
+                throw new EntityNotExistsException(user.Id);
+
+            if (lookupUser.PermissionGroupUsers.IsEmpty())
+                return;
+
+            var tobeRemoved = lookupUser.PermissionGroupUsers.Where(rg => rg.PermissionGroup.Corp == corp && rg.PermissionGroup.App == app).ToList();
 
             if (tobeRemoved.IsEmpty())
                 return;

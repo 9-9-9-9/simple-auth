@@ -11,6 +11,7 @@ namespace SimpleAuth.Client.Utils
             public static string CheckUserPermission(string userId, string roleId, string permission) => $"api/users/{userId}/roles/{roleId}/{permission}";
             public static string GetMissingPermissions(string userId) => $"api/users/{userId}/roles/_missing";
             public static string AssignUserToPermissionGroups(string userId) => $"api/users/{userId}/permission-groups";
+            public static string UnAssignUserFromAllGroupsAsync(string userId) => $"api/users/{userId}/permission-groups";
             public const string CreateUser = "api/users";
         }
 
