@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.Builder
             return app;
         }
 
-        public static IServiceCollection UseSimpleAuthDefaultServices(this IServiceCollection services,
+        public static IServiceCollection AddDefaultSimpleAuthServices(this IServiceCollection services,
             IConfigurationSection simpleAuthSettingsConfiguration = null)
         {
             if (simpleAuthSettingsConfiguration != null)
@@ -63,14 +63,15 @@ namespace Microsoft.AspNetCore.Builder
             services
                 .RegisterModules<BasicServiceModules>()
                 .RegisterModules<ServiceModules>()
+                .RegisterModules<DependencyInjectionModules>()
                 .UseConfiguredTenantProvider();
             return services;
         }
 
-        public static IServiceCollection UseSimpleAuthDefaultServices(this IServiceCollection services,
+        public static IServiceCollection AddDefaultSimpleAuthServices(this IServiceCollection services,
             IConfigurationRoot configuration = null)
         {
-            services.UseSimpleAuthDefaultServices(configuration?.GetSection(nameof(SimpleAuthSettings)));
+            services.AddDefaultSimpleAuthServices(configuration?.GetSection(nameof(SimpleAuthSettings)));
             return services;
         }
 

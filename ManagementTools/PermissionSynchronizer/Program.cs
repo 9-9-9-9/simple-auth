@@ -108,8 +108,35 @@ namespace PermissionSynchronizer
             CreateUsers(allUserIds);
 
             await AddPermissionToGroupsAsync(groups);
+            await AddUserToGroupsAsync(users);
 
             "Done".Write();
+        }
+
+        #region Assigning
+
+        private static async Task AddUserToGroupsAsync(ICollection<UserModel> userModels)
+        {
+            nameof(AddUserToGroupsAsync).Write();
+
+            var userManagementService = ServiceProvider.GetService<IUserManagementService>();
+
+            foreach (var userModel in userModels)
+            {
+                try
+                {
+                    await userManagementService.AssignUserToGroupsAsync(userModel.UserId,
+                        new ModifyUserPermissionGroupsModel
+                        {
+                            PermissionGroups = userModel.Groups
+                        });
+                }
+                catch (SimpleAuthHttpRequestException e)
+                {
+                    throw new SimpleAuthHttpRequestException(e.HttpStatusCode,
+                        $"Assign user {userModel.UserId} to permission groups");
+                }
+            }
         }
 
         private static async Task AddPermissionToGroupsAsync(ICollection<GroupModel> groupModels)
@@ -141,10 +168,13 @@ namespace PermissionSynchronizer
                 }
                 catch (SimpleAuthHttpRequestException e)
                 {
-                    throw new SimpleAuthHttpRequestException(e.HttpStatusCode, $"Assign permission to group {groupModel.Name}");
+                    throw new SimpleAuthHttpRequestException(e.HttpStatusCode,
+                        $"Assign permission to group {groupModel.Name}");
                 }
             }
         }
+
+        #endregion
 
         #region Entities creatation
 

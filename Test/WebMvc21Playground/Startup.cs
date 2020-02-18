@@ -31,7 +31,7 @@ namespace WebMvc21Playground
             });
             */
             
-            services.UseSimpleAuthDefaultServices(Configuration.GetSection(nameof(SimpleAuthSettings)));
+            services.AddDefaultSimpleAuthServices(Configuration.GetSection(nameof(SimpleAuthSettings)));
 
             services.StorePermissionInClaim();
             
