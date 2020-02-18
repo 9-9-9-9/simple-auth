@@ -26,6 +26,11 @@ namespace SimpleAuth.Core.Extensions
             return source?.Where(x => x != null);
         }
 
+        public static IEnumerable<string> DropBlank(this IEnumerable<string> source)
+        {
+            return source?.Where(x => !x.IsBlank());
+        }
+
         public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T newElement)
         {
             if (newElement is null)
