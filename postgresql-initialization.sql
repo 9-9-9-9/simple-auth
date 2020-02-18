@@ -43,7 +43,7 @@ CREATE TABLE "Users" (
 CREATE TABLE "PermissionRecords" (
     "Id" UUID NOT NULL CONSTRAINT "PK_PermissionRecords" PRIMARY KEY,
     "RoleId" TEXT NOT NULL,
-    "Permission" INTEGER NOT NULL,
+    "Verb" INTEGER NOT NULL,
     "PermissionGroupId" uuid NULL,
     "Env" TEXT NOT NULL,
     "Tenant" TEXT NOT NULL,

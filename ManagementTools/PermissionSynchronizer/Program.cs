@@ -38,10 +38,13 @@ namespace PermissionSynchronizer
         internal static async Task Main(string[] args)
         {
             await Task.CompletedTask;
+            
+            if (!args.IsAny())
+                throw new ArgumentException("Require file as parameter");
 
             var inputFile = args.Single(x => !x.IsBlank());
             if (inputFile.IsBlank() || !File.Exists(inputFile))
-                throw new ArgumentException($"File not found");
+                throw new ArgumentException("File not found");
 
             inputFile.Write();
 
@@ -82,9 +85,9 @@ namespace PermissionSynchronizer
             // DI
             var builder = new ConfigurationBuilder();
             builder
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile("/configmaps/management-tools/appsettings.json", optional: false, reloadOnChange: true);
-            //builder.AddUserSecrets(GetType().Assembly, false);
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("/configmaps/management-tools/appsettings.json", optional: true, reloadOnChange: true);
+            
             var configuration = builder.Build();
 
             IServiceCollection services = new ServiceCollection();
@@ -103,10 +106,14 @@ namespace PermissionSynchronizer
             CreateRoles(allRoleIdsWoCA);
             CreateGroups(allGroupNames);
             CreateUsers(allUserIds);
+            
+            "Done".Write();
         }
 
         private static void CreateRoles(ICollection<string> roleIdsWoCA)
         {
+            nameof(CreateRoles).Write();
+            
             var roleManagementService = ServiceProvider.GetService<IRoleManagementService>();
 
             var clientPermissionModels = roleIdsWoCA.Select(roleIdWoCA =>
@@ -145,6 +152,8 @@ namespace PermissionSynchronizer
 
         private static void CreateGroups(ICollection<string> groups)
         {
+            nameof(CreateGroups).Write();
+            
             var permissionGroupManagementService = ServiceProvider.GetService<IPermissionGroupManagementService>();
 
             var createGroupModels = groups.Select(x => new CreatePermissionGroupModel
@@ -173,6 +182,8 @@ namespace PermissionSynchronizer
 
         private static void CreateUsers(ICollection<string> users)
         {
+            nameof(CreateUsers).Write();
+            
             var userManagementService = ServiceProvider.GetService<IUserManagementService>();
 
             var createUserModels = users.Select(x => new CreateUserModel
