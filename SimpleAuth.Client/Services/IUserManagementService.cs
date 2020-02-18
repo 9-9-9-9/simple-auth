@@ -9,6 +9,7 @@ namespace SimpleAuth.Client.Services
     public interface IUserManagementService
     {
         Task AssignUserToGroupsAsync(string userId, ModifyUserPermissionGroupsModel modifyUserPermissionGroupsModel);
+        Task UnAssignUserFromAllGroupsAsync(string userId);
         Task CreateUserAsync(CreateUserModel createUserModel);
     }
 
@@ -36,6 +37,16 @@ namespace SimpleAuth.Client.Services
                     .Append(EndpointBuilder.User.AssignUserToPermissionGroups(userId))
                     .Method(Constants.HttpMethods.POST),
                 modifyUserPermissionGroupsModel.JsonSerialize()
+            );
+        }
+
+        public Task UnAssignUserFromAllGroupsAsync(string userId)
+        {
+            return _httpService.DoHttpRequestWithoutResponseAsync(
+                true,
+                NewRequest()
+                    .Append(EndpointBuilder.User.UnAssignUserFromAllGroupsAsync(userId))
+                    .Method(Constants.HttpMethods.DELETE)
             );
         }
 

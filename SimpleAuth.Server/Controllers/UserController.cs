@@ -149,6 +149,34 @@ namespace SimpleAuth.Server.Controllers
                 }
             );
         }
+        
+        /// <summary>
+        /// UnAssign user from all groups within specific application
+        /// </summary>
+        /// <param name="userId">The user id which should be revoke permission</param>
+        /// <response code="200">UnAssignment completed successfully</response>
+        /// <response code="404">Target user id not found</response>
+        [HttpDelete, Route("{userId}/permission-groups")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UnAssignUserFromAllGroupsAsync(string userId)
+        {
+            return await ProcedureDefaultResponse(async () =>
+                {
+                    var user = Service.GetUser(userId, RequestAppHeaders.Corp);
+                    if (user == default)
+                        throw new EntityNotExistsException(
+                            $"{userId} at {RequestAppHeaders.App} of {RequestAppHeaders.Corp}");
+                    await Service.UnAssignUserFromAllGroupsAsync(new Shared.Domains.User
+                    {
+                        Id = userId
+                    }, RequestAppHeaders.Corp, RequestAppHeaders.App);
+                    _logger.LogInformation(
+                        $"UnAssign user {userId} to from all groups of corp {RequestAppHeaders.Corp}, app {RequestAppHeaders.App}"
+                    );
+                }
+            );
+        }
 
         /// <summary>
         /// Get the current active roles of an user, but for the current corp and app only, another corp/app are excluded
