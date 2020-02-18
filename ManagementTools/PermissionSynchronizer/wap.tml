@@ -12,7 +12,7 @@ Groups
 	admin
 		d.0.weatherforecast.a 	View
 		d.0.weatherforecast.b 	View
-		d.0.best.a 		View
+		d.0.best.a 		        View
 	user
 		d.0.weatherforecast.a 	View
 		d.0.weatherforecast.b 	View
