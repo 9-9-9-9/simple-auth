@@ -25,6 +25,7 @@ namespace SimpleAuth.Shared
 
             public const string SourceCorp = "src-corp";
             public const string SourceApp = "src-app";
+            public const string FyiReadOnlyToken = "token-is-readonly";
         }
 
         public static class Encryption

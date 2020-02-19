@@ -64,7 +64,8 @@ namespace SimpleAuth.Server.Middlewares
                 if (requestAppHeaders.Version != currentTokenVersion)
                 {
                     logger.LogError(
-                        $"Client using an out dated token version {requestAppHeaders.Version}, current version is {currentTokenVersion}");
+                        $"Client using an out dated token version {requestAppHeaders.Version}, current version is {currentTokenVersion}"
+                    );
                     actionExecutingContext.Result =
                         StatusCodes.Status426UpgradeRequired.WithMessage(
                             $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {requestAppHeaders.Version}"
@@ -74,11 +75,13 @@ namespace SimpleAuth.Server.Middlewares
 
                 var methodInfoOfAction = actionExecutingContext.ActionDescriptor.GetType().GetProperty("MethodInfo")
                     ?.GetValue(actionExecutingContext.ActionDescriptor) as MethodInfo;
-                var allowReadOnly = methodInfoOfAction?.GetCustomAttribute<AllowReadOnlyAppTokenAttribute>(false) != null;
+                var allowReadOnly = methodInfoOfAction?.GetCustomAttribute<AllowReadOnlyAppTokenAttribute>(false) !=
+                                    null;
                 if (!allowReadOnly && requestAppHeaders.ReadOnly)
                 {
                     logger.LogError(
-                        $"Client using a read-only token version {requestAppHeaders.Version}, corp {requestAppHeaders.Corp}, app {requestAppHeaders.App}");
+                        $"Client using a read-only token version {requestAppHeaders.Version}, corp {requestAppHeaders.Corp}, app {requestAppHeaders.App}"
+                    );
                     actionExecutingContext.Result =
                         StatusCodes.Status426UpgradeRequired.WithMessage(
                             "Expected Non read-only token"
@@ -93,6 +96,10 @@ namespace SimpleAuth.Server.Middlewares
                     requestAppHeaders.Corp);
                 actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceApp,
                     requestAppHeaders.App);
+
+                if (requestAppHeaders.ReadOnly)
+                    actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.FyiReadOnlyToken,
+                        "true");
             }
         }
     }
