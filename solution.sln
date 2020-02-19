@@ -69,6 +69,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Extensions.PermissionScanner", "Extensions\SimpleAuth.Extensions.PermissionScanner\SimpleAuth.Extensions.PermissionScanner.csproj", "{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Extensions.PermissionGenerator", "Extensions\SimpleAuth.Extensions.PermissionGenerator\SimpleAuth.Extensions.PermissionGenerator.csproj", "{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -403,6 +405,18 @@ Global
 		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|x64.Build.0 = Release|Any CPU
 		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|x86.ActiveCfg = Release|Any CPU
 		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|x86.Build.0 = Release|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Release|x64.Build.0 = Release|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -430,6 +444,7 @@ Global
 		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE} = {4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}
 		{48EA69C1-A12C-43E4-AE50-7C008459DB4B} = {F97DA732-802E-4C94-800D-AF1E8772E829}
 		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED} = {FB626A95-62E5-4A95-939B-4F9ECA4F6443}
+		{9F123A9C-DDAF-4C42-9DCF-6F67950A5E3B} = {FB626A95-62E5-4A95-939B-4F9ECA4F6443}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B53DD286-B6DE-4EBF-8E02-1081D86E57B1}

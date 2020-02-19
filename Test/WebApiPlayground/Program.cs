@@ -14,6 +14,13 @@ namespace WebApiPlayground
             scanner
                 .AddAssembly(typeof(Program).Assembly)
                 .ScanToFile();
+            
+            
+            var scanner2 = new PermissionGenerator<SaModuleAttribute, SaPermissionAttribute>("test", "wap", "staging", "prod");
+            scanner2
+                .AddAssembly(typeof(Program).Assembly)
+                .ScanToFile();
+            
             CreateHostBuilder(args).Build().Run();
         }
 

@@ -134,11 +134,12 @@ namespace SimpleAuth.Extensions
 
         public void ScanToFile(string fileName = null)
         {
+            if (fileName != null && fileName.IsBlank())
+                throw new ArgumentException(nameof(fileName));
+            
             var outputFileName = fileName ?? $"PermissionScanner-{DateTime.Now:yyyyMMdd:HHmmss}.txt";
-            File.WriteAllText(outputFileName,
-                "# The following permissions contains only modules, submodules and verbs\n");
 
-            var sb = new StringBuilder();
+            var sb = new StringBuilder("# The following permissions contains only modules, submodules and verbs\n");
 
             foreach (var permissionInfo in Scan())
             {
