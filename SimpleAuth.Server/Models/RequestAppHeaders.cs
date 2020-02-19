@@ -24,5 +24,10 @@ namespace SimpleAuth.Server.Models
         /// Version of token
         /// </summary>
         public int Version { get; set; }
+
+        /// <summary>
+        /// Indicate this is just an readonly token
+        /// </summary>
+        public bool ReadOnly { get; set; }
     }
 }

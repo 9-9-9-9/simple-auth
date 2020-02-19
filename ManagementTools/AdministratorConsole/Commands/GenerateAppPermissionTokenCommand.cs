@@ -16,19 +16,23 @@ namespace AdministratorConsole.Commands
 
         protected override IEnumerable<string> GetOthersArgumentsProblems(params string[] args)
         {
-            yield break;
+            var @public = args[2];
+            if (IsCorrectBool(@public))
+                yield break;
+            else
+                yield return "Invalid @public, accepted y/n";
         }
 
-        protected override int[] IdxParametersCanNotBeBlank => new[] {0, 1};
+        protected override int[] IdxParametersCanNotBeBlank => new[] {0, 1, 2};
 
         protected override Task DoMainJob(string[] args)
         {
-            return Print(_administrationService.GenerateAppPermissionTokenAsync(args[0], args[1]));
+            return Print(_administrationService.GenerateAppPermissionTokenAsync(args[0], args[1], ParseBoolean(args[2]) ?? true));
         }
 
         public override string[] GetParametersName()
         {
-            return new[] {"Corp", "App"};
+            return new[] {"Corp", "App", "Public (y/n)"};
         }
     }
 }

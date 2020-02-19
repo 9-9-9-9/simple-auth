@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using SimpleAuth.Core.Extensions;
+using SimpleAuth.Server.Attributes;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Models;
 using SimpleAuth.Services;
@@ -65,15 +67,32 @@ namespace SimpleAuth.Server.Middlewares
                         $"Client using an out dated token version {requestAppHeaders.Version}, current version is {currentTokenVersion}");
                     actionExecutingContext.Result =
                         StatusCodes.Status426UpgradeRequired.WithMessage(
-                            $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {requestAppHeaders.Version}");
+                            $"Mis-match token {nameof(TokenInfo.Version)}, expected {currentTokenVersion} but {requestAppHeaders.Version}"
+                        );
+                    return;
+                }
+
+                var methodInfoOfAction = actionExecutingContext.ActionDescriptor.GetType().GetProperty("MethodInfo")
+                    ?.GetValue(actionExecutingContext.ActionDescriptor) as MethodInfo;
+                var allowReadOnly = methodInfoOfAction?.GetCustomAttribute<AllowReadOnlyAppTokenAttribute>(false) != null;
+                if (!allowReadOnly && requestAppHeaders.ReadOnly)
+                {
+                    logger.LogError(
+                        $"Client using a read-only token version {requestAppHeaders.Version}, corp {requestAppHeaders.Corp}, app {requestAppHeaders.App}");
+                    actionExecutingContext.Result =
+                        StatusCodes.Status426UpgradeRequired.WithMessage(
+                            "Expected Non read-only token"
+                        );
                     return;
                 }
 
                 actionExecutingContext.HttpContext.Items[Constants.Headers.AppPermission] = requestAppHeaders;
                 logger.LogInformation($"Access granted for {nameof(RequestAppHeaders)}");
-                
-                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceCorp, requestAppHeaders.Corp);
-                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceApp, requestAppHeaders.App);
+
+                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceCorp,
+                    requestAppHeaders.Corp);
+                actionExecutingContext.HttpContext.Response.Headers.TryAdd(Constants.Headers.SourceApp,
+                    requestAppHeaders.App);
             }
         }
     }

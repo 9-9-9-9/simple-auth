@@ -57,6 +57,31 @@ namespace ConsoleApps.Shared.Commands
         {
             message.Write();
         }
+
+        protected bool? ParseBoolean(string input)
+        {
+            switch (input?.Trim().ToLowerInvariant())
+            {
+                case "y":
+                case "yes":
+                case "true":
+                case "ok":
+                case "1":
+                    return true;
+                case "n":
+                case "no":
+                case "false":
+                case "0":
+                    return false;
+                default:
+                    return null;
+            }
+        }
+
+        protected bool IsCorrectBool(string input)
+        {
+            return ParseBoolean(input).HasValue;
+        }
     }
 
     public static class CommandExtensions

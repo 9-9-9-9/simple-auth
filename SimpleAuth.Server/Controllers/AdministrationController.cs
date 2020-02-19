@@ -47,13 +47,16 @@ namespace SimpleAuth.Server.Controllers
         /// </summary>
         /// <param name="corp">Target corp to generate token</param>
         /// <param name="app">Target app to generate token, if app does not exists, a newly one with version 1 will be generated</param>
+        /// <param name="public">Query param indicate this is generated for public use, being used by client, those client are restricted to read-only</param>
         /// <returns>A newly created token, with version increased</returns>
         /// <response code="200">Token generated successfully</response>
         /// <response code="400">Specified corp/app is malformed</response>
+        /// <response code="428">Token has to be generated without ReadOnly flag set to false (means public != true)</response>
         [HttpGet("token/{corp}/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GenerateAppPermissionToken(string corp, string app)
+        [ProducesResponseType(StatusCodes.Status428PreconditionRequired)]
+        public async Task<IActionResult> GenerateAppPermissionToken(string corp, string app, [FromQuery] bool @public)
         {
             _logger.LogWarning($"{nameof(GenerateAppPermissionToken)} for application {corp}.{app}");
             
@@ -62,23 +65,51 @@ namespace SimpleAuth.Server.Controllers
             if (!_rolePartsValidationService.IsValidApp(app).IsValid)
                 return StatusCodes.Status400BadRequest.WithMessage(nameof(app));
             
-            var nextTokenVersion = await _tokenInfoService.IncreaseVersionAsync(new TokenInfo
+            if (@public)
             {
-                Corp = corp,
-                App = app
-            });
+                var currentVersion = await _tokenInfoService.GetCurrentVersionAsync(new TokenInfo
+                {
+                    Corp = corp,
+                    App = app
+                }, true);
 
-            var actionResult = StatusCodes.Status201Created.WithMessage(_encryption.Encrypt(new RequestAppHeaders
+                if (currentVersion < 1)
+                    return StatusCodes.Status428PreconditionRequired.WithEmpty();
+
+                var actionResult =
+                    StatusCodes.Status200OK.WithMessage(GenerateAppTokenContent(currentVersion, true));
+
+                _logger.LogWarning($"Generated read-only token for {corp}.{app} at current version {currentVersion}");
+
+                return actionResult;
+            }
+            else
             {
-                Header = Constants.Headers.AppPermission,
-                Corp = corp,
-                App = app,
-                Version = nextTokenVersion
-            }.ToJson()));
-            
-            _logger.LogWarning($"Generated token for {corp}.{app} version {nextTokenVersion}");
+                var nextTokenVersion = await _tokenInfoService.IncreaseVersionAsync(new TokenInfo
+                {
+                    Corp = corp,
+                    App = app
+                });
 
-            return actionResult;
+                var actionResult =
+                    StatusCodes.Status200OK.WithMessage(GenerateAppTokenContent(nextTokenVersion, false));
+
+                _logger.LogWarning($"Generated token for {RequireCorpToken.Corp}.{app} version {nextTokenVersion}");
+
+                return actionResult;
+            }
+
+            string GenerateAppTokenContent(int version, bool isReadOnly)
+            {
+                return _encryption.Encrypt(new RequestAppHeaders
+                {
+                    Header = Constants.Headers.AppPermission,
+                    Corp = corp,
+                    App = app,
+                    Version = version,
+                    ReadOnly = isReadOnly
+                }.ToJson());
+            }
         }
 
         /// <summary>
