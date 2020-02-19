@@ -80,8 +80,7 @@ namespace SimpleAuth.Server.Middlewares
                     logger.LogError(
                         $"Client using a read-only token version {requestAppHeaders.Version}, corp {requestAppHeaders.Corp}, app {requestAppHeaders.App}");
                     actionExecutingContext.Result =
-                        // TODO replace status code
-                        StatusCodes.Status418ImATeapot.WithMessage(
+                        StatusCodes.Status426UpgradeRequired.WithMessage(
                             "Expected Non read-only token"
                         );
                     return;
