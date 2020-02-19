@@ -38,7 +38,7 @@ namespace SimpleAuth.Extensions
             _propVerb = _typeSaPermissionAttr.GetProperty("Verb", BindingFlags.Instance | BindingFlags.Public);
         }
 
-        private readonly ICollection<Assembly> _targetAssemblies = new List<Assembly>();
+        private readonly ICollection<Assembly> _targetAssemblies = new HashSet<Assembly>();
 
         public PermissionScanner<TSaModuleAttribute, TSaPermissionAttribute> AddAssembly(Assembly assembly)
         {
@@ -60,10 +60,14 @@ namespace SimpleAuth.Extensions
         {
             return RoleUtils.Distinct(ScanJob().Select(x => new ClientPermissionModel
             {
+                
+                #region Dummy data to help distinct result
                 Corp = "x",
                 App = "x",
                 Env = "x",
                 Tenant = "x",
+                #endregion
+                
                 Module = x.Module,
                 SubModules = x.SubModules,
                 Verb = x.Verb
