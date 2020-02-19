@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
+      <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

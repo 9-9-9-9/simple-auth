@@ -65,6 +65,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebMvc21Playground", "Test\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermissionSynchronizer", "ManagementTools\PermissionSynchronizer\PermissionSynchronizer.csproj", "{48EA69C1-A12C-43E4-AE50-7C008459DB4B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{FB626A95-62E5-4A95-939B-4F9ECA4F6443}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAuth.Extensions.PermissionScanner", "Extensions\SimpleAuth.Extensions.PermissionScanner\SimpleAuth.Extensions.PermissionScanner.csproj", "{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -387,6 +391,18 @@ Global
 		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|x64.Build.0 = Release|Any CPU
 		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|x86.ActiveCfg = Release|Any CPU
 		{48EA69C1-A12C-43E4-AE50-7C008459DB4B}.Release|x86.Build.0 = Release|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Debug|x64.Build.0 = Debug|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Debug|x86.Build.0 = Debug|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|x64.ActiveCfg = Release|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|x64.Build.0 = Release|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|x86.ActiveCfg = Release|Any CPU
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -413,6 +429,7 @@ Global
 		{14C575B0-7ED5-45C2-B51B-BC7BC5EF8F74} = {88CDF640-EADD-43A7-94FA-21B4D822337A}
 		{0000CED5-F9C5-4A9B-B854-0C9021F26CFE} = {4112ACE6-70F4-4BFD-8493-2A8DCA8E7F6A}
 		{48EA69C1-A12C-43E4-AE50-7C008459DB4B} = {F97DA732-802E-4C94-800D-AF1E8772E829}
+		{130AD6D9-60C2-406E-BD0E-6CF6EBAE91ED} = {FB626A95-62E5-4A95-939B-4F9ECA4F6443}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B53DD286-B6DE-4EBF-8E02-1081D86E57B1}

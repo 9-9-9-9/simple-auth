@@ -10,3 +10,4 @@ bin/
 coverage*
 logs/
 *.nupkg
+PermissionScanner*.txt
