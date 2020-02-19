@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\AspNetCore\SimpleAuth.Client.AspNetCore22\SimpleAuth.Client.AspNetCore22.csproj" />
+      <ProjectReference Include="..\..\Extensions\SimpleAuth.Extensions.PermissionGenerator\SimpleAuth.Extensions.PermissionGenerator.csproj" />
       <ProjectReference Include="..\..\Extensions\SimpleAuth.Extensions.PermissionScanner\SimpleAuth.Extensions.PermissionScanner.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
