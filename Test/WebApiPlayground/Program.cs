@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using SimpleAuth.Client.AspNetCore.Attributes;
+using SimpleAuth.Extensions;
 
 namespace WebApiPlayground
 {
@@ -8,6 +10,10 @@ namespace WebApiPlayground
     {
         public static void Main(string[] args)
         {
+            var scanner = new PermissionScanner<SaModuleAttribute, SaPermissionAttribute>();
+            scanner
+                .AddAssembly(typeof(Program).Assembly)
+                .ScanToFile();
             CreateHostBuilder(args).Build().Run();
         }
 

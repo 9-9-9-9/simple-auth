@@ -113,6 +113,15 @@ namespace WebApiPlayground.Controllers
             return GetSample();
         }
 
+        [HttpGet("3x")]
+        [SaModule("best")]
+        [SaPermission(Verb.View, "a")]
+        [SaPermission(Verb.Edit, "b")]
+        public IEnumerable<WeatherForecast> ForTestingPermissionScanner()
+        {
+            return GetSample();
+        }
+
         private IEnumerable<WeatherForecast> GetSample()
         {
             var rng = new Random();
