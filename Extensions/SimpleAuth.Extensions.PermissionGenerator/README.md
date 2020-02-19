@@ -18,8 +18,15 @@ scanner.Scan(); // returns collection of group with their own permissions
 scanner.ScanToFile(optional file name); // direct printing to a file, default is tml format (to be used to synchronyze using PermissionSynchronyzer tool)
 ```
 
-Sample result exported from Test/WebApiPlayground
+Attributes
+```
+SaModule from SimpleAuth.Client.AspNetCore, module part will be extracted
+SaPermission from SimpleAuth.Client.AspNetCore, Verb and SubModule parts will be extracted. Multiple attributes generate multiple permissions
+SaGroup will be used for grouping Permissions, this name also be used as Permission Group name. Multiple attributes put each permission into every group defined
+SaTenant to specific permission only be generated for specific tenants. No SaTenant defined then tenant value will be wildcard (*). Multiple SaTenant attributes defined will generate permission for each tenant 
+```
 
+Sample result exported from Test/WebApiPlayground
 
 ```
 Users
