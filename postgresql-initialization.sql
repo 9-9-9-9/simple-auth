@@ -13,7 +13,8 @@ CREATE TABLE "PermissionGroups" (
     "Name" TEXT NOT NULL,
     "Locked" BOOL NOT NULL,
     "Corp" TEXT NOT NULL,
-    "App" TEXT NOT NULL
+    "App" TEXT NOT NULL,
+    "Description" TEXT NOT NULL,
 );
 
 CREATE TABLE "Roles" (
