@@ -19,7 +19,7 @@ namespace SimpleAuth.Server.Controllers
     /// <summary>
     /// Reserved Endpoint for serving requests relate to Google, such as sign-in using OAuth token
     /// </summary>
-    [Microsoft.AspNetCore.Components.Route("api/external/_google")]
+    [Route("api/external/_google")]
     [RequireAppToken]
     public class GoogleController : BaseController<IUserService, IUserRepository, User>
     {

@@ -94,7 +94,7 @@ namespace SimpleAuth.Server.Controllers
                 var actionResult =
                     StatusCodes.Status200OK.WithMessage(GenerateAppTokenContent(nextTokenVersion, false));
 
-                _logger.LogWarning($"Generated token for {RequireCorpToken.Corp}.{app} version {nextTokenVersion}");
+                _logger.LogWarning($"Generated token for {corp}.{app} version {nextTokenVersion}");
 
                 return actionResult;
             }
