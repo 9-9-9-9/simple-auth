@@ -89,7 +89,7 @@ namespace SimpleAuth.Server.Controllers
         }
 
         /// <summary>
-        /// Update permission group Name & Description
+        /// Update permission group Name and Description
         /// </summary>
         /// <param name="groupName">Name of the permission group to be updated</param>
         /// <param name="updatePermissionGroupInfoModel">Contains information to be updated, null value fields means not update</param>
