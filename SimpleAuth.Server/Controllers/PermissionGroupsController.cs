@@ -74,17 +74,42 @@ namespace SimpleAuth.Server.Controllers
         /// <summary>
         /// Get specific permission group information
         /// </summary>
-        /// <param name="name">Name of the permission group</param>
+        /// <param name="groupName">Name of the permission group</param>
         /// <returns>Information of the permission group, refer domain model <see cref="Shared.Domains.PermissionGroup"/></returns>
         /// <response code="200">Permission Group information retrieved successfully</response>
         /// <response code="404">Permission Group could not be found</response>
-        [HttpGet("{name}")]
+        [HttpGet("{groupName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetPermissionGroup(string name)
+        public async Task<IActionResult> GetPermissionGroup(string groupName)
         {
             return await ProcedureResponseForLookUp(() =>
-                FindPermissionGroupAsync(name, RequestAppHeaders.Corp, RequestAppHeaders.App)
+                FindPermissionGroupAsync(groupName, RequestAppHeaders.Corp, RequestAppHeaders.App)
+            );
+        }
+
+        /// <summary>
+        /// Update permission group Name and Description
+        /// </summary>
+        /// <param name="groupName">Name of the permission group to be updated</param>
+        /// <param name="updatePermissionGroupInfoModel">Contains information to be updated, null value fields means not update</param>
+        /// <response code="200">Permission Group information retrieved successfully</response>
+        /// <response code="404">Permission Group could not be found</response>
+        [HttpPost("{groupName}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdatePermissionGroupInfo(string groupName, 
+            [FromBody] UpdatePermissionGroupInfoModel updatePermissionGroupInfoModel)
+        {
+            return await ProcedureDefaultResponse(async () =>
+                await Service.UpdateGroupInfoAsync(new Shared.Domains.PermissionGroup
+                {
+                    Name = groupName,
+                }, RequestAppHeaders.Corp, RequestAppHeaders.App, new Shared.Domains.PermissionGroup
+                {
+                    Name = updatePermissionGroupInfoModel.Name.TrimToNull(),
+                    Description = updatePermissionGroupInfoModel.Description.TrimToNull()
+                })
             );
         }
 

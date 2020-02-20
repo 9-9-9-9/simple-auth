@@ -26,6 +26,7 @@ namespace SimpleAuth.Services
         Task DeletePermissionsFromGroupAsync(PermissionGroup permissionGroup, PermissionModel[] permissionModels);
         Task DeleteAllPermissionsFromGroupAsync(PermissionGroup permissionGroup);
         Task DeleteGroupAsync(PermissionGroup permissionGroup);
+        Task UpdateGroupInfoAsync(PermissionGroup targetGroup, string corp, string app, PermissionGroup newInfo);
     }
 
     public class DefaultPermissionGroupService : DomainService<IPermissionGroupRepository, Entities.PermissionGroup>,
@@ -96,10 +97,12 @@ namespace SimpleAuth.Services
             Permission[] initRoles = new Permission[0];
             if (newPermissionGroup.CopyFromPermissionGroups.IsAny())
             {
-                var groupsToCopyFrom = FindByName(newPermissionGroup.CopyFromPermissionGroups, newPermissionGroup.Corp, newPermissionGroup.App)
+                var groupsToCopyFrom = FindByName(newPermissionGroup.CopyFromPermissionGroups, newPermissionGroup.Corp,
+                        newPermissionGroup.App)
                     .ToArray();
                 // ReSharper disable once AssignNullToNotNullAttribute
-                var missingGroups = newPermissionGroup.CopyFromPermissionGroups.Except(groupsToCopyFrom.Select(x => x.Name))
+                var missingGroups = newPermissionGroup.CopyFromPermissionGroups
+                    .Except(groupsToCopyFrom.Select(x => x.Name))
                     .ToArray();
                 if (missingGroups.Any())
                     throw new EntityNotExistsException(missingGroups);
@@ -111,6 +114,7 @@ namespace SimpleAuth.Services
             {
                 Id = Guid.NewGuid(),
                 Name = newPermissionGroup.Name,
+                Description = newPermissionGroup.Description,
                 Corp = newPermissionGroup.Corp,
                 App = newPermissionGroup.App,
                 Locked = false,
@@ -133,7 +137,8 @@ namespace SimpleAuth.Services
             await Repository.UpdateAsync(entity);
         }
 
-        public async Task AddPermissionsToGroupAsync(PermissionGroup permissionGroup, PermissionModel[] permissionModels)
+        public async Task AddPermissionsToGroupAsync(PermissionGroup permissionGroup,
+            PermissionModel[] permissionModels)
         {
             if (permissionGroup == null)
                 throw new ArgumentNullException(nameof(permissionGroup));
@@ -165,7 +170,8 @@ namespace SimpleAuth.Services
             await UpdateRolesAsync(permissionGroup, newRoles);
         }
 
-        public async Task DeletePermissionsFromGroupAsync(PermissionGroup permissionGroup, PermissionModel[] permissionModels)
+        public async Task DeletePermissionsFromGroupAsync(PermissionGroup permissionGroup,
+            PermissionModel[] permissionModels)
         {
             if (permissionGroup == null)
                 throw new ArgumentNullException(nameof(permissionGroup));
@@ -184,7 +190,8 @@ namespace SimpleAuth.Services
             if (crossAppRoleModels.Any())
                 throw new SimpleAuthSecurityException(string.Join(',', crossAppRoleModels.Select(x => x.Role)));
 
-            var domainGroup = await GetGroupByNameAsync(permissionGroup.Name, permissionGroup.Corp, permissionGroup.App);
+            var domainGroup =
+                await GetGroupByNameAsync(permissionGroup.Name, permissionGroup.Corp, permissionGroup.App);
 
             if (domainGroup == default)
                 throw new EntityNotExistsException($"{permissionGroup.Name}");
@@ -210,7 +217,7 @@ namespace SimpleAuth.Services
         {
             if (permissionGroup == null)
                 throw new ArgumentNullException(nameof(permissionGroup));
-            
+
             var domain = await GetGroupByNameAsync(permissionGroup.Name, permissionGroup.Corp, permissionGroup.App);
 
             if (domain == default)
@@ -238,6 +245,23 @@ namespace SimpleAuth.Services
                 throw new EntityNotExistsException(permissionGroup.Name);
 
             await Repository.DeleteAsync(g);
+        }
+
+        public async Task UpdateGroupInfoAsync(PermissionGroup targetGroup, string corp, string app,
+            PermissionGroup newInfo)
+        {
+            var permissionGroup =
+                await Repository.FindSingleAsync(x => x.Name == targetGroup.Name && x.Corp == corp && x.App == app);
+
+            if (permissionGroup == null)
+                throw new EntityNotExistsException(targetGroup.Name);
+
+            if (newInfo.Name != null)
+                permissionGroup.Name = newInfo.Name;
+            if (newInfo.Description != null)
+                permissionGroup.Description = newInfo.Description;
+
+            await Repository.UpdateAsync(permissionGroup);
         }
 
         private async Task UpdateRolesAsync(PermissionGroup permissionGroup, List<PermissionRecord> newRoles)

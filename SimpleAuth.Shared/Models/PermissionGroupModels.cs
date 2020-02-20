@@ -8,12 +8,20 @@ namespace SimpleAuth.Shared.Models
     public class CreatePermissionGroupModel
     {
         public string Name { get; set; }
+        
+        public string Description { get; set; }
 
         [Required] public string Corp { get; set; }
 
         [Required] public string App { get; set; }
 
         public string[] CopyFromPermissionGroups { get; set; }
+    }
+
+    public class UpdatePermissionGroupInfoModel
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
     }
 
     public class PermissionGroupResponseModel
