@@ -73,7 +73,7 @@ namespace SimpleAuth.Client.Services
         {
             return _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
                 NewRequest()
-                    .Append(EndpointBuilder.User.CheckGoogleToken())
+                    .Append(EndpointBuilder.ExternalLoginProvider.CheckGoogleToken)
                     .Method(Constants.HttpMethods.POST),
                 loginByGoogleRequest.JsonSerialize()
             );

@@ -7,12 +7,17 @@ namespace SimpleAuth.Client.Utils
             public static string GetUser(string userId) => $"api/users/{userId}";
             public static string GetActivePermissions(string userId) => $"api/users/{userId}/_permissions";
             public static string CheckPass(string userId) => $"api/users/{userId}/_password";
-            public static string CheckGoogleToken() => $"api/external/_google/_token";
             public static string CheckUserPermission(string userId, string roleId, string permission) => $"api/users/{userId}/_permissions/{roleId}/{permission}";
             public static string GetMissingPermissions(string userId) => $"api/users/{userId}/_permissions/_missing";
             public static string AssignUserToPermissionGroups(string userId) => $"api/users/{userId}/_permission-groups";
             public static string UnAssignUserFromAllGroupsAsync(string userId) => $"api/users/{userId}/_permission-groups";
             public const string CreateUser = "api/users";
+        }
+
+        public static class ExternalLoginProvider
+        {
+            public const string CheckGoogleToken = "api/external/_google/_token";
+            public const string GetPublicGoogleSignInClientId = "api/external/_google/_googleSignInClientId";
         }
 
         public static class Administration
