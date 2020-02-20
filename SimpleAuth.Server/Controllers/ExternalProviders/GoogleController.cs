@@ -19,7 +19,7 @@ namespace SimpleAuth.Server.Controllers
     /// <summary>
     /// Reserved Endpoint for serving requests relate to Google, such as sign-in using OAuth token
     /// </summary>
-    [Microsoft.AspNetCore.Components.Route("api/external/google")]
+    [Microsoft.AspNetCore.Components.Route("api/external/_google")]
     [RequireAppToken]
     public class GoogleController : BaseController<IUserService, IUserRepository, User>
     {
@@ -46,7 +46,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="423">User had been locked in the specified Corp</response>
         /// <response code="412">Cannot Google for verifying token</response>
         /// <response code="406">There are some mis-match/invalidated information from token info that does not fit requirement</response>
-        [HttpPost("token")]
+        [HttpPost("_token")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status423Locked)]

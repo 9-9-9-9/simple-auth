@@ -120,7 +120,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">Assign user to the specific permission groups completed</response>
         /// <response code="400">Request model is invalid</response>
         /// <response code="404">Target user id or permission group not found</response>
-        [HttpPost, Route("{userId}/permission-groups")]
+        [HttpPost, Route("{userId}/_permission-groups")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -158,7 +158,7 @@ namespace SimpleAuth.Server.Controllers
         /// <param name="userId">The user id which should be revoke permission</param>
         /// <response code="200">UnAssignment completed successfully</response>
         /// <response code="404">Target user id not found</response>
-        [HttpDelete, Route("{userId}/permission-groups")]
+        [HttpDelete, Route("{userId}/_permission-groups")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UnAssignUserFromAllGroupsAsync(string userId)
@@ -187,11 +187,11 @@ namespace SimpleAuth.Server.Controllers
         /// <returns>Array of <see cref="SimpleAuth.Shared.Models.PermissionModel"/></returns>
         /// <response code="200">Retrieve information without any problem</response>
         /// <response code="404">User id could not be found</response>
-        [HttpGet("{userId}/roles")]
+        [HttpGet("{userId}/_permissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [AllowReadOnlyAppToken]
-        public async Task<IActionResult> GetActiveRoles(string userId)
+        public async Task<IActionResult> GetActivePermissions(string userId)
         {
             return await ProcedureDefaultResponseIfError(() =>
                 GetBaseResponseUserModelAsync(userId, Service)
@@ -216,7 +216,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">User HAS the required permission</response>
         /// <response code="406">User DOES NOT HAVE the required permission</response>
         /// <response code="404">User is not exists</response>
-        [HttpGet, Route("{userId}/roles/{roleId}/{verb}")]
+        [HttpGet, Route("{userId}/_permissions/{roleId}/{verb}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -251,7 +251,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">User HAS all the required permissions</response>
         /// <response code="406">Any of the permissions user does not have</response>
         /// <response code="404">User is not exists</response>
-        [HttpPost, Route("{userId}/roles/_missing")]
+        [HttpPost, Route("{userId}/_permissions/_missing")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status406NotAcceptable)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -290,7 +290,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="404">User not found</response>
         /// <response code="412">User does not has password, thus can not be checked</response>
         /// <response code="401">Password mis-match</response>
-        [HttpPost("{userId}/password")]
+        [HttpPost("{userId}/_password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
@@ -330,7 +330,7 @@ namespace SimpleAuth.Server.Controllers
         /// <param name="newPassword">Plain text of the new password</param>
         /// <response code="200">Password updated successfully</response>
         /// <response code="400">Password is malformed</response>
-        [HttpPut("{userId}/password")]
+        [HttpPut("{userId}/_password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ChangePass(string userId, [FromBody] string newPassword)
@@ -361,7 +361,7 @@ namespace SimpleAuth.Server.Controllers
         /// </summary>
         /// <param name="userId">User to be locked</param>
         /// <response code="200">Operation completed successfully</response>
-        [HttpPost, Route("{userId}/lock")]
+        [HttpPost, Route("{userId}/_lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> LockUser(string userId)
         {
@@ -390,7 +390,7 @@ namespace SimpleAuth.Server.Controllers
         /// </summary>
         /// <param name="userId">User to be unlocked</param>
         /// <response code="200">Operation completed successfully</response>
-        [HttpDelete, Route("{userId}/lock")]
+        [HttpDelete, Route("{userId}/_lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> UnLockUser(string userId)
         {

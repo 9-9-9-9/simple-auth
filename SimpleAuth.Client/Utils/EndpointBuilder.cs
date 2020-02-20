@@ -5,23 +5,23 @@ namespace SimpleAuth.Client.Utils
         public static class User
         {
             public static string GetUser(string userId) => $"api/users/{userId}";
-            public static string GetActiveRoles(string userId) => $"api/users/{userId}/roles";
-            public static string CheckPass(string userId) => $"api/users/{userId}/password";
-            public static string CheckGoogleToken(string userId) => $"api/users/{userId}/roles";
-            public static string CheckUserPermission(string userId, string roleId, string permission) => $"api/users/{userId}/roles/{roleId}/{permission}";
-            public static string GetMissingPermissions(string userId) => $"api/users/{userId}/roles/_missing";
-            public static string AssignUserToPermissionGroups(string userId) => $"api/users/{userId}/permission-groups";
-            public static string UnAssignUserFromAllGroupsAsync(string userId) => $"api/users/{userId}/permission-groups";
+            public static string GetActivePermissions(string userId) => $"api/users/{userId}/_permissions";
+            public static string CheckPass(string userId) => $"api/users/{userId}/_password";
+            public static string CheckGoogleToken() => $"api/external/_google/_token";
+            public static string CheckUserPermission(string userId, string roleId, string permission) => $"api/users/{userId}/_permissions/{roleId}/{permission}";
+            public static string GetMissingPermissions(string userId) => $"api/users/{userId}/_permissions/_missing";
+            public static string AssignUserToPermissionGroups(string userId) => $"api/users/{userId}/_permission-groups";
+            public static string UnAssignUserFromAllGroupsAsync(string userId) => $"api/users/{userId}/_permission-groups";
             public const string CreateUser = "api/users";
         }
 
         public static class Administration
         {
-            public static string GenerateCorpPermissionToken(string corp) => $"admin/token/{corp}";
-            public static string GenerateAppPermissionToken(string corp, string app) => $"admin/token/{corp}/{app}";
-            public static string GenerateAppPermissionToken(string app) => $"corp/token/{app}";
-            public static string EncryptPlainText() => "admin/encrypt";
-            public static string DecryptData() => "admin/decrypt";
+            public static string GenerateCorpPermissionToken(string corp) => $"api/admin/_token/{corp}";
+            public static string GenerateAppPermissionToken(string corp, string app) => $"api/admin/_token/{corp}/{app}";
+            public static string GenerateAppPermissionToken(string app) => $"api/corp/_token/{app}";
+            public static string EncryptPlainText() => "api/admin/_encrypt";
+            public static string DecryptData() => "api/admin/_decrypt";
         }
 
         public static class RoleManagement

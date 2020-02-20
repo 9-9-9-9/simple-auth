@@ -99,7 +99,7 @@ namespace SimpleAuth.Server.Controllers
         /// <param name="roleId">Id of the role which should be locked</param>
         /// <response code="200">Operation had been completed successfully</response>
         /// <response code="404">Role could not be found</response>
-        [HttpPost, Route("{roleId}/lock")]
+        [HttpPost, Route("{roleId}/_lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> LockRole(string roleId)
@@ -127,7 +127,7 @@ namespace SimpleAuth.Server.Controllers
         /// <param name="roleId">Id of the role which should be unlocked</param>
         /// <response code="200">Operation had been completed successfully</response>
         /// <response code="404">Role could not be found</response>
-        [HttpDelete, Route("{roleId}/lock")]
+        [HttpDelete, Route("{roleId}/_lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateLock(string roleId)

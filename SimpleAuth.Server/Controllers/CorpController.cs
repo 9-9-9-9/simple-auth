@@ -16,7 +16,7 @@ namespace SimpleAuth.Server.Controllers
     /// <summary>
     /// Controller for managing Corp. By providing a corp-level token as `x-corp-token` header, requester can access features
     /// </summary>
-    [Route("corp")]
+    [Route("api/corp")]
     [RequireCorpToken]
     public class CorpController : BaseController
     {
@@ -47,7 +47,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">Token generated successfully</response>
         /// <response code="400">Specified app is malformed</response>
         /// <response code="428">Token has to be generated without ReadOnly flag set to false (means public != true)</response>
-        [HttpGet("token/{app}")]
+        [HttpGet("_token/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status428PreconditionRequired)]

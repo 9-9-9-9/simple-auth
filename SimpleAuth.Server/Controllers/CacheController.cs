@@ -8,7 +8,7 @@ using SimpleAuth.Server.Middlewares;
 
 namespace SimpleAuth.Server.Controllers
 {
-    [Route("cache")]
+    [Route("api/cache")]
     [RequireAppToken]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class CacheController : BaseController
@@ -22,7 +22,7 @@ namespace SimpleAuth.Server.Controllers
             _cachedTokenInfoRepository = cachedTokenInfoRepository;
         }
 
-        [HttpGet, Route("clear/token-info")]
+        [HttpGet, Route("_clear/_token-info")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> ClearCacheTokenInfo()
         {

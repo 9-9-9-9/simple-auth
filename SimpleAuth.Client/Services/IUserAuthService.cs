@@ -45,7 +45,7 @@ namespace SimpleAuth.Client.Services
         {
             return _httpService.DoHttpRequestWithResponseContentAsync<PermissionModel[]>(
                 NewRequest()
-                    .Append(EndpointBuilder.User.GetActiveRoles(userId))
+                    .Append(EndpointBuilder.User.GetActivePermissions(userId))
                     .Method(Constants.HttpMethods.GET)
             );
         }
@@ -73,7 +73,7 @@ namespace SimpleAuth.Client.Services
         {
             return _httpService.DoHttpRequestWithResponseContentAsync<ResponseUserModel>(
                 NewRequest()
-                    .Append(EndpointBuilder.User.CheckGoogleToken(loginByGoogleRequest.Email))
+                    .Append(EndpointBuilder.User.CheckGoogleToken())
                     .Method(Constants.HttpMethods.POST),
                 loginByGoogleRequest.JsonSerialize()
             );

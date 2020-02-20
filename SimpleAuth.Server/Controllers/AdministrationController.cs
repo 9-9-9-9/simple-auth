@@ -18,7 +18,7 @@ namespace SimpleAuth.Server.Controllers
     /// <summary>
     /// Master controller for administration. By providing a master token as `x-master-token` header, requester can access ultimate features
     /// </summary>
-    [Route("admin")]
+    [Route("api/admin")]
     [RequireMasterToken]
     public class AdministrationController : BaseController
     {
@@ -52,7 +52,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">Token generated successfully</response>
         /// <response code="400">Specified corp/app is malformed</response>
         /// <response code="428">Token has to be generated without ReadOnly flag set to false (means public != true)</response>
-        [HttpGet("token/{corp}/{app}")]
+        [HttpGet("_token/{corp}/{app}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status428PreconditionRequired)]
@@ -119,7 +119,7 @@ namespace SimpleAuth.Server.Controllers
         /// <returns>A newly created token, with version increased</returns>
         /// <response code="200">Token generated successfully</response>
         /// <response code="400">Specified corp is malformed</response>
-        [HttpGet("token/{corp}")]
+        [HttpGet("_token/{corp}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GenerateCorpPermissionToken(string corp)
@@ -154,7 +154,7 @@ namespace SimpleAuth.Server.Controllers
         /// <returns>Data which were encrypted by public key, default encryption method using RSA 2048</returns>
         /// <response code="200">Encrypted text from input data</response>
         /// <response code="400">Input data was blank</response>
-        [HttpGet("encrypt")]
+        [HttpGet("_encrypt")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult EncryptPlainText([FromQuery, Required] string data)
@@ -175,7 +175,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">Decrypted value from input data</response>
         /// <response code="400">Input data was blank</response>
         /// <response code="417">Error occured during decryption. Perhaps input data was incorrect, something which was not encrypted using master public/private key pair</response>
-        [HttpGet("decrypt")]
+        [HttpGet("_decrypt")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status417ExpectationFailed)]

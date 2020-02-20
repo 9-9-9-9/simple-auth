@@ -95,7 +95,7 @@ namespace SimpleAuth.Server.Controllers
         /// <returns>All roles, locked roles also included</returns>
         /// <response code="200">Permission Group information retrieved successfully</response>
         /// <response code="404">Permission Group could not be found</response>
-        [HttpGet("{groupName}/permissions")]
+        [HttpGet("{groupName}/_permissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPermissions(string groupName)
@@ -116,7 +116,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">Added without any problem</response>
         /// <response code="404">Permission Group/Role Id could not be found</response>
         /// <response code="400">Request model is malformed</response>
-        [HttpPost, Route("{groupName}/permissions")]
+        [HttpPost, Route("{groupName}/_permissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -143,7 +143,7 @@ namespace SimpleAuth.Server.Controllers
         /// <response code="200">Removed without any problem</response>
         /// <response code="404">Permission Group/Role Id could not be found</response>
         /// <response code="400">Either of query parameters are malformed</response>
-        [HttpDelete, Route("{groupName}/permissions")]
+        [HttpDelete, Route("{groupName}/_permissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -214,7 +214,7 @@ namespace SimpleAuth.Server.Controllers
         /// <param name="groupName">Name of the permission group which should be locked</param>
         /// <response code="200">Operation had been completed successfully</response>
         /// <response code="404">Permission group could not be found</response>
-        [HttpPost("{groupName}/lock")]
+        [HttpPost("{groupName}/_lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> LockPermissionGroup(string groupName)
@@ -240,7 +240,7 @@ namespace SimpleAuth.Server.Controllers
         /// <param name="groupName">Name of the permission group which should be unlocked</param>
         /// <response code="200">Operation had been completed successfully</response>
         /// <response code="404">Permission Group could not be found</response>
-        [HttpDelete("{groupName}/lock")]
+        [HttpDelete("{groupName}/_lock")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UnlockPermissionGroup(string groupName)
