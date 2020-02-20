@@ -38,6 +38,12 @@ namespace SimpleAuth.Shared
             public const int KeySize = 2048;
         }
 
+        public static class Public
+        {
+            public const string Section = "SA:Public";
+            public const string GoogleSignInClientId = "GoogleSignInClientId";
+        }
+
         public static class Identity
         {
             public const string Issuer = "SA";

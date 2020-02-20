@@ -4,13 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SimpleAuth.Core.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Server.Attributes;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Middlewares;
+using SimpleAuth.Server.Models;
 using SimpleAuth.Server.Services;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;
+using SimpleAuth.Shared;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 
@@ -25,16 +28,19 @@ namespace SimpleAuth.Server.Controllers
     {
         private readonly IGoogleService _googleService;
         private readonly ILogger<UserController> _logger;
+        private readonly string _googleSignInClientId;
 
         /// <summary>
         /// DI constructor
         /// </summary>
         public GoogleController(IServiceProvider serviceProvider,
-            IGoogleService googleService) : base(
+            IGoogleService googleService,
+            PublicConstants publicConstants) : base(
             serviceProvider)
         {
             _googleService = googleService;
             _logger = serviceProvider.ResolveLogger<UserController>();
+            _googleSignInClientId = publicConstants.GoogleSignInClientId;
         }
 
         /// <summary>
@@ -93,6 +99,21 @@ namespace SimpleAuth.Server.Controllers
 
                 return StatusCodes.Status200OK.WithJson(model);
             });
+        }
+
+        /// <summary>
+        /// Return a public Google SignIn Client Id, which clients can be used to OAuth without register their own client id
+        /// </summary>
+        /// <returns>Google SignIn Client Id</returns>
+        /// <response code="412">Missing configuration in appsettings.json, section 'SA:Public:GoogleSignInClientId'</response>
+        [HttpGet("_googleSignInClientId")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status412PreconditionFailed)]
+        public IActionResult GetPublicGoogleSignInClientId()
+        {
+            if (_googleSignInClientId.IsBlank())
+                return StatusCodes.Status412PreconditionFailed.WithMessage($"Missing configuration in appsettings.json, section '{Constants.Public.Section}:{Constants.Public.GoogleSignInClientId}'");
+            return Ok(_googleSignInClientId);
         }
     }
 }

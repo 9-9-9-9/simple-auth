@@ -39,6 +39,12 @@ namespace SimpleAuthServer
                 PublicKey = secretSection[Constants.Encryption.PublicKeyName],
                 PrivateKey = secretSection[Constants.Encryption.PrivateKeyName]
             });
+            
+            var publicSection = Configuration.GetSection(Constants.Public.Section);
+            services.AddSingleton(new PublicConstants
+            {
+                GoogleSignInClientId = publicSection[Constants.Public.GoogleSignInClientId]
+            });
 
             services.AddSingleton(new SecretConstants(secretSection[Constants.Encryption.MasterTokenKey]));
 
