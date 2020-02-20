@@ -46,7 +46,7 @@ namespace DummyTmlGenerator
             if (GenerateForEnvironments.Length == 0 || GenerateForEnvironments.Any(x => x.IsBlank()))
                 throw new ArgumentException(nameof(GenerateForEnvironments));
 
-            var users = RandomManyText(NumberOfUsers).ToList();
+            var users = RandomManyText(NumberOfUsers, 6).ToList();
             var groups = RandomManyText(NumberOfPermissionGroups).ToList();
             var roleIds = RandomRoleIds(NumberOfRoleIds).ToList();
 
@@ -113,8 +113,8 @@ namespace DummyTmlGenerator
                     var noOfSubModules = Rad.Next(0, 5);
                     var model = new ClientPermissionModel
                     {
-                        Corp = Corp,
-                        App = App,
+                        Corp = "x",
+                        App = "x",
                         Env = null,
                         Tenant = "0",
                         Module = RandomText(noOfChar),
@@ -128,7 +128,7 @@ namespace DummyTmlGenerator
                             continue;
                         atLeastOneReturned = true;
                         model.Env = env;
-                        yield return model.ComputeId();
+                        yield return model.ComputeId().Substring(4);
                     }
                 }
             }

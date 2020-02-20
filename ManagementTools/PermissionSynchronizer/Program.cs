@@ -187,6 +187,7 @@ namespace PermissionSynchronizer
         private static void CreateRoles(ICollection<string> roleIdsWoCA)
         {
             nameof(CreateRoles).Write();
+            var cnt = roleIdsWoCA.Count;
 
             var roleManagementService = ServiceProvider.GetService<IRoleManagementService>();
 
@@ -203,6 +204,7 @@ namespace PermissionSynchronizer
             {
                 try
                 {
+                    $"{cnt--} role Ids remaining".Write();
                     await roleManagementService.AddRoleAsync(new CreateRoleModel
                     {
                         Corp = cpm.Corp,
@@ -227,6 +229,7 @@ namespace PermissionSynchronizer
         private static void CreateGroups(ICollection<string> groups)
         {
             nameof(CreateGroups).Write();
+            var cnt = groups.Count;
 
             var permissionGroupManagementService = ServiceProvider.GetService<IPermissionGroupManagementService>();
 
@@ -241,6 +244,7 @@ namespace PermissionSynchronizer
             {
                 try
                 {
+                    $"{cnt--} groups remaining".Write();
                     await permissionGroupManagementService.AddPermissionGroupAsync(cgm);
                     return (true, HttpStatusCode.Created, cgm.Name);
                 }
