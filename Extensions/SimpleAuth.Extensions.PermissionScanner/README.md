@@ -1,4 +1,4 @@
-### This an extension for SimpleAuth.Client.AspNetCore
+### This is an extension for SimpleAuth.Client.AspNetCore
 #### which helps exporting permissions from assembly
 by scanning classes and method within provided assemblies
 
