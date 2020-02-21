@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SimpleAuth.Shared.DependencyInjection;
 
-namespace Test.SimpleAuth.Core.Test.DependencyInjection
+namespace Test.SimpleAuth.Shared.Test.DependencyInjection
 {
     public class TestRegistrableModules
     {

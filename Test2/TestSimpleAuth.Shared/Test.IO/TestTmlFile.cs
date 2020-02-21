@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using SimpleAuth.Shared.IO;
 
-namespace Test.SimpleAuth.Core.Test.IO
+namespace Test.SimpleAuth.Shared.Test.IO
 {
     public class TestTmlFile
     {
