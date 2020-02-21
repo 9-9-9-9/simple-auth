@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ConsoleApps.Shared.Commands;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Models;
 
 namespace AppManagementConsole.Commands

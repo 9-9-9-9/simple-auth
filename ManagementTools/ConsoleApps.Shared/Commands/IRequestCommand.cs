@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 
 namespace ConsoleApps.Shared.Commands
 {

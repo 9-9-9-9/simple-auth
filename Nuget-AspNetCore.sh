@@ -39,7 +39,6 @@ release_aspnetcore() {
 	dotnet pack AspNetCore/SimpleAuth.Client.$PROJECT/SimpleAuth.Client.$PROJECT.csproj -c Release -p:PackageVersion=$VERSION -o .
 	dotnet pack SimpleAuth.Client/SimpleAuth.Client.csproj -c Release -p:PackageVersion=$VERSION -o .
 	dotnet pack SimpleAuth.Shared/SimpleAuth.Shared.csproj -c Release -p:PackageVersion=$VERSION -o .
-	dotnet pack SimpleAuth.Core/SimpleAuth.Core.csproj -c Release -p:PackageVersion=$VERSION -o .
 
 	dotnet nuget push SimpleAuth.Client.AspNetCore.$VERSION.nupkg -k $NUGET_KEY -s $NUGET_ORG
 	if [ $? -ne 0 ]
@@ -59,13 +58,6 @@ release_aspnetcore() {
 	if [ $? -ne 0 ]
 	then
 	    echo 'Failure pushing package SimpleAuth.Shared to nuget server'
-	    exit 2
-	fi
-
-	dotnet nuget push SimpleAuth.Core.$VERSION.nupkg -k $NUGET_KEY -s $NUGET_ORG
-	if [ $? -ne 0 ]
-	then
-	    echo 'Failure pushing package SimpleAuth.Core to nuget server'
 	    exit 2
 	fi
 

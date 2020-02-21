@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace SimpleAuth.Core.Utils
+namespace SimpleAuth.Shared.Utils
 {
     public static class EncryptionUtils
     {

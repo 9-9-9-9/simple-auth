@@ -8,7 +8,7 @@ using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Models;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Exceptions;
 
 namespace SimpleAuth.Client.AspNetCore.Middlewares

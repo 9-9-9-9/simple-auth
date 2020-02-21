@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ConsoleApps.Shared.Commands;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 
 namespace AppManagementConsole.Commands
 {

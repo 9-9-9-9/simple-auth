@@ -4,7 +4,7 @@ using AppManagementConsole.Commands;
 using ConsoleApps.Shared;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 
 namespace AppManagementConsole
 {

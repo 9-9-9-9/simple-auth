@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleAuth.Core.Extensions
+namespace SimpleAuth.Shared.Extensions
 {
     public static class CollectionGenericExtensions
     {

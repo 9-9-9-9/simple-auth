@@ -23,7 +23,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\DatabasesImplementation\SimpleAuth.Postgres\SimpleAuth.Postgres.csproj" />
-        <ProjectReference Include="..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
         <ProjectReference Include="..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
     </ItemGroup>
 

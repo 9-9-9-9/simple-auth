@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using SimpleAuth.Client.AspNetCore.Models;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Utils;

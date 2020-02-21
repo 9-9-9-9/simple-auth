@@ -4,7 +4,7 @@ using ConsoleApps.Shared;
 using CorpManagementConsole.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 
 namespace CorpManagementConsole
 {

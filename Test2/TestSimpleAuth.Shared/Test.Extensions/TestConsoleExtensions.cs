@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 
-namespace Test.SimpleAuth.Core.Test.Extensions
+namespace Test.SimpleAuth.Shared.Test.Extensions
 {
     public class TestConsoleExtensions
     {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SimpleAuth.Core.Utils;
+using SimpleAuth.Shared.Utils;
 using SimpleAuth.Services;
 using SimpleAuth.Shared;
 using Test.Shared;

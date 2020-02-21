@@ -9,7 +9,6 @@
       <ProjectReference Include="..\..\Extensions\SimpleAuth.Extensions.PermissionGenerator\SimpleAuth.Extensions.PermissionGenerator.csproj" />
       <ProjectReference Include="..\..\Extensions\SimpleAuth.Extensions.PermissionScanner\SimpleAuth.Extensions.PermissionScanner.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
-      <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
       <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
     </ItemGroup>
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Moq;
 using Moq.Contrib.HttpClient;
 using NUnit.Framework;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Server.Services;
 using SimpleAuth.Services;
 using SimpleAuth.Shared.Domains;

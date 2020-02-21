@@ -6,12 +6,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19249.1" />
-      <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19249.1"/>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0"/>
     </ItemGroup>
 
 </Project>

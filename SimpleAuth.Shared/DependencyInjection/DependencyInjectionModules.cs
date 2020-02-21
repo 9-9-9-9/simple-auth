@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SimpleAuth.Core.DependencyInjection
+namespace SimpleAuth.Shared.DependencyInjection
 {
     public class DependencyInjectionModules : RegistrableModules
     {
