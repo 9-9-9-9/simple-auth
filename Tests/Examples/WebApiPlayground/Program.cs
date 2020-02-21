@@ -10,18 +10,12 @@ namespace WebApiPlayground
     {
         public static void Main(string[] args)
         {
-            var scanner = new PermissionScanner<SaModuleAttribute, SaPermissionAttribute>();
-            scanner
-                .AddAssembly(typeof(Program).Assembly)
-                .ScanToFile();
-
-
-            var scanner2 = new PermissionGenerator<SaModuleAttribute, SaPermissionAttribute>(
+            var scanner = new PermissionGenerator<SaModuleAttribute, SaPermissionAttribute>(
                 "test",
                 "wap",
                 "staging", "prod"
             );
-            scanner2
+            scanner
                 .AddAssembly(typeof(Program).Assembly)
                 .ScanToFile();
 
