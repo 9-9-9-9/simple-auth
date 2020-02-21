@@ -4,14 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using SimpleAuth.Shared.Extensions;
-using SimpleAuth.Extensions.PermissionGenerator.Attributes;
+using SimpleAuth.Client.Extensions.PermissionGenerator.Attributes;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Models;
-using SimpleAuth.Shared.Utils;
 
-namespace SimpleAuth.Extensions
+namespace SimpleAuth.Client.Extensions
 {
     public class PermissionGenerator<TSaModuleAttribute, TSaPermissionAttribute> : IDisposable
         where TSaModuleAttribute : Attribute

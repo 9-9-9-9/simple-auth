@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Models;
-using SimpleAuth.Extensions.PermissionGenerator.Attributes;
+using SimpleAuth.Client.Extensions.PermissionGenerator.Attributes;
 using SimpleAuth.Shared.Enums;
 
 namespace WebApiPlayground.Controllers
