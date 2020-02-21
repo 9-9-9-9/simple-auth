@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using NUnit.Framework;
-using SimpleAuth.Core.Utils;
+using SimpleAuth.Shared.Utils;
 
 namespace Test.SimpleAuth.Core.Utils
 {

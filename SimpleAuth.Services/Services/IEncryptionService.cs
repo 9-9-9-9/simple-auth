@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using SimpleAuth.Core.Utils;
+using SimpleAuth.Shared.Utils;
 
 namespace SimpleAuth.Services
 {

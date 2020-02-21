@@ -5,7 +5,7 @@ using SimpleAuth.Client.AspNetCore.Middlewares;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMethodReturnValue.Global

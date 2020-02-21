@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;

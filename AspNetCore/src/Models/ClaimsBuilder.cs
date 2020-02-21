@@ -9,7 +9,7 @@ using SimpleAuth.Client.AspNetCore.Attributes;
 using SimpleAuth.Client.AspNetCore.Services;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
 

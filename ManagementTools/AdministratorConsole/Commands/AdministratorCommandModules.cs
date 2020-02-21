@@ -1,6 +1,6 @@
 ﻿using ConsoleApps.Shared.Commands;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 
 namespace AdministratorConsole.Commands
 {

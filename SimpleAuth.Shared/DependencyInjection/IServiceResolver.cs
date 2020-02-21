@@ -1,6 +1,6 @@
 using System;
 
-namespace SimpleAuth.Core.DependencyInjection
+namespace SimpleAuth.Shared.DependencyInjection
 {
     public interface IServiceResolver
     {

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 
 namespace Test.SimpleAuth.Shared.Mock.Repositories
 {

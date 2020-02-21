@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Server.Models;
 using SimpleAuth.Services;
 using SimpleAuth.Shared.Exceptions;

@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using ConsoleApps.Shared.Commands;
-using SimpleAuth.Core.Utils;
+using SimpleAuth.Shared.Utils;
 
 namespace AdministratorConsole.Commands
 {

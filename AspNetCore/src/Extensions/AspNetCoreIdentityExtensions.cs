@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using SimpleAuth.Client.Models;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 using SimpleAuth.Shared.Models;
 
 namespace Microsoft.AspNetCore.Identity

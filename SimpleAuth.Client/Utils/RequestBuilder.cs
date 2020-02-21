@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Specialized;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared;
 
 namespace SimpleAuth.Client.Utils

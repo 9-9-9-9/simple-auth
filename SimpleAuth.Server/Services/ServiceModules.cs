@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 #pragma warning disable 1591
 
 namespace SimpleAuth.Server.Services

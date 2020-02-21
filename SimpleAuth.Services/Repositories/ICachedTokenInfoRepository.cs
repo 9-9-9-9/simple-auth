@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Services.Entities;
 
 namespace SimpleAuth.Repositories

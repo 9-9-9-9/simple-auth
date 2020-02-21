@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 
 namespace SimpleAuth.Repositories
 {

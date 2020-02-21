@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ConsoleApps.Shared.Commands;
-using SimpleAuth.Core.Utils;
+using SimpleAuth.Shared.Utils;
 using SimpleAuth.Shared;
 
 namespace AdministratorConsole.Commands

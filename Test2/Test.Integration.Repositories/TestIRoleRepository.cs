@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services.Entities;
 using SimpleAuth.Shared;

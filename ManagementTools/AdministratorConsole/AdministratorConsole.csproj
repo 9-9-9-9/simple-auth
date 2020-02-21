@@ -7,7 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\SimpleAuth.Client\SimpleAuth.Client.csproj" />
-    <ProjectReference Include="..\..\SimpleAuth.Core\SimpleAuth.Core.csproj" />
     <ProjectReference Include="..\..\SimpleAuth.Shared\SimpleAuth.Shared.csproj" />
     <ProjectReference Include="..\ConsoleApps.Shared\ConsoleApps.Shared.csproj" />
   </ItemGroup>

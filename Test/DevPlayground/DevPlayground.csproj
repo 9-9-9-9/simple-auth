@@ -5,8 +5,4 @@
         <TargetFramework>netcoreapp3.0</TargetFramework>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\SimpleAuth.Services\SimpleAuth.Services.csproj" />
-    </ItemGroup>
-
 </Project>

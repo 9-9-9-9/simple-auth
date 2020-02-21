@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 
 namespace Test.SimpleAuth.Core.Test.Extensions
 {

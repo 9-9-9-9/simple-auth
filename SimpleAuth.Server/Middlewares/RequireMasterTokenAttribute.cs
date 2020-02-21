@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Server.Extensions;
 using SimpleAuth.Server.Models;
 using SimpleAuth.Services;

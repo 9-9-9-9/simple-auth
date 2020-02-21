@@ -1,6 +1,6 @@
 using System;
 
-namespace SimpleAuth.Core.Extensions
+namespace SimpleAuth.Shared.Extensions
 {
     public static class ValueExtensions
     {

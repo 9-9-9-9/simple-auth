@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 
 namespace ConsoleApps.Shared
 {

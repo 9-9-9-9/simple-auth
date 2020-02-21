@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 using SimpleAuth.InMemoryDb.Services;
 
 namespace SimpleAuth.InMemoryDb

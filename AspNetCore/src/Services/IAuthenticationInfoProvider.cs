@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using SimpleAuth.Client.Models;
 using SimpleAuth.Client.Services;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Exceptions;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;

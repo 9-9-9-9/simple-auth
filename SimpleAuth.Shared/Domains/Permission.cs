@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Enums;
 using SimpleAuth.Shared.Models;
 using SimpleAuth.Shared.Utils;

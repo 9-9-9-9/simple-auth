@@ -3,8 +3,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using SimpleAuth.Client.AspNetCore.Services;
-using SimpleAuth.Core.DependencyInjection;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.DependencyInjection;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Models;
 
 namespace SimpleAuth.Client.Models

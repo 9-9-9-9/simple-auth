@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Moq.Language.Flow;
 using NUnit.Framework;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Repositories;
 using SimpleAuth.Services;
 using SimpleAuth.Services.Entities;

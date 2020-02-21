@@ -1,15 +1,22 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using SimpleAuth.Core.DependencyInjection;
+using SimpleAuth.Shared.DependencyInjection;
 
 namespace Test.SimpleAuth.Core.Test.DependencyInjection
 {
-    public class TestRegistrableModules : BaseTestClass
+    public class TestRegistrableModules
     {
-        protected override void RegisteredServices(IServiceCollection serviceCollection)
+        protected IServiceProvider Prepare()
+        {
+            var services = new ServiceCollection();
+            RegisteredServices(services);
+            return services.BuildServiceProvider();
+        }
+        
+        protected void RegisteredServices(IServiceCollection serviceCollection)
         {
             serviceCollection.RegisterModules<MyRegistrableModels>();
-            base.RegisteredServices(serviceCollection);
         }
 
         [Test]

@@ -10,7 +10,7 @@ using System.Web;
 using SimpleAuth.Client.Exceptions;
 using SimpleAuth.Client.InternalExtensions;
 using SimpleAuth.Client.Utils;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared;
 using SimpleAuth.Shared.Exceptions;
 

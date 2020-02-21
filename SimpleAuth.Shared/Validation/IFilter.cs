@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 using SimpleAuth.Shared.Domains;
 using SimpleAuth.Shared.Models;
 using ValidationResult = SimpleAuth.Shared.Models.ValidationResult;

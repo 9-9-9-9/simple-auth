@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using SimpleAuth.Core.Extensions;
+using SimpleAuth.Shared.Extensions;
 
 namespace SimpleAuth.Shared.Exceptions
 {
