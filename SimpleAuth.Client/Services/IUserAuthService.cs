@@ -37,8 +37,7 @@ namespace SimpleAuth.Client.Services
         {
             return base.NewRequest()
                 .WithAppToken()
-                .WithFilterEnv()
-                .WithFilterTenant();
+                .WithFilterEnv();
         }
 
         public Task<PermissionModel[]> GetActiveRolesAsync(string userId)
