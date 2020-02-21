@@ -15,7 +15,7 @@ echo "Perform testing Services|Shared the 2 project made the core value of this 
 
 dotnet restore
 dotnet build
-minicover instrument --workdir . --assemblies "Test2/**/bin/**/*.dll" --sources "SimpleAuth.Services/**/*.cs" --sources "SimpleAuth.Shared/**/*.cs" --exclude-sources "SimpleAuth.Shared/Exceptions/*.cs"
+minicover instrument --workdir . --assemblies "Tests/UnitTests/**/bin/**/*.dll" --sources "SimpleAuth.Services/**/*.cs" --sources "SimpleAuth.Shared/**/*.cs" --exclude-sources "SimpleAuth.Services/Repositories/*.cs" --exclude-sources "SimpleAuth.Shared/Exceptions/*.cs"
 minicover reset
 dotnet test --no-build
 minicover uninstrument --workdir ./
