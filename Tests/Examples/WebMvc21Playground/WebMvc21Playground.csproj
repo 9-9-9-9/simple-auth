@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\AspNetCore\SimpleAuth.Client.AspNetCore21\SimpleAuth.Client.AspNetCore21.csproj" />
+    <ProjectReference Include="..\..\..\AspNetCore\SimpleAuth.Client.AspNetCore21\SimpleAuth.Client.AspNetCore21.csproj" />
   </ItemGroup>
 
 </Project>

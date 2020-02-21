@@ -5,19 +5,18 @@
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>Test.SimpleAuth.Server</RootNamespace>
+        <RootNamespace>Test.SimpleAuth.Services</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Moq.Contrib.HttpClient" Version="1.2.0" />
         <PackageReference Include="nunit" Version="3.12.0" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\SimpleAuth.Server\SimpleAuth.Server.csproj" />
-      <ProjectReference Include="..\Test.Shared\Test.Shared.csproj" />
+      <ProjectReference Include="..\..\..\SimpleAuth.Services\SimpleAuth.Services.csproj" />
+      <ProjectReference Include="..\..\Test.Shared\Test.Shared.csproj" />
     </ItemGroup>
 
 </Project>

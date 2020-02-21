@@ -31,9 +31,9 @@ echo "COVER_PRJ_SRC=$COVER_PRJ_SRC"
 
 dotnet restore
 dotnet build
-minicover instrument --workdir . --assemblies "Test2/$TEST_PRJ_NAME/bin/**/$COVER_PRJ_SRC.dll" --sources "$COVER_PRJ_SRC/**/*.cs" $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14}
+minicover instrument --workdir . --assemblies "Tests/IntegrationTests/$TEST_PRJ_NAME/bin/**/$COVER_PRJ_SRC.dll" --sources "$COVER_PRJ_SRC/**/*.cs" $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14}
 minicover reset
-dotnet test --no-build "Test2/$TEST_PRJ_NAME/$TEST_PRJ_NAME.csproj"
+dotnet test --no-build "Tests/IntegrationTests/$TEST_PRJ_NAME/$TEST_PRJ_NAME.csproj"
 minicover uninstrument --workdir ./
 minicover htmlreport --workdir ./ --threshold 90
 minicover report --workdir ./ --threshold 90
