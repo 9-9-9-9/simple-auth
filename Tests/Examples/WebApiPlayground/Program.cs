@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using SimpleAuth.Client.AspNetCore.Attributes;
-using SimpleAuth.Extensions;
+using SimpleAuth.Client.Extensions;
 
 namespace WebApiPlayground
 {
